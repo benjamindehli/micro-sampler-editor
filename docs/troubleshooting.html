@@ -81,17 +81,17 @@
   <h2 id="tips">Gotchas worth knowing</h2>
   <div class="note warn">
     <b class="label">RAM vs. SAVED</b>
-    <p>Edits and uploads go to the device's <strong>current bank, which is RAM</strong> — they're lost on
-      power-off or bank-switch. To keep them: do a <strong>WRITE</strong> on the device, or restore to a user
+    <p>Edits and uploads go to the device's <strong>current bank, which is RAM</strong>. They're lost on
+      power-off or bank-switch. To keep them, do a <strong>WRITE</strong> on the device, or restore to a user
       bank from the editor. <strong>Back up your bank</strong> (Utility → BACKUP) before bulk operations, and
       never disconnect mid-transfer. More in <a href="concepts#persistence">RAM vs saved</a>.</p>
   </div>
   <ul>
-    <li><strong>One USB owner at a time</strong> — close other MIDI applications (and Korg's editor) while the
-      bridge is running; only one program can hold the device.</li>
+    <li><strong>One USB owner at a time.</strong> Close other MIDI applications (and Korg's editor) while the
+      bridge is running. Only one program can hold the device.</li>
     <li><strong>Pattern playback</strong> needs <code>GLOBAL → MIDI CLK = AUTO</code> on the device.</li>
-    <li><strong>Remote sampling &amp; record</strong> give no feedback in the editor — watch the device screen.</li>
-    <li><strong>Panel edits</strong> only transmit while the device is on its sample-edit page; press
+    <li><strong>Remote sampling &amp; record</strong> give no feedback in the editor, so watch the device screen.</li>
+    <li><strong>Panel edits</strong> only transmit while the device is on its sample-edit page. Press
       <strong>RECEIVE</strong> (or refocus the window) to re-sync after fiddling with the hardware.</li>
   </ul>
 
@@ -103,12 +103,12 @@
             <strong>Retry</strong> in the panel first (the bridge also retries, including a USB reset, on its
             own). Only power-cycle the device if it keeps failing.</td></tr>
     <tr><td>"BRIDGE OFFLINE"</td>
-        <td>The local bridge isn't running — open the app (menu bar ♪ → Open Editor), or start the
-            classic launcher (or <code>sudo python3 native-tools/bridge.py</code>); the page reconnects
+        <td>The local bridge isn't running. Open the app (menu bar ♪ → Open Editor), or start the
+            classic launcher (or <code>sudo python3 native-tools/bridge.py</code>). The page reconnects
             by itself.</td></tr>
     <tr><td>macOS won't open the launcher ("unidentified developer")</td>
         <td>Only the classic ZIP's launcher scripts are unsigned (the <a href="getting-started#download">
-            desktop apps</a> are signed and notarized — no approval dance). Approve the launcher once:
+            desktop apps</a> are signed and notarized, with no approval dance). Approve the launcher once:
             right-click (Control-click) → <strong>Open</strong> → <strong>Open</strong>. On newer macOS
             without that option, double-click once, then <strong>System Settings → Privacy &amp;
             Security → Open Anyway</strong>. See <a href="getting-started#macos">Getting started</a>
@@ -126,15 +126,15 @@
         <td>Tick <strong>MIDI IN</strong> on the Samples view and approve the browser's Web MIDI prompt. Web
             MIDI needs Chrome, Edge or Firefox (not Safari).</td></tr>
     <tr><td>Uploaded sample sounds wrong</td>
-        <td>The device plays 16-bit audio at fixed rates; the editor resamples automatically — re-upload if you
+        <td>The device plays 16-bit audio at fixed rates, and the editor resamples automatically. Re-upload if you
             changed the source file.</td></tr>
     <tr><td>USB seems stuck after many reconnects</td>
-        <td>Power-cycle the microSAMPLER — heavy connect/disconnect churn can wedge its USB firmware, which only
+        <td>Power-cycle the microSAMPLER. Heavy connect/disconnect churn can wedge its USB firmware, which only
             a power-cycle fully resets.</td></tr>
     <tr><td>macOS app won't reopen, launches slowly, or lingers in the background</td>
         <td>Update to <strong>v1.15.1 or later</strong>, which fixes several app lifecycle issues (instant
             launch, clean quit, reliable reopen). After updating the Editor app it refreshes its background
-            helper on the next launch; if it shows a one-time error right after an update, quit and reopen it.</td></tr>
+            helper on the next launch. If it shows a one-time error right after an update, quit and reopen it.</td></tr>
   </table>
 
   <h2 id="faq">FAQ</h2>
@@ -145,11 +145,11 @@
   <h3>Why does it need administrator rights (sudo)?</h3>
   <p>Your operating system's MIDI driver normally owns the device's USB interface, so taking it over needs
     elevated rights. The macOS Editor app handles this with a background service you approve once (no
-    typed password); the classic launchers ask for <code>sudo</code> each start. The Library app and
+    typed password). The classic launchers ask for <code>sudo</code> each start. The Library app and
     library mode never touch USB, so they need no elevation at all.</p>
 
   <h3>Do my edits save automatically?</h3>
-  <p>No — edits go to the <a href="concepts#persistence">current bank, which is RAM</a>. WRITE to a user
+  <p>No. Edits go to the <a href="concepts#persistence">current bank, which is RAM</a>. WRITE to a user
     bank on the device, or restore a backup into a user bank from the Utility view, to keep them across power
     cycles. Back up before bulk changes.</p>
 
@@ -159,13 +159,13 @@
     a <code>--mock</code> mode for exploring the interface.</p>
 
   <h3>Can I run it alongside my DAW?</h3>
-  <p>Not at the same time — the device can only have one USB owner, and its sample/pattern transfers aren't
+  <p>Not at the same time. The device can only have one USB owner, and its sample/pattern transfers aren't
     ordinary MIDI. Close the DAW (and any other MIDI software) while the bridge is running, and close the
     bridge before using the microSAMPLER as a USB-MIDI device in your DAW.</p>
 
   <h3>Will it work on Windows?</h3>
   <p>It's experimental and untested there. libusb can't open the device until its USB driver is switched to
-    WinUSB with <a href="https://zadig.akeo.ie/">Zadig</a> — see <a href="getting-started#windows">Getting
+    WinUSB with <a href="https://zadig.akeo.ie/">Zadig</a>. See <a href="getting-started#windows">Getting
     started</a>.</p>
 
   <h3>Is my data safe?</h3>
@@ -186,7 +186,7 @@
       <a href="https://github.com/benjamindehli/microsampler-editor-librarian/releases">Releases &amp; changelog ↗</a>
     </nav>
     <a class="logo-link" href="https://www.dehlimusikk.no/" target="_blank" rel="noopener" title="Visit Dehli Musikk"><img class="logo" src="assets/logo.svg" alt="Dehli Musikk"></a>
-    <p>microSAMPLER Editor / Librarian — an independent, unofficial project by <a href="https://www.dehlimusikk.no/" target="_blank" rel="noopener">Dehli Musikk</a>.
+    <p>microSAMPLER Editor / Librarian is an independent, unofficial project by <a href="https://www.dehlimusikk.no/" target="_blank" rel="noopener">Dehli Musikk</a>.
       microSAMPLER and Korg are trademarks of Korg Inc. Licensed under the GNU GPL v3.</p>
   </footer>
 </main>
