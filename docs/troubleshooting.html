@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Korg microSAMPLER editor — troubleshooting &amp; FAQ</title>
+<title>Korg microSAMPLER editor: troubleshooting &amp; FAQ</title>
 <meta name="description" content="Fixes for connection and USB issues on the Korg microSAMPLER editor, the MIDI-clock setting, persistence, macOS Gatekeeper, and common questions answered.">
 <link rel="canonical" href="https://benjamindehli.github.io/microsampler-editor-librarian/troubleshooting">
 <meta name="robots" content="index, follow">
@@ -13,13 +13,13 @@
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="microSAMPLER Editor / Librarian">
-<meta property="og:title" content="Korg microSAMPLER editor — troubleshooting &amp; FAQ">
+<meta property="og:title" content="Korg microSAMPLER editor: troubleshooting &amp; FAQ">
 <meta property="og:description" content="Connection and USB issues, the MIDI-clock setting, persistence, and common questions answered.">
 <meta property="og:url" content="https://benjamindehli.github.io/microsampler-editor-librarian/troubleshooting">
 <meta property="og:image" content="https://benjamindehli.github.io/microsampler-editor-librarian/assets/og/troubleshooting.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="microSAMPLER Editor / Librarian — Troubleshooting & FAQ">
+<meta property="og:image:alt" content="microSAMPLER Editor / Librarian: Troubleshooting & FAQ">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://benjamindehli.github.io/microsampler-editor-librarian/assets/og/troubleshooting.jpg">
 <link rel="preload" href="assets/fonts/chakra-petch-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -30,13 +30,13 @@
 { "@context": "https://schema.org", "@type": "FAQPage",
   "mainEntity": [
     { "@type": "Question", "name": "Why does it need administrator rights (sudo)?",
-      "acceptedAnswer": { "@type": "Answer", "text": "The operating system's MIDI driver owns the device's USB interface, so claiming it needs elevated rights. The macOS Editor app handles this with a background service approved once in System Settings; the classic launchers ask for sudo each start. The Library app never touches USB and needs no elevation." } },
-    { "@type": "Question", "name": "Pattern playback does nothing — why?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Your operating system's MIDI driver normally owns the device's USB interface, so taking it over needs elevated rights. The macOS Editor app handles this with a background service you approve once (no typed password). The classic launchers ask for sudo each start. The Library app and library mode never touch USB, so they need no elevation at all." } },
+    { "@type": "Question", "name": "Why does pattern playback do nothing?",
       "acceptedAnswer": { "@type": "Answer", "text": "The microSAMPLER's sequencer advances on incoming MIDI clock. Set GLOBAL > MIDI CLK = AUTO (or EXT MIDI) on the device so it follows the editor's transport." } },
     { "@type": "Question", "name": "Do my edits save automatically?",
-      "acceptedAnswer": { "@type": "Answer", "text": "No. Edits go to the device's current bank, which is RAM, and are lost on power-off or bank switch. WRITE to a user bank on the device, or restore a backup into a user bank, to keep them." } },
+      "acceptedAnswer": { "@type": "Answer", "text": "No. Edits go to the current bank, which is RAM. WRITE to a user bank on the device, or restore a backup into a user bank from the Utility view, to keep them across power cycles. Back up before bulk changes." } },
     { "@type": "Question", "name": "Can I use it without a microSAMPLER?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes — run the bridge in library mode to open bank backups and extract their samples (WAV) and patterns (MIDI) with no hardware connected. There is also a mock mode for exploring the interface." } }
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Library mode opens bank backups (Korg .msmpl_bank files or this app's ZIPs) and extracts their samples as WAVs and patterns as MIDI, with no hardware. There is also a --mock mode for exploring the interface." } }
   ] }
 </script>
 <script type="application/ld+json">
