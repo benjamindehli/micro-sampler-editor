@@ -1,0 +1,15 @@
+WEBVTT
+
+NOTE Captions for the silent demo loop. Each cue names the view on screen.
+
+00:00.000 --> 00:02.000
+Samples view: the 36-pad grid with waveform editing and an on-screen keyboard.
+
+00:02.000 --> 00:04.000
+Effect view: an effect type selected with its full parameter grid.
+
+00:04.000 --> 00:06.000
+Patterns view: pattern cards with piano-roll previews.
+
+00:06.000 --> 00:08.000
+Utility view: full bank backup and restore.
