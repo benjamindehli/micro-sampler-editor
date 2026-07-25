@@ -1,0 +1,13 @@
+{
+    "charset": "utf-8",
+    "insert_final_newline": true,
+    "trailingComma": "none",
+    "tabWidth": 4,
+    "semi": true,
+    "singleQuote": false,
+    "useTabs": false,
+    "endOfLine": "lf",
+    "printWidth": 150,
+    "indent_style": "space",
+    "singleAttributePerLine": false
+}
