@@ -1,196 +1,294 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Korg microSAMPLER editor: troubleshooting &amp; FAQ</title>
-<meta name="description" content="Fixes for connection and USB issues on the Korg microSAMPLER editor, the MIDI-clock setting, persistence, macOS Gatekeeper, and common questions answered.">
-<link rel="canonical" href="https://benjamindehli.github.io/microsampler-editor-librarian/troubleshooting">
-<meta name="robots" content="index, follow">
-<meta name="theme-color" content="#0b0b0d">
-<link rel="icon" type="image/svg+xml" href="assets/appicon.svg">
-<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
-<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-<meta property="og:type" content="article">
-<meta property="og:site_name" content="microSAMPLER Editor / Librarian">
-<meta property="og:title" content="Korg microSAMPLER editor: troubleshooting &amp; FAQ">
-<meta property="og:description" content="Connection and USB issues, the MIDI-clock setting, persistence, and common questions answered.">
-<meta property="og:url" content="https://benjamindehli.github.io/microsampler-editor-librarian/troubleshooting">
-<meta property="og:image" content="https://benjamindehli.github.io/microsampler-editor-librarian/assets/og/troubleshooting.jpg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="microSAMPLER Editor / Librarian: Troubleshooting & FAQ">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://benjamindehli.github.io/microsampler-editor-librarian/assets/og/troubleshooting.jpg">
-<link rel="preload" href="assets/fonts/chakra-petch-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="assets/fonts/chakra-petch-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="css/docs.css">
-<script src="docs.js" defer></script>
-<script type="application/ld+json">
-{ "@context": "https://schema.org", "@type": "FAQPage",
-  "mainEntity": [
-    { "@type": "Question", "name": "Why does it need administrator rights (sudo)?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Your operating system's MIDI driver normally owns the device's USB interface, so taking it over needs elevated rights. The macOS Editor app handles this with a background service you approve once (no typed password). The classic launchers ask for sudo each start. The Library app and library mode never touch USB, so they need no elevation at all." } },
-    { "@type": "Question", "name": "Why does pattern playback do nothing?",
-      "acceptedAnswer": { "@type": "Answer", "text": "The microSAMPLER's sequencer advances on incoming MIDI clock. Set GLOBAL > MIDI CLK = AUTO (or EXT MIDI) on the device so it follows the editor's transport." } },
-    { "@type": "Question", "name": "Do my edits save automatically?",
-      "acceptedAnswer": { "@type": "Answer", "text": "No. Edits go to the current bank, which is RAM. WRITE to a user bank on the device, or restore a backup into a user bank from the Utility view, to keep them across power cycles. Back up before bulk changes." } },
-    { "@type": "Question", "name": "Can I use it without a microSAMPLER?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Library mode opens bank backups (Korg .msmpl_bank files or this app's ZIPs) and extracts their samples as WAVs and patterns as MIDI, with no hardware. There is also a --mock mode for exploring the interface." } }
-  ] }
-</script>
-<script type="application/ld+json">
-{ "@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
-  {"@type":"ListItem","position":1,"name":"Home","item":"https://benjamindehli.github.io/microsampler-editor-librarian/"},
-  {"@type":"ListItem","position":2,"name":"Troubleshooting","item":"https://benjamindehli.github.io/microsampler-editor-librarian/troubleshooting"}]}
-</script>
-</head>
-<body>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Korg microSAMPLER editor: troubleshooting &amp; FAQ</title>
+        <meta
+            name="description"
+            content="Fixes for connection and USB issues on the Korg microSAMPLER editor, the MIDI-clock setting, persistence, macOS Gatekeeper, and common questions answered."
+        />
+        <link rel="canonical" href="https://benjamindehli.github.io/microsampler-editor-librarian/troubleshooting" />
+        <meta name="robots" content="index, follow" />
+        <meta name="theme-color" content="#0b0b0d" />
+        <link rel="icon" type="image/svg+xml" href="assets/appicon.svg" />
+        <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
+        <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+        <meta property="og:type" content="article" />
+        <meta property="og:site_name" content="microSAMPLER Editor / Librarian" />
+        <meta property="og:title" content="Korg microSAMPLER editor: troubleshooting &amp; FAQ" />
+        <meta property="og:description" content="Connection and USB issues, the MIDI-clock setting, persistence, and common questions answered." />
+        <meta property="og:url" content="https://benjamindehli.github.io/microsampler-editor-librarian/troubleshooting" />
+        <meta property="og:image" content="https://benjamindehli.github.io/microsampler-editor-librarian/assets/og/troubleshooting.jpg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="microSAMPLER Editor / Librarian: Troubleshooting & FAQ" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content="https://benjamindehli.github.io/microsampler-editor-librarian/assets/og/troubleshooting.jpg" />
+        <link rel="preload" href="assets/fonts/chakra-petch-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin />
+        <link rel="preload" href="assets/fonts/chakra-petch-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin />
+        <link rel="stylesheet" href="css/docs.css" />
+        <script src="docs.js" defer></script>
+        <script type="application/ld+json">
+            {
+                "@context": "https://schema.org",
+                "@type": "FAQPage",
+                "mainEntity": [
+                    {
+                        "@type": "Question",
+                        "name": "Why does it need administrator rights (sudo)?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Your operating system's MIDI driver normally owns the device's USB interface, so taking it over needs elevated rights. The macOS Editor app handles this with a background service you approve once (no typed password). The classic launchers ask for sudo each start. The Library app and library mode never touch USB, so they need no elevation at all."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Why does pattern playback do nothing?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "The microSAMPLER's sequencer advances on incoming MIDI clock. Set GLOBAL > MIDI CLK = AUTO (or EXT MIDI) on the device so it follows the editor's transport."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Do my edits save automatically?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "No. Edits go to the current bank, which is RAM. WRITE to a user bank on the device, or restore a backup into a user bank from the Utility view, to keep them across power cycles. Back up before bulk changes."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Can I use it without a microSAMPLER?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Yes. Library mode opens bank backups (Korg .msmpl_bank files or this app's ZIPs) and extracts their samples as WAVs and patterns as MIDI, with no hardware. There is also a --mock mode for exploring the interface."
+                        }
+                    }
+                ]
+            }
+        </script>
+        <script type="application/ld+json">
+            {
+                "@context": "https://schema.org",
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://benjamindehli.github.io/microsampler-editor-librarian/" },
+                    {
+                        "@type": "ListItem",
+                        "position": 2,
+                        "name": "Troubleshooting",
+                        "item": "https://benjamindehli.github.io/microsampler-editor-librarian/troubleshooting"
+                    }
+                ]
+            }
+        </script>
+    </head>
+    <body>
+        <header class="topnav" id="top">
+            <a class="brand" href="./">
+                <img src="assets/logo.svg" alt="Dehli Musikk" />
+                <b>microSAMPLER <span>Editor / Librarian</span></b>
+            </a>
+            <button class="menu-btn" aria-label="Toggle menu">MENU</button>
+            <nav>
+                <a href="./">Home</a>
+                <a href="getting-started">Getting started</a>
+                <a href="guide">Guide</a>
+                <a href="concepts">Concepts</a>
+                <a href="troubleshooting" class="active">Troubleshooting</a>
+                <a class="gh" href="https://github.com/benjamindehli/microsampler-editor-librarian" target="_blank" rel="noopener">GitHub ↗</a>
+            </nav>
+        </header>
 
-<header class="topnav" id="top">
-  <a class="brand" href="./">
-    <img src="assets/logo.svg" alt="Dehli Musikk">
-    <b>microSAMPLER <span>Editor / Librarian</span></b>
-  </a>
-  <button class="menu-btn" aria-label="Toggle menu">MENU</button>
-  <nav>
-    <a href="./">Home</a>
-    <a href="getting-started">Getting started</a>
-    <a href="guide">Guide</a>
-    <a href="concepts">Concepts</a>
-    <a href="troubleshooting" class="active">Troubleshooting</a>
-    <a class="gh" href="https://github.com/benjamindehli/microsampler-editor-librarian" target="_blank" rel="noopener">GitHub ↗</a>
-  </nav>
-</header>
+        <main class="content">
+            <div class="page-head">
+                <h1>Troubleshooting &amp; FAQ</h1>
+                <p>Common issues and fixes, the gotchas worth knowing, and answers to frequent questions.</p>
+            </div>
 
-<main class="content">
-  <div class="page-head">
-    <h1>Troubleshooting &amp; FAQ</h1>
-    <p>Common issues and fixes, the gotchas worth knowing, and answers to frequent questions.</p>
-  </div>
+            <nav class="toc" aria-label="On this page">
+                <b>On this page</b>
+                <ul>
+                    <li><a href="#tips">Gotchas worth knowing</a></li>
+                    <li><a href="#fixes">Troubleshooting</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                </ul>
+            </nav>
 
-  <nav class="toc" aria-label="On this page">
-    <b>On this page</b>
-    <ul>
-      <li><a href="#tips">Gotchas worth knowing</a></li>
-      <li><a href="#fixes">Troubleshooting</a></li>
-      <li><a href="#faq">FAQ</a></li>
-    </ul>
-  </nav>
+            <h2 id="tips">Gotchas worth knowing</h2>
+            <div class="note warn">
+                <b class="label">RAM vs. SAVED</b>
+                <p>
+                    Edits and uploads go to the device's <strong>current bank, which is RAM</strong>. They're lost on power-off or bank-switch. To
+                    keep them, do a <strong>WRITE</strong> on the device, or restore to a user bank from the editor.
+                    <strong>Back up your bank</strong> (Utility → BACKUP) before bulk operations, and never disconnect mid-transfer. More in
+                    <a href="concepts#persistence">RAM vs saved</a>.
+                </p>
+            </div>
+            <ul>
+                <li>
+                    <strong>One USB owner at a time.</strong> Close other MIDI applications (and Korg's editor) while the bridge is running. Only one
+                    program can hold the device.
+                </li>
+                <li><strong>Pattern playback</strong> needs <code>GLOBAL → MIDI CLK = AUTO</code> on the device.</li>
+                <li><strong>Remote sampling &amp; record</strong> give no feedback in the editor, so watch the device screen.</li>
+                <li>
+                    <strong>Panel edits</strong> only transmit while the device is on its sample-edit page. Press <strong>RECEIVE</strong> (or refocus
+                    the window) to re-sync after fiddling with the hardware.
+                </li>
+            </ul>
 
-  <h2 id="tips">Gotchas worth knowing</h2>
-  <div class="note warn">
-    <b class="label">RAM vs. SAVED</b>
-    <p>Edits and uploads go to the device's <strong>current bank, which is RAM</strong>. They're lost on
-      power-off or bank-switch. To keep them, do a <strong>WRITE</strong> on the device, or restore to a user
-      bank from the editor. <strong>Back up your bank</strong> (Utility → BACKUP) before bulk operations, and
-      never disconnect mid-transfer. More in <a href="concepts#persistence">RAM vs saved</a>.</p>
-  </div>
-  <ul>
-    <li><strong>One USB owner at a time.</strong> Close other MIDI applications (and Korg's editor) while the
-      bridge is running. Only one program can hold the device.</li>
-    <li><strong>Pattern playback</strong> needs <code>GLOBAL → MIDI CLK = AUTO</code> on the device.</li>
-    <li><strong>Remote sampling &amp; record</strong> give no feedback in the editor, so watch the device screen.</li>
-    <li><strong>Panel edits</strong> only transmit while the device is on its sample-edit page. Press
-      <strong>RECEIVE</strong> (or refocus the window) to re-sync after fiddling with the hardware.</li>
-  </ul>
+            <h2 id="fixes">Troubleshooting</h2>
+            <table>
+                <tr>
+                    <th scope="col">Symptom</th>
+                    <th scope="col">Fix</th>
+                </tr>
+                <tr>
+                    <td>"microSAMPLER not responding" / "no inquiry reply"</td>
+                    <td>
+                        Usually a brief hiccup while claiming the USB connection, not a real fault. Click <strong>Retry</strong> in the panel first
+                        (the bridge also retries, including a USB reset, on its own). Only power-cycle the device if it keeps failing.
+                    </td>
+                </tr>
+                <tr>
+                    <td>"BRIDGE OFFLINE"</td>
+                    <td>
+                        The local bridge isn't running. Open the app (menu bar ♪ → Open Editor), or start the classic launcher (or
+                        <code>sudo python3 native-tools/bridge.py</code>). The page reconnects by itself.
+                    </td>
+                </tr>
+                <tr>
+                    <td>macOS won't open the launcher ("unidentified developer")</td>
+                    <td>
+                        Only the classic ZIP's launcher scripts are unsigned (the <a href="getting-started#download"> desktop apps</a> are signed and
+                        notarized, with no approval dance). Approve the launcher once: right-click (Control-click) → <strong>Open</strong> →
+                        <strong>Open</strong>. On newer macOS without that option, double-click once, then
+                        <strong>System Settings → Privacy &amp; Security → Open Anyway</strong>. See
+                        <a href="getting-started#macos">Getting started</a> for the Terminal alternative.
+                    </td>
+                </tr>
+                <tr>
+                    <td>Device not found / permission error</td>
+                    <td>
+                        Run with administrator rights (the launcher does this), check the cable, and close any other MIDI app holding the device. On
+                        Windows, switch the driver to WinUSB with <a href="https://zadig.akeo.ie/">Zadig</a>.
+                    </td>
+                </tr>
+                <tr>
+                    <td>Edits made on the device don't show in the app</td>
+                    <td>
+                        The microSAMPLER only transmits panel edits while it's on its sample-edit page. Press <strong>RECEIVE</strong> (or just
+                        refocus the window) to re-read the bank.
+                    </td>
+                </tr>
+                <tr>
+                    <td>Pattern play does nothing</td>
+                    <td>Set <code>GLOBAL → MIDI CLK = AUTO</code> (or EXT MIDI) on the device.</td>
+                </tr>
+                <tr>
+                    <td>A connected MIDI keyboard doesn't play</td>
+                    <td>
+                        Tick <strong>MIDI IN</strong> on the Samples view and approve the browser's Web MIDI prompt. Web MIDI needs Chrome, Edge or
+                        Firefox (not Safari).
+                    </td>
+                </tr>
+                <tr>
+                    <td>Uploaded sample sounds wrong</td>
+                    <td>
+                        The device plays 16-bit audio at fixed rates, and the editor resamples automatically. Re-upload if you changed the source
+                        file.
+                    </td>
+                </tr>
+                <tr>
+                    <td>USB seems stuck after many reconnects</td>
+                    <td>
+                        Power-cycle the microSAMPLER. Heavy connect/disconnect churn can wedge its USB firmware, which only a power-cycle fully
+                        resets.
+                    </td>
+                </tr>
+                <tr>
+                    <td>macOS app won't reopen, launches slowly, or lingers in the background</td>
+                    <td>
+                        Update to <strong>v1.15.1 or later</strong>, which fixes several app lifecycle issues (instant launch, clean quit, reliable
+                        reopen). After updating the Editor app it refreshes its background helper on the next launch. If it shows a one-time error
+                        right after an update, quit and reopen it.
+                    </td>
+                </tr>
+            </table>
 
-  <h2 id="fixes">Troubleshooting</h2>
-  <table>
-    <tr><th scope="col">Symptom</th><th scope="col">Fix</th></tr>
-    <tr><td>"microSAMPLER not responding" / "no inquiry reply"</td>
-        <td>Usually a brief hiccup while claiming the USB connection, not a real fault. Click
-            <strong>Retry</strong> in the panel first (the bridge also retries, including a USB reset, on its
-            own). Only power-cycle the device if it keeps failing.</td></tr>
-    <tr><td>"BRIDGE OFFLINE"</td>
-        <td>The local bridge isn't running. Open the app (menu bar ♪ → Open Editor), or start the
-            classic launcher (or <code>sudo python3 native-tools/bridge.py</code>). The page reconnects
-            by itself.</td></tr>
-    <tr><td>macOS won't open the launcher ("unidentified developer")</td>
-        <td>Only the classic ZIP's launcher scripts are unsigned (the <a href="getting-started#download">
-            desktop apps</a> are signed and notarized, with no approval dance). Approve the launcher once:
-            right-click (Control-click) → <strong>Open</strong> → <strong>Open</strong>. On newer macOS
-            without that option, double-click once, then <strong>System Settings → Privacy &amp;
-            Security → Open Anyway</strong>. See <a href="getting-started#macos">Getting started</a>
-            for the Terminal alternative.</td></tr>
-    <tr><td>Device not found / permission error</td>
-        <td>Run with administrator rights (the launcher does this), check the cable, and close any other MIDI
-            app holding the device. On Windows, switch the driver to WinUSB with
-            <a href="https://zadig.akeo.ie/">Zadig</a>.</td></tr>
-    <tr><td>Edits made on the device don't show in the app</td>
-        <td>The microSAMPLER only transmits panel edits while it's on its sample-edit page. Press
-            <strong>RECEIVE</strong> (or just refocus the window) to re-read the bank.</td></tr>
-    <tr><td>Pattern play does nothing</td>
-        <td>Set <code>GLOBAL → MIDI CLK = AUTO</code> (or EXT MIDI) on the device.</td></tr>
-    <tr><td>A connected MIDI keyboard doesn't play</td>
-        <td>Tick <strong>MIDI IN</strong> on the Samples view and approve the browser's Web MIDI prompt. Web
-            MIDI needs Chrome, Edge or Firefox (not Safari).</td></tr>
-    <tr><td>Uploaded sample sounds wrong</td>
-        <td>The device plays 16-bit audio at fixed rates, and the editor resamples automatically. Re-upload if you
-            changed the source file.</td></tr>
-    <tr><td>USB seems stuck after many reconnects</td>
-        <td>Power-cycle the microSAMPLER. Heavy connect/disconnect churn can wedge its USB firmware, which only
-            a power-cycle fully resets.</td></tr>
-    <tr><td>macOS app won't reopen, launches slowly, or lingers in the background</td>
-        <td>Update to <strong>v1.15.1 or later</strong>, which fixes several app lifecycle issues (instant
-            launch, clean quit, reliable reopen). After updating the Editor app it refreshes its background
-            helper on the next launch. If it shows a one-time error right after an update, quit and reopen it.</td></tr>
-  </table>
+            <h2 id="faq">FAQ</h2>
+            <h3>Is this made or supported by Korg?</h3>
+            <p>
+                No. It's an independent, unofficial project, not affiliated with or endorsed by Korg, and it contains no Korg software or firmware.
+                The protocol was reverse-engineered for interoperability with hardware you own.
+            </p>
 
-  <h2 id="faq">FAQ</h2>
-  <h3>Is this made or supported by Korg?</h3>
-  <p>No. It's an independent, unofficial project, not affiliated with or endorsed by Korg, and it contains no
-    Korg software or firmware. The protocol was reverse-engineered for interoperability with hardware you own.</p>
+            <h3>Why does it need administrator rights (sudo)?</h3>
+            <p>
+                Your operating system's MIDI driver normally owns the device's USB interface, so taking it over needs elevated rights. The macOS
+                Editor app handles this with a background service you approve once (no typed password). The classic launchers ask for
+                <code>sudo</code> each start. The Library app and library mode never touch USB, so they need no elevation at all.
+            </p>
 
-  <h3>Why does it need administrator rights (sudo)?</h3>
-  <p>Your operating system's MIDI driver normally owns the device's USB interface, so taking it over needs
-    elevated rights. The macOS Editor app handles this with a background service you approve once (no
-    typed password). The classic launchers ask for <code>sudo</code> each start. The Library app and
-    library mode never touch USB, so they need no elevation at all.</p>
+            <h3>Do my edits save automatically?</h3>
+            <p>
+                No. Edits go to the <a href="concepts#persistence">current bank, which is RAM</a>. WRITE to a user bank on the device, or restore a
+                backup into a user bank from the Utility view, to keep them across power cycles. Back up before bulk changes.
+            </p>
 
-  <h3>Do my edits save automatically?</h3>
-  <p>No. Edits go to the <a href="concepts#persistence">current bank, which is RAM</a>. WRITE to a user
-    bank on the device, or restore a backup into a user bank from the Utility view, to keep them across power
-    cycles. Back up before bulk changes.</p>
+            <h3>Can I use it without a microSAMPLER?</h3>
+            <p>
+                Yes. <a href="guide#library">Library mode</a> opens bank backups (Korg <code>.msmpl_bank</code> files or this app's ZIPs) and extracts
+                their samples as WAVs and patterns as MIDI, with no hardware. There's also a <code>--mock</code> mode for exploring the interface.
+            </p>
 
-  <h3>Can I use it without a microSAMPLER?</h3>
-  <p>Yes. <a href="guide#library">Library mode</a> opens bank backups (Korg <code>.msmpl_bank</code> files
-    or this app's ZIPs) and extracts their samples as WAVs and patterns as MIDI, with no hardware. There's also
-    a <code>--mock</code> mode for exploring the interface.</p>
+            <h3>Can I run it alongside my DAW?</h3>
+            <p>
+                Not at the same time. The device can only have one USB owner, and its sample/pattern transfers aren't ordinary MIDI. Close the DAW
+                (and any other MIDI software) while the bridge is running, and close the bridge before using the microSAMPLER as a USB-MIDI device in
+                your DAW.
+            </p>
 
-  <h3>Can I run it alongside my DAW?</h3>
-  <p>Not at the same time. The device can only have one USB owner, and its sample/pattern transfers aren't
-    ordinary MIDI. Close the DAW (and any other MIDI software) while the bridge is running, and close the
-    bridge before using the microSAMPLER as a USB-MIDI device in your DAW.</p>
+            <h3>Will it work on Windows?</h3>
+            <p>
+                It's experimental and untested there. libusb can't open the device until its USB driver is switched to WinUSB with
+                <a href="https://zadig.akeo.ie/">Zadig</a>. See <a href="getting-started#windows">Getting started</a>.
+            </p>
 
-  <h3>Will it work on Windows?</h3>
-  <p>It's experimental and untested there. libusb can't open the device until its USB driver is switched to
-    WinUSB with <a href="https://zadig.akeo.ie/">Zadig</a>. See <a href="getting-started#windows">Getting
-    started</a>.</p>
+            <h3>Is my data safe?</h3>
+            <p>
+                The software is provided "as is", without warranty. It writes to the device's memory, so back up your banks before bulk operations and
+                never disconnect mid-transfer. The author accepts no responsibility for any damage to your device or loss of data.
+            </p>
 
-  <h3>Is my data safe?</h3>
-  <p>The software is provided "as is", without warranty. It writes to the device's memory, so back up your
-    banks before bulk operations and never disconnect mid-transfer. The author accepts no responsibility for
-    any damage to your device or loss of data.</p>
+            <p>
+                Didn't find it? Open an issue or check the changelog on
+                <a href="https://github.com/benjamindehli/microsampler-editor-librarian">GitHub</a>.
+            </p>
 
-  <p>Didn't find it? Open an issue or check the changelog on
-    <a href="https://github.com/benjamindehli/microsampler-editor-librarian">GitHub</a>.</p>
+            <footer>
+                <nav>
+                    <a href="./">Home</a>
+                    <a href="getting-started">Getting started</a>
+                    <a href="guide">Guide</a>
+                    <a href="concepts">Concepts</a>
+                    <a href="troubleshooting">Troubleshooting</a>
+                    <a href="https://github.com/benjamindehli/microsampler-editor-librarian/releases">Releases &amp; changelog ↗</a>
+                </nav>
+                <a class="logo-link" href="https://www.dehlimusikk.no/" target="_blank" rel="noopener" title="Visit Dehli Musikk"
+                    ><img class="logo" src="assets/logo.svg" alt="Dehli Musikk"
+                /></a>
+                <p>
+                    microSAMPLER Editor / Librarian is an independent, unofficial project by
+                    <a href="https://www.dehlimusikk.no/" target="_blank" rel="noopener">Dehli Musikk</a>. microSAMPLER and Korg are trademarks of
+                    Korg Inc. Licensed under the GNU GPL v3.
+                </p>
+            </footer>
+        </main>
 
-  <footer>
-    <nav>
-      <a href="./">Home</a>
-      <a href="getting-started">Getting started</a>
-      <a href="guide">Guide</a>
-      <a href="concepts">Concepts</a>
-      <a href="troubleshooting">Troubleshooting</a>
-      <a href="https://github.com/benjamindehli/microsampler-editor-librarian/releases">Releases &amp; changelog ↗</a>
-    </nav>
-    <a class="logo-link" href="https://www.dehlimusikk.no/" target="_blank" rel="noopener" title="Visit Dehli Musikk"><img class="logo" src="assets/logo.svg" alt="Dehli Musikk"></a>
-    <p>microSAMPLER Editor / Librarian is an independent, unofficial project by <a href="https://www.dehlimusikk.no/" target="_blank" rel="noopener">Dehli Musikk</a>.
-      microSAMPLER and Korg are trademarks of Korg Inc. Licensed under the GNU GPL v3.</p>
-  </footer>
-</main>
-
-<a class="to-top" href="#top" aria-label="Back to top" title="Back to top">↑</a>
-</body>
+        <a class="to-top" href="#top" aria-label="Back to top" title="Back to top">↑</a>
+    </body>
 </html>

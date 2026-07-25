@@ -1,283 +1,422 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Korg microSAMPLER editor: getting started, install &amp; setup</title>
-<meta name="description" content="Download the signed Korg microSAMPLER editor apps for macOS and Linux, or use the classic launchers, plus first-run steps and device setup (MIDI clock).">
-<link rel="canonical" href="https://benjamindehli.github.io/microsampler-editor-librarian/getting-started">
-<meta name="robots" content="index, follow">
-<meta name="theme-color" content="#0b0b0d">
-<link rel="icon" type="image/svg+xml" href="assets/appicon.svg">
-<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
-<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-<meta property="og:type" content="article">
-<meta property="og:site_name" content="microSAMPLER Editor / Librarian">
-<meta property="og:title" content="Getting started: Korg microSAMPLER editor">
-<meta property="og:description" content="Install the Korg microSAMPLER editor on macOS, Linux or Windows, first run, and device setup.">
-<meta property="og:url" content="https://benjamindehli.github.io/microsampler-editor-librarian/getting-started">
-<meta property="og:image" content="https://benjamindehli.github.io/microsampler-editor-librarian/assets/og/getting-started.jpg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="microSAMPLER Editor / Librarian: Getting started">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://benjamindehli.github.io/microsampler-editor-librarian/assets/og/getting-started.jpg">
-<link rel="preload" href="assets/fonts/chakra-petch-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="assets/fonts/chakra-petch-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="css/docs.css">
-<script src="docs.js" defer></script>
-<script type="application/ld+json">
-{ "@context": "https://schema.org", "@type": "TechArticle",
-  "headline": "Getting started with the microSAMPLER Editor / Librarian",
-  "description": "Download the apps, requirements, installation, first run and device setup.",
-  "inLanguage": "en",
-  "author": { "@type": "Person", "name": "Benjamin Dehli", "url": "https://www.dehlimusikk.no/" },
-  "image": "https://benjamindehli.github.io/microsampler-editor-librarian/assets/og/getting-started.jpg",
-  "datePublished": "2026-06-27",
-  "dateModified": "2026-07-23",
-  "mainEntityOfPage": "https://benjamindehli.github.io/microsampler-editor-librarian/getting-started" }
-</script>
-<script type="application/ld+json">
-{ "@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
-  {"@type":"ListItem","position":1,"name":"Home","item":"https://benjamindehli.github.io/microsampler-editor-librarian/"},
-  {"@type":"ListItem","position":2,"name":"Getting started","item":"https://benjamindehli.github.io/microsampler-editor-librarian/getting-started"}]}
-</script>
-</head>
-<body>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Korg microSAMPLER editor: getting started, install &amp; setup</title>
+        <meta
+            name="description"
+            content="Download the signed Korg microSAMPLER editor apps for macOS and Linux, or use the classic launchers, plus first-run steps and device setup (MIDI clock)."
+        />
+        <link rel="canonical" href="https://benjamindehli.github.io/microsampler-editor-librarian/getting-started" />
+        <meta name="robots" content="index, follow" />
+        <meta name="theme-color" content="#0b0b0d" />
+        <link rel="icon" type="image/svg+xml" href="assets/appicon.svg" />
+        <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
+        <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+        <meta property="og:type" content="article" />
+        <meta property="og:site_name" content="microSAMPLER Editor / Librarian" />
+        <meta property="og:title" content="Getting started: Korg microSAMPLER editor" />
+        <meta property="og:description" content="Install the Korg microSAMPLER editor on macOS, Linux or Windows, first run, and device setup." />
+        <meta property="og:url" content="https://benjamindehli.github.io/microsampler-editor-librarian/getting-started" />
+        <meta property="og:image" content="https://benjamindehli.github.io/microsampler-editor-librarian/assets/og/getting-started.jpg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="microSAMPLER Editor / Librarian: Getting started" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content="https://benjamindehli.github.io/microsampler-editor-librarian/assets/og/getting-started.jpg" />
+        <link rel="preload" href="assets/fonts/chakra-petch-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin />
+        <link rel="preload" href="assets/fonts/chakra-petch-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin />
+        <link rel="stylesheet" href="css/docs.css" />
+        <script src="docs.js" defer></script>
+        <script type="application/ld+json">
+            {
+                "@context": "https://schema.org",
+                "@type": "TechArticle",
+                "headline": "Getting started with the microSAMPLER Editor / Librarian",
+                "description": "Download the apps, requirements, installation, first run and device setup.",
+                "inLanguage": "en",
+                "author": { "@type": "Person", "name": "Benjamin Dehli", "url": "https://www.dehlimusikk.no/" },
+                "image": "https://benjamindehli.github.io/microsampler-editor-librarian/assets/og/getting-started.jpg",
+                "datePublished": "2026-06-27",
+                "dateModified": "2026-07-23",
+                "mainEntityOfPage": "https://benjamindehli.github.io/microsampler-editor-librarian/getting-started"
+            }
+        </script>
+        <script type="application/ld+json">
+            {
+                "@context": "https://schema.org",
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://benjamindehli.github.io/microsampler-editor-librarian/" },
+                    {
+                        "@type": "ListItem",
+                        "position": 2,
+                        "name": "Getting started",
+                        "item": "https://benjamindehli.github.io/microsampler-editor-librarian/getting-started"
+                    }
+                ]
+            }
+        </script>
+    </head>
+    <body>
+        <header class="topnav" id="top">
+            <a class="brand" href="./">
+                <img src="assets/logo.svg" alt="Dehli Musikk" />
+                <b>microSAMPLER <span>Editor / Librarian</span></b>
+            </a>
+            <button class="menu-btn" aria-label="Toggle menu">MENU</button>
+            <nav>
+                <a href="./">Home</a>
+                <a href="getting-started" class="active">Getting started</a>
+                <a href="guide">Guide</a>
+                <a href="concepts">Concepts</a>
+                <a href="troubleshooting">Troubleshooting</a>
+                <a class="gh" href="https://github.com/benjamindehli/microsampler-editor-librarian" target="_blank" rel="noopener">GitHub ↗</a>
+            </nav>
+        </header>
 
-<header class="topnav" id="top">
-  <a class="brand" href="./">
-    <img src="assets/logo.svg" alt="Dehli Musikk">
-    <b>microSAMPLER <span>Editor / Librarian</span></b>
-  </a>
-  <button class="menu-btn" aria-label="Toggle menu">MENU</button>
-  <nav>
-    <a href="./">Home</a>
-    <a href="getting-started" class="active">Getting started</a>
-    <a href="guide">Guide</a>
-    <a href="concepts">Concepts</a>
-    <a href="troubleshooting">Troubleshooting</a>
-    <a class="gh" href="https://github.com/benjamindehli/microsampler-editor-librarian" target="_blank" rel="noopener">GitHub ↗</a>
-  </nav>
-</header>
+        <main class="content">
+            <div class="page-head">
+                <h1>Getting started</h1>
+                <p>
+                    Download the app for your platform (or use the classic launchers), then the first-run steps to get the editor talking to your
+                    microSAMPLER.
+                </p>
+            </div>
 
-<main class="content">
-  <div class="page-head">
-    <h1>Getting started</h1>
-    <p>Download the app for your platform (or use the classic launchers), then the first-run steps
-      to get the editor talking to your microSAMPLER.</p>
-  </div>
+            <nav class="toc" aria-label="On this page">
+                <b>On this page</b>
+                <ul>
+                    <li><a href="#download">Download the apps</a></li>
+                    <li><a href="#requirements">Requirements</a></li>
+                    <li><a href="#get">The classic way (ZIP)</a></li>
+                    <li><a href="#macos">Launcher: macOS</a></li>
+                    <li><a href="#linux">Launcher: Linux</a></li>
+                    <li><a href="#windows">Launcher: Windows</a></li>
+                    <li><a href="#manual">Manual &amp; mock</a></li>
+                    <li><a href="#first-run">First run</a></li>
+                    <li><a href="#device-setup">Device setup</a></li>
+                </ul>
+            </nav>
 
-  <nav class="toc" aria-label="On this page">
-    <b>On this page</b>
-    <ul>
-      <li><a href="#download">Download the apps</a></li>
-      <li><a href="#requirements">Requirements</a></li>
-      <li><a href="#get">The classic way (ZIP)</a></li>
-      <li><a href="#macos">Launcher: macOS</a></li>
-      <li><a href="#linux">Launcher: Linux</a></li>
-      <li><a href="#windows">Launcher: Windows</a></li>
-      <li><a href="#manual">Manual &amp; mock</a></li>
-      <li><a href="#first-run">First run</a></li>
-      <li><a href="#device-setup">Device setup</a></li>
-    </ul>
-  </nav>
+            <h2 id="download">Download the apps</h2>
+            <p>The quickest way in: signed, notarized desktop apps. No Terminal, no password prompts, nothing else to install.</p>
 
-  <h2 id="download">Download the apps</h2>
-  <p>The quickest way in: signed, notarized desktop apps. No Terminal, no password prompts, nothing
-    else to install.</p>
+            <h3>macOS (13 Ventura or newer)</h3>
+            <p>
+                <a
+                    class="cta"
+                    href="https://github.com/benjamindehli/microsampler-editor-librarian/releases/latest/download/microSAMPLER-macos-arm64.dmg"
+                    >Download for Apple&nbsp;Silicon →</a
+                >
+                <a
+                    class="cta"
+                    href="https://github.com/benjamindehli/microsampler-editor-librarian/releases/latest/download/microSAMPLER-macos-x86_64.dmg"
+                    >Download for Intel →</a
+                >
+            </p>
+            <p>Open the disk image and drag both apps to the Applications shortcut:</p>
+            <ul>
+                <li>
+                    <strong>microSAMPLER Editor Librarian</strong> is the full editor, as a menu-bar app. On first launch macOS asks you to approve
+                    its background service once (System Settings → Login Items). After that the editor is one click away. The service claims the
+                    microSAMPLER only while the editor is open, and releases it a few minutes after you close the tab, so the device stays available
+                    to your DAW the rest of the time.
+                </li>
+                <li>
+                    <strong>microSAMPLER Library</strong> lets you browse, play and export the samples and patterns in bank backups (including
+                    original Korg <code>.msmpl_bank</code> files), no hardware needed.
+                </li>
+            </ul>
 
-  <h3>macOS (13 Ventura or newer)</h3>
-  <p>
-    <a class="cta" href="https://github.com/benjamindehli/microsampler-editor-librarian/releases/latest/download/microSAMPLER-macos-arm64.dmg">Download for Apple&nbsp;Silicon →</a>
-    <a class="cta" href="https://github.com/benjamindehli/microsampler-editor-librarian/releases/latest/download/microSAMPLER-macos-x86_64.dmg">Download for Intel →</a>
-  </p>
-  <p>Open the disk image and drag both apps to the Applications shortcut:</p>
-  <ul>
-    <li><strong>microSAMPLER Editor Librarian</strong> is the full editor, as a menu-bar app. On first
-      launch macOS asks you to approve its background service once (System Settings → Login Items).
-      After that the editor is one click away. The service claims the microSAMPLER only while the
-      editor is open, and releases it a few minutes after you close the tab, so the device stays
-      available to your DAW the rest of the time.</li>
-    <li><strong>microSAMPLER Library</strong> lets you browse, play and export the samples and patterns in
-      bank backups (including original Korg <code>.msmpl_bank</code> files), no hardware needed.</li>
-  </ul>
+            <h3>Linux</h3>
+            <p>
+                <a
+                    class="cta"
+                    href="https://github.com/benjamindehli/microsampler-editor-librarian/releases/latest/download/microSAMPLER_Library-x86_64.AppImage"
+                    >Download the Library AppImage →</a
+                >
+            </p>
+            <p>
+                Make it executable (<code>chmod +x</code>, or "Allow launching" in your file manager) and run it. Also available as a plain
+                <a
+                    href="https://github.com/benjamindehli/microsampler-editor-librarian/releases/latest/download/microSAMPLER_Library-linux-x86_64.tar.gz"
+                    >tar.gz</a
+                >. For the full editor on Linux, use the <a href="#linux">classic launcher</a> below.
+            </p>
 
-  <h3>Linux</h3>
-  <p><a class="cta" href="https://github.com/benjamindehli/microsampler-editor-librarian/releases/latest/download/microSAMPLER_Library-x86_64.AppImage">Download the Library AppImage →</a></p>
-  <p>Make it executable (<code>chmod +x</code>, or "Allow launching" in your file manager) and run it.
-    Also available as a plain <a href="https://github.com/benjamindehli/microsampler-editor-librarian/releases/latest/download/microSAMPLER_Library-linux-x86_64.tar.gz">tar.gz</a>.
-    For the full editor on Linux, use the <a href="#linux">classic launcher</a> below.</p>
+            <div class="note">
+                <b class="label">WINDOWS</b>
+                <p>
+                    No app yet. Use the <a href="#windows">classic launcher</a> below. It's experimental, and device mode needs a one-time driver
+                    swap.
+                </p>
+            </div>
 
-  <div class="note">
-    <b class="label">WINDOWS</b>
-    <p>No app yet. Use the <a href="#windows">classic launcher</a> below. It's experimental, and device mode
-      needs a one-time driver swap.</p>
-  </div>
+            <h2 id="requirements">Requirements</h2>
+            <h3>Hardware</h3>
+            <ul>
+                <li>A <strong>Korg microSAMPLER</strong>.</li>
+                <li>A <strong>USB cable</strong> (USB-B, the standard "printer" type) to connect it to your computer.</li>
+            </ul>
+            <figure>
+                <picture>
+                    <source
+                        type="image/avif"
+                        sizes="(max-width: 860px) 100vw, 792px"
+                        srcset="
+                            assets/hardware/rear-panel_396.avif   396w,
+                            assets/hardware/rear-panel_792.avif   792w,
+                            assets/hardware/rear-panel_1584.avif 1584w
+                        "
+                    />
+                    <source
+                        type="image/webp"
+                        sizes="(max-width: 860px) 100vw, 792px"
+                        srcset="
+                            assets/hardware/rear-panel_396.webp   396w,
+                            assets/hardware/rear-panel_792.webp   792w,
+                            assets/hardware/rear-panel_1584.webp 1584w
+                        "
+                    />
+                    <img
+                        src="assets/hardware/rear-panel_792.jpg"
+                        width="792"
+                        height="539"
+                        loading="lazy"
+                        sizes="(max-width: 860px) 100vw, 792px"
+                        srcset="
+                            assets/hardware/rear-panel_396.jpg   396w,
+                            assets/hardware/rear-panel_792.jpg   792w,
+                            assets/hardware/rear-panel_1584.jpg 1584w
+                        "
+                        alt="microSAMPLER rear panel showing the USB-B port and audio jacks"
+                    />
+                </picture>
+                <figcaption>The microSAMPLER's rear panel. The USB port is what connects to your computer.</figcaption>
+            </figure>
 
-  <h2 id="requirements">Requirements</h2>
-  <h3>Hardware</h3>
-  <ul>
-    <li>A <strong>Korg microSAMPLER</strong>.</li>
-    <li>A <strong>USB cable</strong> (USB-B, the standard "printer" type) to connect it to your computer.</li>
-  </ul>
-  <figure>
-    <picture>
-      <source type="image/avif" sizes="(max-width: 860px) 100vw, 792px"
-        srcset="assets/hardware/rear-panel_396.avif 396w, assets/hardware/rear-panel_792.avif 792w, assets/hardware/rear-panel_1584.avif 1584w">
-      <source type="image/webp" sizes="(max-width: 860px) 100vw, 792px"
-        srcset="assets/hardware/rear-panel_396.webp 396w, assets/hardware/rear-panel_792.webp 792w, assets/hardware/rear-panel_1584.webp 1584w">
-      <img src="assets/hardware/rear-panel_792.jpg" width="792" height="539" loading="lazy"
-        sizes="(max-width: 860px) 100vw, 792px"
-        srcset="assets/hardware/rear-panel_396.jpg 396w, assets/hardware/rear-panel_792.jpg 792w, assets/hardware/rear-panel_1584.jpg 1584w"
-        alt="microSAMPLER rear panel showing the USB-B port and audio jacks">
-    </picture>
-    <figcaption>The microSAMPLER's rear panel. The USB port is what connects to your computer.</figcaption>
-  </figure>
+            <h3>Software</h3>
+            <table>
+                <tr>
+                    <th scope="col">Component</th>
+                    <th scope="col">Notes</th>
+                </tr>
+                <tr>
+                    <td>Operating system</td>
+                    <td>Apps: macOS 13+ / Linux x86-64. Classic launchers: macOS (tested), Linux (should work), Windows (untested)</td>
+                </tr>
+                <tr>
+                    <td>Python 3.8+</td>
+                    <td>
+                        Classic launchers only. The apps bundle their own runtime. macOS: via the Xcode Command Line Tools (<code
+                            >xcode-select --install</code
+                        >) or <a href="https://python.org">python.org</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>pyusb</code> (BSD) + <code>libusb</code> (LGPL)</td>
+                    <td>Bundled with the app, so there's no <code>pip</code> or Homebrew step (a system copy is used instead if you have one)</td>
+                </tr>
+                <tr>
+                    <td>A modern browser</td>
+                    <td>Chrome / Chromium recommended (Web MIDI needs Chrome, Edge or Firefox)</td>
+                </tr>
+            </table>
+            <p>
+                The editor itself needs <strong>no installation and no build step</strong>. It's plain web files served by a small local helper (the
+                "bridge").
+            </p>
 
-  <h3>Software</h3>
-  <table>
-    <tr><th scope="col">Component</th><th scope="col">Notes</th></tr>
-    <tr><td>Operating system</td><td>Apps: macOS 13+ / Linux x86-64. Classic launchers: macOS (tested), Linux (should work), Windows (untested)</td></tr>
-    <tr><td>Python 3.8+</td><td>Classic launchers only. The apps bundle their own runtime. macOS: via the Xcode Command Line Tools (<code>xcode-select --install</code>) or <a href="https://python.org">python.org</a></td></tr>
-    <tr><td><code>pyusb</code> (BSD) + <code>libusb</code> (LGPL)</td><td>Bundled with the app, so there's no <code>pip</code> or Homebrew step (a system copy is used instead if you have one)</td></tr>
-    <tr><td>A modern browser</td><td>Chrome / Chromium recommended (Web MIDI needs Chrome, Edge or Firefox)</td></tr>
-  </table>
-  <p>The editor itself needs <strong>no installation and no build step</strong>. It's plain web files
-    served by a small local helper (the "bridge").</p>
-
-  <h2 id="get">The classic way: ZIP + launchers</h2>
-  <p>Everything also runs from a small ZIP with per-platform launchers, needing only Python 3.
-    This is the way on Windows, and for the full editor on Linux.</p>
-  <p><a class="cta" href="https://github.com/benjamindehli/microsampler-editor-librarian/releases">Download the latest release →</a></p>
-  <p>Unzip it, then open a terminal in the unzipped folder. Prefer git? Clone instead:</p>
-  <pre><code>git clone https://github.com/benjamindehli/microsampler-editor-librarian.git
+            <h2 id="get">The classic way: ZIP + launchers</h2>
+            <p>
+                Everything also runs from a small ZIP with per-platform launchers, needing only Python 3. This is the way on Windows, and for the full
+                editor on Linux.
+            </p>
+            <p><a class="cta" href="https://github.com/benjamindehli/microsampler-editor-librarian/releases">Download the latest release →</a></p>
+            <p>Unzip it, then open a terminal in the unzipped folder. Prefer git? Clone instead:</p>
+            <pre><code>git clone https://github.com/benjamindehli/microsampler-editor-librarian.git
 cd microsampler-editor-librarian</code></pre>
 
-  <h2 id="macos">Launcher: macOS</h2>
-  <p>Nothing to install. pyusb and libusb are bundled. Just use the launcher:</p>
-  <ol class="steps">
-    <li>Connect the microSAMPLER to your Mac with the USB cable and power it on.</li>
-    <li>Open the <code>macOS/</code> folder and double-click <code>microSAMPLER Editor Librarian.command</code>.</li>
-    <li>Enter your password when asked. Administrator rights are required to claim the USB connection from macOS.</li>
-    <li>The editor opens in your browser automatically.</li>
-  </ol>
-  <div class="note warn">
-    <b class="label">FIRST RUN: "UNIDENTIFIED DEVELOPER"</b>
-    <p>The launcher is unsigned (it's a free, open-source project), so the first time you open it macOS
-      blocks it with <em>"cannot be opened because it is from an unidentified developer"</em>. Approve it once:</p>
-    <ul>
-      <li><strong>Right-click</strong> (or Control-click) the launcher → <strong>Open</strong>, then
-        <strong>Open</strong> again in the dialog.</li>
-      <li>On newer macOS, if there's no <em>Open</em> option: double-click it once (it gets blocked), then go
-        to <strong>System Settings → Privacy &amp; Security</strong>, find the message about the blocked
-        launcher, and click <strong>Open Anyway</strong>.</li>
-    </ul>
-    <p>Comfortable with Terminal? Clear the download quarantine on the whole unzipped folder instead, then
-      double-click as normal. You only need to do this once:</p>
-    <pre><code>xattr -dr com.apple.quarantine microsampler-editor-librarian</code></pre>
-  </div>
+            <h2 id="macos">Launcher: macOS</h2>
+            <p>Nothing to install. pyusb and libusb are bundled. Just use the launcher:</p>
+            <ol class="steps">
+                <li>Connect the microSAMPLER to your Mac with the USB cable and power it on.</li>
+                <li>Open the <code>macOS/</code> folder and double-click <code>microSAMPLER Editor Librarian.command</code>.</li>
+                <li>Enter your password when asked. Administrator rights are required to claim the USB connection from macOS.</li>
+                <li>The editor opens in your browser automatically.</li>
+            </ol>
+            <div class="note warn">
+                <b class="label">FIRST RUN: "UNIDENTIFIED DEVELOPER"</b>
+                <p>
+                    The launcher is unsigned (it's a free, open-source project), so the first time you open it macOS blocks it with
+                    <em>"cannot be opened because it is from an unidentified developer"</em>. Approve it once:
+                </p>
+                <ul>
+                    <li>
+                        <strong>Right-click</strong> (or Control-click) the launcher → <strong>Open</strong>, then <strong>Open</strong> again in the
+                        dialog.
+                    </li>
+                    <li>
+                        On newer macOS, if there's no <em>Open</em> option: double-click it once (it gets blocked), then go to
+                        <strong>System Settings → Privacy &amp; Security</strong>, find the message about the blocked launcher, and click
+                        <strong>Open Anyway</strong>.
+                    </li>
+                </ul>
+                <p>
+                    Comfortable with Terminal? Clear the download quarantine on the whole unzipped folder instead, then double-click as normal. You
+                    only need to do this once:
+                </p>
+                <pre><code>xattr -dr com.apple.quarantine microsampler-editor-librarian</code></pre>
+            </div>
 
-  <h2 id="linux">Launcher: Linux</h2>
-  <p>pyusb and libusb are bundled (x86-64 and ARM64). Just use the launcher:</p>
-  <ol class="steps">
-    <li>Connect the microSAMPLER and power it on.</li>
-    <li>Open the <code>Linux/</code> folder and double-click <code>microSAMPLER Editor Librarian.sh</code>.
-      Some file managers open <code>.sh</code> files in an editor. Mark it executable / "Allow launching"
-      first, or run <code>./'Linux/microSAMPLER Editor Librarian.sh'</code> from a terminal.</li>
-    <li>Enter your password when asked (root is needed to claim the USB device).</li>
-    <li>The editor opens in your browser automatically.</li>
-  </ol>
+            <h2 id="linux">Launcher: Linux</h2>
+            <p>pyusb and libusb are bundled (x86-64 and ARM64). Just use the launcher:</p>
+            <ol class="steps">
+                <li>Connect the microSAMPLER and power it on.</li>
+                <li>
+                    Open the <code>Linux/</code> folder and double-click <code>microSAMPLER Editor Librarian.sh</code>. Some file managers open
+                    <code>.sh</code> files in an editor. Mark it executable / "Allow launching" first, or run
+                    <code>./'Linux/microSAMPLER Editor Librarian.sh'</code> from a terminal.
+                </li>
+                <li>Enter your password when asked (root is needed to claim the USB device).</li>
+                <li>The editor opens in your browser automatically.</li>
+            </ol>
 
-  <h2 id="windows">Launcher: Windows <span style="color:var(--err)">(experimental)</span></h2>
-  <div class="note warn">
-    <b class="label">UNTESTED, EXTRA SETUP REQUIRED</b>
-    <p>Windows hasn't been verified, and libusb can't open the device until its USB driver is switched to
-      <strong>WinUSB</strong> using <a href="https://zadig.akeo.ie/">Zadig</a>.</p>
-  </div>
-  <ol class="steps">
-    <li>Install <a href="https://python.org/">Python&nbsp;3</a> (tick "Add to PATH"). pyusb and a 64-bit
-      <code>libusb</code> DLL are bundled, so there's nothing else to install.</li>
-    <li>With the microSAMPLER connected, run <strong>Zadig</strong> and replace its driver with
-      <strong>WinUSB</strong> (or libusbK).</li>
-    <li>Open the <code>Windows/</code> folder and double-click <code>microSAMPLER Editor Librarian.bat</code>.</li>
-  </ol>
+            <h2 id="windows">Launcher: Windows <span style="color: var(--err)">(experimental)</span></h2>
+            <div class="note warn">
+                <b class="label">UNTESTED, EXTRA SETUP REQUIRED</b>
+                <p>
+                    Windows hasn't been verified, and libusb can't open the device until its USB driver is switched to <strong>WinUSB</strong> using
+                    <a href="https://zadig.akeo.ie/">Zadig</a>.
+                </p>
+            </div>
+            <ol class="steps">
+                <li>
+                    Install <a href="https://python.org/">Python&nbsp;3</a> (tick "Add to PATH"). pyusb and a 64-bit <code>libusb</code> DLL are
+                    bundled, so there's nothing else to install.
+                </li>
+                <li>With the microSAMPLER connected, run <strong>Zadig</strong> and replace its driver with <strong>WinUSB</strong> (or libusbK).</li>
+                <li>Open the <code>Windows/</code> folder and double-click <code>microSAMPLER Editor Librarian.bat</code>.</li>
+            </ol>
 
-  <h2 id="manual">Any platform: manual &amp; mock</h2>
-  <p>Run the bridge directly, then open <a href="http://localhost:8765">http://localhost:8765</a>:</p>
-  <pre><code>sudo python3 native-tools/bridge.py</code></pre>
-  <div class="note">
-    <b class="label">WHY SUDO?</b>
-    <p>The operating system's MIDI driver owns the device's USB interface. The bridge needs elevated rights
-      to take it over while it runs. It hands control back when it exits.</p>
-  </div>
-  <p>To explore the interface with <strong>no device connected</strong>, run the bridge in mock mode (no
-    password needed):</p>
-  <pre><code>python3 native-tools/bridge.py --mock</code></pre>
+            <h2 id="manual">Any platform: manual &amp; mock</h2>
+            <p>Run the bridge directly, then open <a href="http://localhost:8765">http://localhost:8765</a>:</p>
+            <pre><code>sudo python3 native-tools/bridge.py</code></pre>
+            <div class="note">
+                <b class="label">WHY SUDO?</b>
+                <p>
+                    The operating system's MIDI driver owns the device's USB interface. The bridge needs elevated rights to take it over while it
+                    runs. It hands control back when it exits.
+                </p>
+            </div>
+            <p>To explore the interface with <strong>no device connected</strong>, run the bridge in mock mode (no password needed):</p>
+            <pre><code>python3 native-tools/bridge.py --mock</code></pre>
 
-  <h2 id="first-run">First run</h2>
-  <ol class="steps">
-    <li>With the device connected and the bridge running, open the editor in your browser.</li>
-    <li>Check the <strong>CONNECTED</strong> light (top-right) is green.</li>
-    <li>Press <strong>RECEIVE</strong> (top-right) to read the current bank from the device. Its 36 sample
-      slots and settings appear.</li>
-    <li>Click any pad to start editing.</li>
-  </ol>
-  <figure>
-    <picture>
-      <source type="image/avif" sizes="(max-width: 860px) 100vw, 792px"
-        srcset="assets/hardware/setup_396.avif 396w, assets/hardware/setup_792.avif 792w, assets/hardware/setup_1584.avif 1584w">
-      <source type="image/webp" sizes="(max-width: 860px) 100vw, 792px"
-        srcset="assets/hardware/setup_396.webp 396w, assets/hardware/setup_792.webp 792w, assets/hardware/setup_1584.webp 1584w">
-      <img src="assets/hardware/setup_792.jpg" width="792" height="539" loading="lazy"
-        sizes="(max-width: 860px) 100vw, 792px"
-        srcset="assets/hardware/setup_396.jpg 396w, assets/hardware/setup_792.jpg 792w, assets/hardware/setup_1584.jpg 1584w"
-        alt="microSAMPLER connected to a computer running the editor">
-    </picture>
-    <figcaption>The bridge runs locally and the editor talks to the device over USB.</figcaption>
-  </figure>
+            <h2 id="first-run">First run</h2>
+            <ol class="steps">
+                <li>With the device connected and the bridge running, open the editor in your browser.</li>
+                <li>Check the <strong>CONNECTED</strong> light (top-right) is green.</li>
+                <li>Press <strong>RECEIVE</strong> (top-right) to read the current bank from the device. Its 36 sample slots and settings appear.</li>
+                <li>Click any pad to start editing.</li>
+            </ol>
+            <figure>
+                <picture>
+                    <source
+                        type="image/avif"
+                        sizes="(max-width: 860px) 100vw, 792px"
+                        srcset="assets/hardware/setup_396.avif 396w, assets/hardware/setup_792.avif 792w, assets/hardware/setup_1584.avif 1584w"
+                    />
+                    <source
+                        type="image/webp"
+                        sizes="(max-width: 860px) 100vw, 792px"
+                        srcset="assets/hardware/setup_396.webp 396w, assets/hardware/setup_792.webp 792w, assets/hardware/setup_1584.webp 1584w"
+                    />
+                    <img
+                        src="assets/hardware/setup_792.jpg"
+                        width="792"
+                        height="539"
+                        loading="lazy"
+                        sizes="(max-width: 860px) 100vw, 792px"
+                        srcset="assets/hardware/setup_396.jpg 396w, assets/hardware/setup_792.jpg 792w, assets/hardware/setup_1584.jpg 1584w"
+                        alt="microSAMPLER connected to a computer running the editor"
+                    />
+                </picture>
+                <figcaption>The bridge runs locally and the editor talks to the device over USB.</figcaption>
+            </figure>
 
-  <h2 id="device-setup">Device setup</h2>
-  <p>Two device settings matter:</p>
-  <ul>
-    <li><strong>One USB owner at a time.</strong> The microSAMPLER moves samples and patterns over USB using
-      non-standard transfers, so it can't share the connection with a DAW or other MIDI software. Close
-      those (and Korg's original editor) while the bridge is running.</li>
-    <li><strong>MIDI CLK = AUTO</strong> for pattern playback. The device's sequencer is a clock slave, so the
-      editor streams MIDI clock to drive it. On the device, set <code>GLOBAL → MIDI CLK = AUTO</code> (or
-      EXT&nbsp;MIDI). Otherwise the transport buttons do nothing.</li>
-  </ul>
-  <figure>
-    <picture>
-      <source type="image/avif" sizes="(max-width: 860px) 100vw, 792px"
-        srcset="assets/hardware/midi-clk_396.avif 396w, assets/hardware/midi-clk_792.avif 792w, assets/hardware/midi-clk_1584.avif 1584w">
-      <source type="image/webp" sizes="(max-width: 860px) 100vw, 792px"
-        srcset="assets/hardware/midi-clk_396.webp 396w, assets/hardware/midi-clk_792.webp 792w, assets/hardware/midi-clk_1584.webp 1584w">
-      <img src="assets/hardware/midi-clk_792.jpg" width="792" height="539" loading="lazy"
-        sizes="(max-width: 860px) 100vw, 792px"
-        srcset="assets/hardware/midi-clk_396.jpg 396w, assets/hardware/midi-clk_792.jpg 792w, assets/hardware/midi-clk_1584.jpg 1584w"
-        alt="The device GLOBAL page showing MIDI CLK set to AUTO">
-    </picture>
-    <figcaption>Set MIDI CLK to AUTO so the sequencer follows the editor's transport.</figcaption>
-  </figure>
-  <p>New to the hardware? The <a href="concepts">Concepts</a> page explains banks, the two play modes,
-    BPM-sync and the sequencer. Stuck? See <a href="troubleshooting">Troubleshooting</a>.</p>
+            <h2 id="device-setup">Device setup</h2>
+            <p>Two device settings matter:</p>
+            <ul>
+                <li>
+                    <strong>One USB owner at a time.</strong> The microSAMPLER moves samples and patterns over USB using non-standard transfers, so it
+                    can't share the connection with a DAW or other MIDI software. Close those (and Korg's original editor) while the bridge is
+                    running.
+                </li>
+                <li>
+                    <strong>MIDI CLK = AUTO</strong> for pattern playback. The device's sequencer is a clock slave, so the editor streams MIDI clock
+                    to drive it. On the device, set <code>GLOBAL → MIDI CLK = AUTO</code> (or EXT&nbsp;MIDI). Otherwise the transport buttons do
+                    nothing.
+                </li>
+            </ul>
+            <figure>
+                <picture>
+                    <source
+                        type="image/avif"
+                        sizes="(max-width: 860px) 100vw, 792px"
+                        srcset="
+                            assets/hardware/midi-clk_396.avif   396w,
+                            assets/hardware/midi-clk_792.avif   792w,
+                            assets/hardware/midi-clk_1584.avif 1584w
+                        "
+                    />
+                    <source
+                        type="image/webp"
+                        sizes="(max-width: 860px) 100vw, 792px"
+                        srcset="
+                            assets/hardware/midi-clk_396.webp   396w,
+                            assets/hardware/midi-clk_792.webp   792w,
+                            assets/hardware/midi-clk_1584.webp 1584w
+                        "
+                    />
+                    <img
+                        src="assets/hardware/midi-clk_792.jpg"
+                        width="792"
+                        height="539"
+                        loading="lazy"
+                        sizes="(max-width: 860px) 100vw, 792px"
+                        srcset="assets/hardware/midi-clk_396.jpg 396w, assets/hardware/midi-clk_792.jpg 792w, assets/hardware/midi-clk_1584.jpg 1584w"
+                        alt="The device GLOBAL page showing MIDI CLK set to AUTO"
+                    />
+                </picture>
+                <figcaption>Set MIDI CLK to AUTO so the sequencer follows the editor's transport.</figcaption>
+            </figure>
+            <p>
+                New to the hardware? The <a href="concepts">Concepts</a> page explains banks, the two play modes, BPM-sync and the sequencer. Stuck?
+                See <a href="troubleshooting">Troubleshooting</a>.
+            </p>
 
-  <footer>
-    <nav>
-      <a href="./">Home</a>
-      <a href="getting-started">Getting started</a>
-      <a href="guide">Guide</a>
-      <a href="concepts">Concepts</a>
-      <a href="troubleshooting">Troubleshooting</a>
-      <a href="https://github.com/benjamindehli/microsampler-editor-librarian/releases">Releases &amp; changelog ↗</a>
-    </nav>
-    <a class="logo-link" href="https://www.dehlimusikk.no/" target="_blank" rel="noopener" title="Visit Dehli Musikk"><img class="logo" src="assets/logo.svg" alt="Dehli Musikk"></a>
-    <p>microSAMPLER Editor / Librarian is an independent, unofficial project by <a href="https://www.dehlimusikk.no/" target="_blank" rel="noopener">Dehli Musikk</a>.
-      microSAMPLER and Korg are trademarks of Korg Inc. Licensed under the GNU GPL v3.</p>
-  </footer>
-</main>
+            <footer>
+                <nav>
+                    <a href="./">Home</a>
+                    <a href="getting-started">Getting started</a>
+                    <a href="guide">Guide</a>
+                    <a href="concepts">Concepts</a>
+                    <a href="troubleshooting">Troubleshooting</a>
+                    <a href="https://github.com/benjamindehli/microsampler-editor-librarian/releases">Releases &amp; changelog ↗</a>
+                </nav>
+                <a class="logo-link" href="https://www.dehlimusikk.no/" target="_blank" rel="noopener" title="Visit Dehli Musikk"
+                    ><img class="logo" src="assets/logo.svg" alt="Dehli Musikk"
+                /></a>
+                <p>
+                    microSAMPLER Editor / Librarian is an independent, unofficial project by
+                    <a href="https://www.dehlimusikk.no/" target="_blank" rel="noopener">Dehli Musikk</a>. microSAMPLER and Korg are trademarks of
+                    Korg Inc. Licensed under the GNU GPL v3.
+                </p>
+            </footer>
+        </main>
 
-<a class="to-top" href="#top" aria-label="Back to top" title="Back to top">↑</a>
-</body>
+        <a class="to-top" href="#top" aria-label="Back to top" title="Back to top">↑</a>
+    </body>
 </html>
