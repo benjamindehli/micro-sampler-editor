@@ -38,4 +38,16 @@ export default [
       'comma-spacing': ['error', { before: false, after: true }],
     },
   },
+
+  // docs site scripts: small, dependency-free browser code loaded as a classic
+  // <script> (not a module). Declare browser globals so document / window /
+  // addEventListener resolve instead of tripping no-undef.
+  {
+    files: ['docs/**/*.js'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'script',
+      globals: globals.browser,
+    },
+  },
 ];
