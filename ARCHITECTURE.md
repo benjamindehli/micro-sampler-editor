@@ -1,7 +1,7 @@
 # Architecture
 
 How the pieces fit together, for contributors. For *what* the app does see the
-[README](README.md); for *how to contribute* see [CONTRIBUTING](CONTRIBUTING.md).
+[README](README.md). For *how to contribute* see [CONTRIBUTING](CONTRIBUTING.md).
 
 ## The big picture
 
@@ -27,7 +27,7 @@ The solution is a small **local bridge** that owns the device and exposes a plai
 ```
 
 The bridge **serves the web app's static files too**, so there's nothing to
-build or host — open `http://localhost:8765` and it's same-origin.
+build or host. Just open `http://localhost:8765` and it's same-origin.
 
 ## Two transports, one pair of pipes
 
@@ -41,7 +41,7 @@ Everything rides the device's two bulk endpoints (OUT `0x01` / IN `0x82`,
 - **Sample / bank / pattern transfer → raw USB bulk** on the same pipes
   (headers via SysEx, PCM as raw bytes).
 
-The protocol was reverse-engineered from the original 32-bit editor; the codec
+The protocol was reverse-engineered from the original 32-bit editor. The codec
 and message builders live in **`native-tools/protocol.py`** (pure, with an
 offline self-test). The USB transport is **`native-tools/msusb.py`**.
 
@@ -54,14 +54,14 @@ offline self-test). The USB transport is **`native-tools/msusb.py`**.
 | `native-tools/msusb.py` | libusb transport (USB-MIDI packetisation, inquiry). |
 | `native-tools/{download,upload,bank}.py` | Single-sample + full-bank transfer flows (also CLIs). |
 | `native-tools/msmpl_bank.py` | Reader for original Korg `.msmpl_bank` backups (library mode + CLI). |
-| `web-editor/` | The browser app — ES modules, no build step: `app.js` entry, pure leaves in `functions/`, one folder per feature in `components/<name>/` (JS + CSS), globals in `styles/`. |
+| `web-editor/` | The browser app, using ES modules with no build step: `app.js` entry, pure leaves in `functions/`, one folder per feature in `components/<name>/` (JS + CSS), globals in `styles/`. |
 | `tools/bundle/` | The packaged desktop apps: PyInstaller specs + entry scripts, the Swift menu-bar shell for the macOS Editor app, AppImage/DMG/notarization scripts (built by `.github/workflows/package.yml`). |
-| `tools/re/` | Reverse-engineering toolkit (needs Korg's `.pkg`; not distributed). |
+| `tools/re/` | Reverse-engineering toolkit (needs Korg's `.pkg`, not distributed). |
 
 ### Bridge internals (`bridge.py`)
 
 - A single **`Device`** instance owns the libusb handle. **One `RLock`
-  serialises every USB operation** — the device can't be talked to
+  serialises every USB operation**. The device can't be talked to
   concurrently.
 - A **background reader thread** continuously reads the IN endpoint (it pauses
   whenever an operation holds the lock). Incoming SysEx (panel parameter edits)
@@ -69,51 +69,51 @@ offline self-test). The USB transport is **`native-tools/msusb.py`**.
   **SSE** (`/api/events`).
 - **Sessions & dump mode:** every operation re-sends a Device Inquiry (an idle
   device refuses dump-mode requests otherwise), and dump-mode is always left in
-  a `finally`. The sample-select state machine is finicky — see the comments in
+  a `finally`. The sample-select state machine is finicky, so see the comments in
   `bridge.py` / `download.py`.
 - **`--mock`** swaps in a `MockDevice` that serves fake data with no hardware,
   so the whole UI (and the e2e smoke + most tests) run without a device.
 - **`--library`** (port 8766) swaps in a `LibraryDevice`: no USB at all, just
-  browsing/exporting bank backups — what the Library desktop app runs.
+  browsing/exporting bank backups. This is what the Library desktop app runs.
 - **`--daemon`** is how the macOS Editor app's background service runs the
   bridge: the device starts **unclaimed**, is claimed lazily when the editor
-  page opens, and is auto-released after a few idle minutes with no UI — so
+  page opens, and is auto-released after a few idle minutes with no UI, so
   the always-on daemon doesn't hog the microSAMPLER from DAWs. `POST
   /api/release` releases it on demand (the menu bar's *Release Device*).
 
 ### Frontend (`web-editor/`)
 
-Plain ES modules, loaded by `app.html`; **no bundler in dev**. Modules import
+Plain ES modules, loaded by `app.html`, with **no bundler in dev**. Modules import
 through bare aliases (`functions/…`, `components/…`, `app.js`), resolved by an
 import map in `app.html` (dev), esbuild aliases (dist), and a Node hook
-(tests) — so moving a file never touches its importers. Circular imports exist
+(tests), so moving a file never touches its importers. Circular imports exist
 but are runtime-only (used inside functions), so they're safe.
 
-- `app.js` — entry: boot, view switching, `refreshBank()`, focus re-sync.
-- `functions/` — pure leaves: `state` (the single shared mutable state),
+- `app.js` is the entry point: boot, view switching, `refreshBank()`, focus re-sync.
+- `functions/` holds the pure leaves: `state` (the single shared mutable state),
   `util` (DOM/`api()` helpers), `events` (routes SSE messages onto the right
   module), `ticker`, `notes`, `audioTools` (upload DSP), `smfWrite`, and the
-  **generated** `valueTables` + `fxData` (from `tools/re/` — don't hand-edit).
-- `components/<name>/` — one folder per feature (`<name>.js` + `<name>.css`):
+  **generated** `valueTables` + `fxData` (from `tools/re/`, don't hand-edit).
+- `components/<name>/` is one folder per feature (`<name>.js` + `<name>.css`):
   `pads`, `sample-editor` (slot/waveform/sampleLoad/slotops/slice),
   `controls`, `meter`, `effect`, `patterns`, `pattern-editor`, `keyboard`,
   `dialogs`, `utility`, `library`, `update`, `ux`.
-- `styles/` — global sheets: `base` (tokens), `layout`, `fonts`.
+- `styles/` holds the global sheets: `base` (tokens), `layout`, `fonts`.
 
 A production build (`npm run build`, esbuild) bundles/minifies into `dist/` for
-releases, but it's optional — the source runs as-is.
+releases, but it's optional. The source runs as-is.
 
 ### Packaged apps (`tools/bundle/`)
 
 The same bridge + web app, frozen with PyInstaller into double-clickable apps
 (built, signed and notarized by `.github/workflows/package.yml`):
 
-- **microSAMPLER Library** — `library_app.py` + `library.spec`: the bridge in
-  `--library` mode with a bundled runtime; macOS `.app` and Linux
+- **microSAMPLER Library** (`library_app.py` + `library.spec`): the bridge in
+  `--library` mode with a bundled runtime. It ships as a macOS `.app` and Linux
   AppImage/tar.gz. No USB, no privileges.
-- **microSAMPLER Editor Librarian** (macOS 13+) — a small Swift menu-bar app
+- **microSAMPLER Editor Librarian** (macOS 13+) is a small Swift menu-bar app
   (`editor-app/main.swift`) that registers a root **launchd daemon** via
-  `SMAppService` (one-time approval in Login Items); the daemon is the frozen
+  `SMAppService` (one-time approval in Login Items). The daemon is the frozen
   bridge in `--daemon` mode (`editor_daemon.py` + `editor.spec`), so no typed
   `sudo` and no terminal. Both apps ship in one notarized DMG per
   architecture.
@@ -134,7 +134,7 @@ control change → `controls.js` → `POST /api/param {obj,param,value}` → bri
 
 turn a knob on the device → it transmits SysEx → bridge reader thread parses it
 → SSE event → `events.js` → updates the cached value + reflects it in the UI.
-(The device only transmits edits while on its SAMPLE-EDIT page; the app also
+(The device only transmits edits while on its SAMPLE-EDIT page. The app also
 auto-re-reads the bank on window focus to resync.)
 
 ### Sample download / upload
@@ -143,7 +143,7 @@ auto-re-reads the bank on window focus to resync.)
 `0x1F` → params `0x14`), byteswaps BE→LE, returns a WAV (+ `X-Sample-Tempo`
 header) → browser decodes it for the waveform/meter.
 `POST /api/sample/N` (WAV body) → bridge upload (`0x42` header → raw PCM → `0x44`
-param blob); the browser may pre-process the WAV first (the AUDIO TOOLS panel).
+param blob). The browser may pre-process the WAV first (the AUDIO TOOLS panel).
 
 ### Bank backup / restore & patterns
 
@@ -155,18 +155,18 @@ Standard MIDI Files.
 
 - Audition / pad-play: `POST /api/note` → MIDI note on/off (`note = 48 + slot`).
 - Pattern transport: `POST /api/pattern/N/play` selects the pattern (NRPN) and
-  starts the sequencer, with the bridge streaming MIDI clock; `POST
+  starts the sequencer, with the bridge streaming MIDI clock. `POST
   /api/transport/stop` stops it.
 
 ## Key constraints worth knowing
 
-- **One USB owner at a time** — the bridge and any other MIDI software can't
+- **One USB owner at a time.** The bridge and any other MIDI software can't
   hold the device together.
-- **RAM vs flash** — sample/parameter transfers target the device's *current
+- **RAM vs flash.** Sample/parameter transfers target the device's *current
   bank (RAM)*, lost on power-off/bank-switch. Persisting means a panel WRITE or
   restoring to a user bank.
 - **Hardware is largely unverifiable in CI.** The maintainer can't
-  packet-capture; protocol changes are confirmed by hand on a real device. Lean
+  packet-capture. Protocol changes are confirmed by hand on a real device. Lean
   on `--mock`, the offline suite, and call out hardware testing in PRs.
 
 ## Tests & CI
@@ -174,4 +174,4 @@ Standard MIDI Files.
 See [CONTRIBUTING](CONTRIBUTING.md). In short: a Python offline suite
 (`native-tools/test_*.py`, mock device), JS unit tests for the pure modules
 (`test/`, `node --test`), a Playwright browser smoke (`e2e/smoke.py`), and two
-linters (Ruff + ESLint) — all run in `.github/workflows/ci.yml`.
+linters (Ruff + ESLint), all run in `.github/workflows/ci.yml`.

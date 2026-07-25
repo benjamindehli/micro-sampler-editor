@@ -3,17 +3,18 @@
 **microSAMPLER Editor / Librarian** is a locally-run, open-source desktop tool:
 a Python bridge (`native-tools/bridge.py`) that serves a browser UI on
 `http://localhost:8765` and talks to a Korg microSAMPLER over USB. It is not a
-hosted service — it runs entirely on the user's own machine — but it does open a
+hosted service, and it runs entirely on the user's own machine.
+But it does open a
 local HTTP server, claim the USB interface with elevated rights (typed `sudo`
-for the classic launchers; the macOS app uses a one-time-approved background
-helper instead), and process some untrusted input (imported backup `.zip`
-archives, uploaded `.wav` files).
+for the classic launchers, while the macOS app uses a one-time-approved
+background helper instead), and process some untrusted input (imported backup
+`.zip` archives, uploaded `.wav` files).
 Security reports are welcome.
 
 ## Supported Versions
 
 This is a single-maintainer project. Security fixes are applied to the `main`
-branch and rolled into the next tagged release; there are no separately
+branch and rolled into the next tagged release. There are no separately
 maintained release branches, and older releases are not back-patched.
 
 | Version                  | Supported          |
@@ -38,7 +39,7 @@ Report privately through GitHub's built-in advisory flow:
    steps, impact, and a proof-of-concept if you have one.
 
 If you can't use that flow, open a regular issue asking the maintainer to reach
-out — **without any vulnerability details** — and the conversation can move to a
+out, **without any vulnerability details**, and the conversation can move to a
 private channel.
 
 ### What to expect
@@ -61,13 +62,13 @@ Because the app runs locally, the most relevant concerns are things reachable
 without already having control of the machine, for example:
 
 - **In scope:** path traversal or arbitrary file write/read via the bridge's
-  HTTP endpoints; unsafe handling of imported backup `.zip` archives (e.g.
-  zip-slip) or uploaded audio files; the local server unintentionally accepting
+  HTTP endpoints. Unsafe handling of imported backup `.zip` archives (e.g.
+  zip-slip) or uploaded audio files. The local server unintentionally accepting
   requests from other hosts or from untrusted web origins (CSRF/DNS-rebinding).
 - **Out of scope:** issues that require an attacker to already have root/local
-  access to the machine running the bridge; vulnerabilities in third-party
-  dependencies (report those upstream — our only runtime deps are
-  [pyusb](https://github.com/pyusb/pyusb) and libusb); and anything in the
+  access to the machine running the bridge. Vulnerabilities in third-party
+  dependencies (report those upstream, since our only runtime deps are
+  [pyusb](https://github.com/pyusb/pyusb) and libusb). Anything in the
   original Korg `.pkg`, which is not part of this project.
 
 Thank you for helping keep the project and its users safe.

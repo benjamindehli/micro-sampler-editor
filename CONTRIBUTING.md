@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for your interest in the **microSAMPLER Editor / Librarian** — an
+Thanks for your interest in the **microSAMPLER Editor / Librarian**, an
 independent, unofficial editor for the Korg microSAMPLER, reverse-engineered for
 modern macOS. Contributions are welcome: bug reports, fixes, features, docs.
 
@@ -9,28 +9,28 @@ review times.
 
 ## Ground rules
 
-- **Independent & unofficial** — not affiliated with Korg. The communication
-  protocol was reverse-engineered for **interoperability** with hardware the
-  user owns. Don't add Korg software, firmware, presets, or other copyrighted
-  material to the repo.
-- **License** — by contributing you agree your work is licensed under the
+- **Independent & unofficial.** This project is not affiliated with Korg. The
+  communication protocol was reverse-engineered for **interoperability** with
+  hardware the user owns. Don't add Korg software, firmware, presets, or other
+  copyrighted material to the repo.
+- **License.** By contributing you agree your work is licensed under the
   project's [GNU GPL v3](LICENSE).
-- **Security issues** — please report privately (see [SECURITY.md](SECURITY.md)),
+- **Security issues.** Please report privately (see [SECURITY.md](SECURITY.md)),
   not via a public issue or PR.
 
 ## Reporting issues
 
 Use the **Bug report** / **Feature request** templates. For bugs, the most
 useful thing you can do is say **whether it also reproduces in mock mode**
-(`python3 native-tools/bridge.py --mock`) — that tells us instantly whether it's
-a UI bug or device/protocol-related — and paste the **bridge terminal output**
-and **browser console** errors.
+(`python3 native-tools/bridge.py --mock`). That tells us instantly whether it's
+a UI bug or device/protocol-related. Please also paste the **bridge terminal
+output** and **browser console** errors.
 
 ## Development setup
 
-The app is **plain ES modules + per-component CSS with no build step** — just
-run the bridge and open the page. You only need hardware deps for talking to a
-real device.
+The app is **plain ES modules + per-component CSS with no build step**, so you
+just run the bridge and open the page. You only need hardware deps for talking
+to a real device.
 
 ```bash
 # UI / app work — no hardware, no extra deps:
@@ -69,22 +69,22 @@ python3 e2e/smoke.py
 ```
 
 CI (`.github/workflows/ci.yml`) runs the offline suite (Python 3.8 + 3.12), the
-JS checks, both linters, and the e2e smoke — they must pass.
+JS checks, both linters, and the e2e smoke. They must all pass.
 
 ## Code style & conventions
 
 - **Match the surrounding code.** The linters (Ruff for Python, ESLint for JS)
-  are configured as **bug catchers, not formatters** — they flag undefined
+  are configured as **bug catchers, not formatters**. They flag undefined
   names, unused imports, etc., but won't reformat. Keep the existing hand-tuned
-  style; ESLint also auto-sorts import statements (`simple-import-sort`).
+  style. ESLint also auto-sorts import statements (`simple-import-sort`).
 - **Python must stay 3.8-compatible** (the oldest interpreter we support): no
   `match` statements, no 3.9+ stdlib. `pyusb` is imported lazily so the offline
-  suite stays dependency-free — keep it that way.
+  suite stays dependency-free, and it should stay that way.
 - **JavaScript** is browser ES modules (no transpile). Pure, testable logic
   (e.g. value encoders, the audio DSP) lives in modules that unit-test under
-  `node:test` in `test/` — add coverage there when you touch them.
+  `node:test` in `test/`. Add coverage there when you touch them.
 - **CSS** is split per component and themed via CSS custom properties
-  (`--amber-rgb` etc. + `color-mix`) so the accent theming keeps working — avoid
+  (`--amber-rgb` etc. + `color-mix`) so the accent theming keeps working. Avoid
   hard-coding accent colours.
 
 ## Hardware vs. mock
@@ -93,20 +93,20 @@ Much of the device protocol can't be exercised offline, and the maintainer
 can't packet-capture. So:
 
 - Anything touching **`native-tools/bridge.py` / `protocol.py` / the transfer
-  CLIs** is **hardware-critical and largely unverifiable in CI** — change it
+  CLIs** is **hardware-critical and largely unverifiable in CI**. Change it
   conservatively, keep the offline tests green, and **call out in your PR what
   you could and couldn't test on a real device**.
 - The `tools/re/` reverse-engineering toolkit needs Korg's original `.pkg`
   (gitignored, not distributed) and isn't required for most contributions.
 - The **packaged desktop apps** live in `tools/bundle/` (PyInstaller specs,
   entry scripts, the Swift menu-bar shell) and are built/signed/notarized by
-  `.github/workflows/package.yml` — run that workflow manually to validate
+  `.github/workflows/package.yml`. Run that workflow manually to validate
   packaging changes before a release.
 
 ## Regenerating docs assets
 
 The screenshots and demo video under `docs/assets/` are generated from the live
-app — don't hand-edit them. After a UI change, regenerate with:
+app, so don't hand-edit them. After a UI change, regenerate with:
 
 ```bash
 pip install playwright pillow imageio-ffmpeg && playwright install chromium
@@ -118,10 +118,10 @@ It drives the mock bridge headless, so it needs no hardware. Screenshots depend 
 headless Chromium's font rendering, so this is a regenerate-on-demand tool, not a CI
 gate. (`og-cover.jpg` is a real photo and isn't regenerated.)
 
-The author/copyright/location metadata (XMP + IPTC on the PNGs; Exif/GPS + XMP + IPTC
-on the JPG) is **carried forward automatically** — the script copies the existing
+The author/copyright/location metadata (XMP + IPTC on the PNGs, Exif/GPS + XMP + IPTC
+on the JPG) is **carried forward automatically**. The script copies the existing
 stamp from the already-tagged assets, so you don't need to re-tag after a regen. To
-change it, retag the assets once with any tool and the next run picks it up; pass
+change it, retag the assets once with any tool and the next run picks it up. Pass
 `--no-metadata` to skip stamping.
 
 ## Dependencies
@@ -142,7 +142,7 @@ its license) before adding it.
 
 ## Don't commit
 
-- Korg's `.pkg` installer or the owner's manual PDF (copyright — gitignored).
+- Korg's `.pkg` installer or the owner's manual PDF (copyright, gitignored).
 - Personal bank backups / samples (`native-tools/backups/`, `*.wav`, etc. are
   gitignored).
 - `node_modules/` or `dist/` (gitignored).

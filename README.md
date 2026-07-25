@@ -18,8 +18,8 @@ This app covers everything the original did, plus a few things it didn't.
 (contains the full editor as a menu-bar app plus the hardware-free **Library** app).
 
 **Linux:** [Library AppImage](https://github.com/benjamindehli/microsampler-editor-librarian/releases/latest/download/microSAMPLER_Library-x86_64.AppImage)
-(also as [tar.gz](https://github.com/benjamindehli/microsampler-editor-librarian/releases/latest/download/microSAMPLER_Library-linux-x86_64.tar.gz));
-the full editor runs via the launcher in the release ZIP.
+(also as [tar.gz](https://github.com/benjamindehli/microsampler-editor-librarian/releases/latest/download/microSAMPLER_Library-linux-x86_64.tar.gz)).
+The full editor runs via the launcher in the release ZIP.
 
 **Any platform:** the [latest release](https://github.com/benjamindehli/microsampler-editor-librarian/releases/latest) ZIP
 has launchers for macOS, Linux and Windows, needing only Python 3.
@@ -29,33 +29,33 @@ has launchers for macOS, Linux and Windows, needing only Python 3.
 - **SAMPLES**:
   - 36-slot bank overview
   - Audition on the device (honors start/end points) with a playhead on the waveform
-  - On-screen keyboard mirroring the 36 pads — click to play, or tick **⌨ TYPE TO
+  - On-screen keyboard mirroring the 36 pads. Click to play, or tick **⌨ TYPE TO
     PLAY** to play from your computer keyboard (Z/X shift octave). A **SAMPLE /
     KEYBOARD** toggle switches between triggering one sample per key (empty keys
     dimmed) and playing the selected sample pitched across the keyboard
-  - **MIDI IN** — play the device from a connected MIDI keyboard, with velocity,
-    pitch bend and sustain pedal (uses the browser's Web MIDI; honors the SAMPLE /
-    KEYBOARD mode)
-  - WAV download/upload (auto-resample to 48/24/12/6 kHz); drop several WAVs
+  - **MIDI IN**: play the device from a connected MIDI keyboard, with velocity,
+    pitch bend and sustain pedal (uses the browser's Web MIDI, and honors the
+    SAMPLE / KEYBOARD mode)
+  - WAV download/upload (auto-resample to 48/24/12/6 kHz). Drop several WAVs
     onto the pads to bulk-fill consecutive slots
-  - Auto-slice — chop one long sample across consecutive pads, by equal pieces
+  - Auto-slice: chop one long sample across consecutive pads, by equal pieces
     or detected transients (great for drum breaks and loops)
-  - Audio tools on upload — normalize, gain, trim silence, fade in/out,
+  - Audio tools on upload: normalize, gain, trim silence, fade in/out,
     mono ↔ stereo (processed in-browser before transfer)
   - Filter pads by name
   - Live editing of all sample parameters
   - Draggable START/END markers on the waveform (or type exact frame values),
     with optional zero-crossing snap so trims don't click
-  - Editable original BPM (the sample tempo used for BPM-sync) — re-uploads the
-    sample to apply, keeping its audio and other settings
+  - Editable original BPM (the sample tempo used for BPM-sync). Applying it
+    re-uploads the sample, keeping its audio and other settings
   - Zoomable / pannable waveform (scroll to zoom, drag to pan) for
-    sample-accurate trimming — stereo samples show as two half-height lanes
+    sample-accurate trimming. Stereo samples show as two half-height lanes
     (left above right) so each channel reads on its own
   - Renaming banks and samples
-  - All samples preload on connect — and again when you switch banks on the
-    device (re-synced when you return to the app) — with progress shown, so the
+  - All samples preload on connect, and again when you switch banks on the
+    device (re-synced when you return to the app). Progress is shown, so the
     memory meter is exact and waveforms are instant
-  - **FOLLOW** toggle (on by default) — the selection tracks the last sample
+  - **FOLLOW** toggle (on by default): the selection tracks the last sample
     triggered on the device, whether you play it or a pattern does
 - **EFFECT**:
   - All 22 effect types with their full parameter sets
@@ -71,59 +71,59 @@ has launchers for macOS, Linux and Windows, needing only Python 3.
       move/resize, drag-to-erase and a marquee for multi-select
     - **Multi-select** (Shift/⌘-click), **undo/redo**, and **copy/paste** whose
       clipboard persists across patterns (copy from one, paste into another)
-    - Per-note velocity shown as note brightness; arrow keys nudge or resize
-    - **Space** plays/stops the pattern on the device; clicking outside the
+    - Per-note velocity shown as note brightness. Arrow keys nudge or resize
+    - **Space** plays/stops the pattern on the device. Clicking outside the
       dialog saves and closes
     - Set the bar count, grid snap and the keyboard track's sample, then save
       back to the device (build a pattern from scratch on an empty slot, too)
   - Import and Export MIDI files
-  - Remote record trigger (presses the device's [REC] over MIDI; watch the
+  - Remote record trigger (presses the device's [REC] over MIDI, so watch the
     device screen)
 - **UTILITY**:
   - Full bank backup/restore (RAM or persistent user banks)
-  - Cherry-pick restore — copy a single sample out of a backup into any pad
+  - Cherry-pick restore: copy a single sample out of a backup into any pad
     of the current bank
-  - Remote sampling trigger (input select + [SAMPLING] over MIDI; no
+  - Remote sampling trigger (input select + [SAMPLING] over MIDI, with no
     device-state readback, so watch the device screen)
 - **Live two-way sync**:
   - Panel edits on the device show up in the app instantly
 - **Master volume** slider for the device output, and a **panic** button
   (all sound off / stop) for stuck notes
-- **12 accent themes** picked from a swatch dropdown — the whole interface
+- **12 accent themes** picked from a swatch dropdown. The whole interface
   (buttons, LCD, waveform, keys) recolours to match
 - Remembers your last-open view across reloads
-- Tells you when a newer release is available (checks GitHub; dismissible)
+- Tells you when a newer release is available (checks GitHub, dismissible)
 - **Library mode** (no hardware): import original Korg `.msmpl_bank` backups (or
   this app's `.zip` backups), browse and play their samples in the browser,
-  export them as WAVs, and recover the recorded patterns as MIDI files — handy
+  export them as WAVs, and recover the recorded patterns as MIDI files. Handy
   for getting audio and sequences out of old backups
 
 ## Requirements
 
-**The desktop apps above bundle everything** (macOS 13+ / Linux x86-64) — the
+**The desktop apps above bundle everything** (macOS 13+ / Linux x86-64). The
 requirements below apply to the classic ZIP + launchers:
 
 - macOS (tested), Linux (should work) or Windows (untested)
-- **Python 3.8+** — that's the only thing you install.
+- **Python 3.8+** is the only thing you install.
   [pyusb](https://github.com/pyusb/pyusb) (BSD) and
   [libusb](https://libusb.info/) (LGPL) are bundled in
   [`native-tools/vendor/`](native-tools/vendor/), so there's no `pip` or
   Homebrew step. (A system pyusb/libusb, if you have one installed, is used in
-  preference — the bundled copies are just a fallback. A newer system libusb,
+  preference, and the bundled copies are just a fallback. A newer system libusb,
   e.g. `brew install libusb`, can be more robust across reconnects.)
 - Chrome/Chromium recommended (any modern should work)
 - A Korg microSAMPLER connected with USB
 
 ## Run
 
-**Installed the apps?** Just open them — the Editor app puts a ♪ in the menu
-bar and opens the editor; the Library app opens straight into the librarian.
+**Installed the apps?** Just open them. The Editor app puts a ♪ in the menu
+bar and opens the editor, and the Library app opens straight into the librarian.
 The rest of this section is the classic ZIP way:
 
-Open the folder for your platform — **`macOS/`**, **`Linux/`**, or **`Windows/`**
-— and double-click **`microSAMPLER Editor Librarian`** (`.command` / `.sh` /
+Open the folder for your platform (**`macOS/`**, **`Linux/`**, or **`Windows/`**)
+and double-click **`microSAMPLER Editor Librarian`** (`.command` / `.sh` /
 `.bat`). It starts the bridge and opens the editor in your browser automatically.
-(Each folder also has a **`microSAMPLER Library`** launcher — see
+(Each folder also has a **`microSAMPLER Library`** launcher, see
 [Library mode](#library-mode-no-hardware) below.)
 
 - **macOS:** the launcher is unsigned, so the first run is blocked ("unidentified
@@ -133,10 +133,10 @@ Open the folder for your platform — **`macOS/`**, **`Linux/`**, or **`Windows/
   quarantine in a terminal: `xattr -dr com.apple.quarantine "<unzipped folder>"`.)
 - **Linux:** mark the `.sh` executable / "Allow launching" first, or run
   `./'Linux/microSAMPLER Editor Librarian.sh'` from a terminal.
-- **Windows:** **experimental/untested** — the device's USB driver must first be
+- **Windows:** **experimental/untested**. The device's USB driver must first be
   switched to WinUSB with [Zadig](https://zadig.akeo.ie/) so libusb can open it.
 
-macOS and Linux ask for your password — root is required to claim the USB
+macOS and Linux ask for your password, because root is required to claim the USB
 interface from the OS MIDI driver.
 
 ### Manual
@@ -156,25 +156,25 @@ python3 native-tools/bridge.py --mock
 
 ### Library mode (no hardware)
 
-To browse and extract samples from bank backups with no microSAMPLER connected —
-for example to recover audio from old `.msmpl_bank` files saved by Korg's
-original editor — run the bridge in library mode:
+To browse and extract samples from bank backups with no microSAMPLER connected
+(for example to recover audio from old `.msmpl_bank` files saved by Korg's
+original editor), run the bridge in library mode:
 
 ```bash
 python3 native-tools/bridge.py --library
 ```
 
-Library mode serves on **http://localhost:8766** — a separate port from the
+Library mode serves on **http://localhost:8766**, a separate port from the
 device bridge's 8765, so it never clashes with (or attaches to) a running device
 bridge.
 Or just double-click the **`microSAMPLER Library`** launcher in your platform's
-folder (`macOS/`, `Linux/`, `Windows/`) — no password needed, since library mode
-never touches USB.
+folder (`macOS/`, `Linux/`, `Windows/`). No password is needed, since library
+mode never touches USB.
 Open the editor, go to **LIBRARY**, and use **OPEN BANK FILE…** to import a
 `.msmpl_bank` (original Korg) or a `.zip` (this app's) backup.
 You can then play each sample in the browser, download individual WAVs, or grab
 the whole bank as a ZIP of WAVs.
-If the bank holds recorded patterns, they're listed below the pads — download
+If the bank holds recorded patterns, they're listed below the pads. Download
 each as a MIDI file, or all of them as a `.mid` ZIP.
 
 To extract straight to WAVs from the command line, without the app:
@@ -185,7 +185,7 @@ python3 native-tools/msmpl_bank.py extract "my bank.msmpl_bank"   # -> WAVs + ma
 ```
 
 Bank backups land in `native-tools/backups/` (gitignored, they're your data).
-Note that sample/parameter transfers target the device's **current bank (RAM)**; save on the device or restore to a user bank to persist.
+Note that sample/parameter transfers target the device's **current bank (RAM)**. Save on the device or restore to a user bank to persist.
 
 ## Repository layout
 
@@ -230,7 +230,7 @@ Node's built-in test runner (no deps):
 npm test        # node --test test/*.test.mjs
 ```
 
-The app needs **no build step** to develop or run — it's plain ES modules and per-component CSS served straight from `web-editor/`.
+The app needs **no build step** to develop or run. It's plain ES modules and per-component CSS served straight from `web-editor/`.
 
 End-to-end browser smoke (boots the mock bridge, drives the app headless, fails
 on any page/console error or broken interaction):
@@ -242,8 +242,8 @@ python3 e2e/smoke.py        # reuses a bridge already on the port, else starts a
 
 ### Linting
 
-Bug-focused linters (dev-only; not runtime dependencies) keep the no-build code
-honest — they catch undefined names, unused imports, etc. CI runs both.
+Bug-focused linters (dev-only, not runtime dependencies) keep the no-build code
+honest. They catch undefined names, unused imports, etc. CI runs both.
 
 ```bash
 # Python (native-tools/ + tools/) — needs ruff (pip install ruff)
@@ -266,7 +266,7 @@ npm run pack     # -> dist/ + release/microsampler-editor-librarian-vX.Y.Z.zip
 ```
 
 `dist/` mirrors the run layout (`web-editor/` + `native-tools/` + launcher) and runs exactly like the source.
-`esbuild` is build-time only — the app ships no runtime npm dependencies.
+`esbuild` is build-time only, so the app ships no runtime npm dependencies.
 
 `npm run pack` builds `dist/` and packages it into the release ZIP under `release/`,
 named to match the version (`<name>-vX.Y.Z.zip`) and the docs download link, with a
@@ -303,7 +303,7 @@ The communication protocol was independently reverse-engineered for the sole pur
 
 **Use at your own risk.** This software is provided *“as is”*, without warranty of any kind, as set out in sections 15–16 of the [GNU GPL v3](LICENSE).
 The author accepts **no responsibility or liability** for any damage to your device, loss of samples, patterns or other data, or any other consequence of using this software.
-It writes to the device's memory — **back up your bank** (UTILITY → BACKUP) before bulk operations, and never disconnect the device mid-transfer.
+It writes to the device's memory, so **back up your bank** (UTILITY → BACKUP) before bulk operations, and never disconnect the device mid-transfer.
 
 ---
 
