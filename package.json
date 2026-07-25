@@ -1,27 +1,30 @@
 {
-  "name": "microsampler-editor-librarian",
-  "version": "1.16.0",
-  "private": true,
-  "type": "module",
-  "description": "Build tooling for the microSAMPLER Editor / Librarian web app (the app itself has no runtime npm dependencies).",
-  "license": "GPL-3.0-or-later",
-  "author": "Benjamin Dehli <superelg@gmail.com>",
-  "scripts": {
-    "build": "node tools/build.mjs",
-    "pack": "node tools/build.mjs && node tools/pack.mjs",
-    "lint:js": "eslint web-editor",
-    "test": "node --import ./test/alias-register.mjs --test test/*.test.mjs",
-    "stamp-version": "node tools/stamp-docs-version.mjs",
-    "version": "node tools/stamp-docs-version.mjs && git add docs/index.html native-tools/bridge.py CITATION.cff"
-  },
-  "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "esbuild": "^0.28.1",
-    "eslint": "^10.8.0",
-    "eslint-plugin-simple-import-sort": "^14.0.0",
-    "globals": "^17.7.0"
-  },
-  "overrides": {
-    "brace-expansion": "^5.0.7"
-  }
+    "name": "microsampler-editor-librarian",
+    "version": "1.16.0",
+    "private": true,
+    "type": "module",
+    "description": "Build tooling for the microSAMPLER Editor / Librarian web app (the app itself has no runtime npm dependencies).",
+    "license": "GPL-3.0-or-later",
+    "author": "Benjamin Dehli <superelg@gmail.com>",
+    "scripts": {
+        "build": "node tools/build.mjs",
+        "pack": "node tools/build.mjs && node tools/pack.mjs",
+        "lint:js": "eslint web-editor",
+        "format": "prettier --write .",
+        "format:check": "prettier --check .",
+        "test": "node --import ./test/alias-register.mjs --test test/*.test.mjs",
+        "stamp-version": "node tools/stamp-docs-version.mjs",
+        "version": "node tools/stamp-docs-version.mjs && git add docs/index.html native-tools/bridge.py CITATION.cff"
+    },
+    "devDependencies": {
+        "@eslint/js": "^10.0.1",
+        "esbuild": "^0.28.1",
+        "eslint": "^10.8.0",
+        "eslint-plugin-simple-import-sort": "^14.0.0",
+        "globals": "^17.7.0",
+        "prettier": "^3.9.6"
+    },
+    "overrides": {
+        "brace-expansion": "^5.0.7"
+    }
 }

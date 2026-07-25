@@ -7,168 +7,262 @@
    ════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  --steel-0: #0b0b0d;          /* page background            */
-  --steel-1: #121214;          /* panel                      */
-  --steel-2: #18181c;          /* raised panel               */
-  --steel-3: #202026;          /* control face               */
-  --line:    #2b2b33;          /* panel seams                */
-  --line-hi: #3a3a44;
-  --ink:     #b9b2a6;          /* silkscreen text            */
-  --ink-dim: #837d71;          /* muted labels — lifted from #6d685f for legible contrast */
-  /* accent = one tunable colour (the theme switcher overrides these three RGB
+    --steel-0: #0b0b0d; /* page background            */
+    --steel-1: #121214; /* panel                      */
+    --steel-2: #18181c; /* raised panel               */
+    --steel-3: #202026; /* control face               */
+    --line: #2b2b33; /* panel seams                */
+    --line-hi: #3a3a44;
+    --ink: #b9b2a6; /* silkscreen text            */
+    --ink-dim: #837d71; /* muted labels — lifted from #6d685f for legible contrast */
+    /* accent = one tunable colour (the theme switcher overrides these three RGB
      triplets; everything else — glows, borders, the phosphor backgrounds, the
      canvas waveform — derives from them so a theme change is total). */
-  --amber-rgb:    255, 138, 30;   /* Korg backlight             */
-  --amber-hi-rgb: 255, 192, 99;
-  --amber-dk-rgb: 138, 69, 0;
-  --amber:    rgb(var(--amber-rgb));
-  --amber-hi: rgb(var(--amber-hi-rgb));
-  --amber-dk: rgb(var(--amber-dk-rgb));
-  --phos-bg: color-mix(in srgb, rgb(var(--amber-rgb)) 9%, #000); /* LCD glass */
-  --ok:      #79e06b;
-  --err:     #ff4f3d;
-  --r: 6px;
-  font-size: 15px;
+    --amber-rgb: 255, 138, 30; /* Korg backlight             */
+    --amber-hi-rgb: 255, 192, 99;
+    --amber-dk-rgb: 138, 69, 0;
+    --amber: rgb(var(--amber-rgb));
+    --amber-hi: rgb(var(--amber-hi-rgb));
+    --amber-dk: rgb(var(--amber-dk-rgb));
+    --phos-bg: color-mix(in srgb, rgb(var(--amber-rgb)) 9%, #000); /* LCD glass */
+    --ok: #79e06b;
+    --err: #ff4f3d;
+    --r: 6px;
+    font-size: 15px;
 }
 
-* { box-sizing: border-box; }
-[hidden] { display: none !important; }
+* {
+    box-sizing: border-box;
+}
+[hidden] {
+    display: none !important;
+}
 
-html, body { height: 100%; }
+html,
 body {
-  margin: 0;
-  background:
-    radial-gradient(1200px 500px at 50% -200px, #1a1a20 0%, transparent 60%),
-    var(--steel-0);
-  color: var(--ink);
-  font-family: "Chakra Petch", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
-  display: flex; flex-direction: column;
-  min-height: 100vh;
+    height: 100%;
+}
+body {
+    margin: 0;
+    background: radial-gradient(1200px 500px at 50% -200px, #1a1a20 0%, transparent 60%), var(--steel-0);
+    color: var(--ink);
+    font-family: "Chakra Petch", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 /* film grain over everything, very faint */
 .grain {
-  position: fixed; inset: 0; pointer-events: none; z-index: 90; opacity: .05;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E");
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 90;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E");
 }
 
 /* entrance: machine powering on, sections rise in sequence */
-.reveal { animation: rise .55s cubic-bezier(.2,.8,.25,1) both; animation-delay: var(--d, 0s); }
+.reveal {
+    animation: rise 0.55s cubic-bezier(0.2, 0.8, 0.25, 1) both;
+    animation-delay: var(--d, 0s);
+}
 
 /* shared flex filler (pattern cards, pattern-editor header, backup rows) */
-.spacer { flex: 1; }
+.spacer {
+    flex: 1;
+}
 /* shared LED/status blink — used across sheets (.offline-led in layout,
    .screen-status in sample-editor), so it lives in the base sheet */
-@keyframes blink { 50% { opacity: .25; } }
-@keyframes rise { from { opacity: 0; transform: translateY(14px); } }
+@keyframes blink {
+    50% {
+        opacity: 0.25;
+    }
+}
+@keyframes rise {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+}
 
 /* ── silkscreen + LCD primitives ─────────────────────────────────────── */
 .lcd {
-  background:
-    linear-gradient(180deg, rgba(var(--amber-rgb),.06), transparent 40%),
-    var(--phos-bg);
-  border: 1px solid #000;
-  border-radius: 4px;
-  box-shadow:
-    inset 0 2px 8px rgba(0,0,0,.9),
-    inset 0 0 24px rgba(var(--amber-rgb),.05),
-    0 1px 0 var(--line-hi);
-  padding: .45rem .9rem;
-  display: flex; align-items: baseline; gap: .65rem;
+    background: linear-gradient(180deg, rgba(var(--amber-rgb), 0.06), transparent 40%), var(--phos-bg);
+    border: 1px solid #000;
+    border-radius: 4px;
+    box-shadow:
+        inset 0 2px 8px rgba(0, 0, 0, 0.9),
+        inset 0 0 24px rgba(var(--amber-rgb), 0.05),
+        0 1px 0 var(--line-hi);
+    padding: 0.45rem 0.9rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.65rem;
 }
-.lcd-label { font-size: .58rem; letter-spacing: .18em; color: var(--amber-dk); }
+.lcd-label {
+    font-size: 0.58rem;
+    letter-spacing: 0.18em;
+    color: var(--amber-dk);
+}
 .lcd-text {
-  font-family: "Share Tech Mono", monospace;
-  color: var(--amber);
-  text-shadow: 0 0 8px rgba(var(--amber-rgb),.55);
-  letter-spacing: .08em;
+    font-family: "Share Tech Mono", monospace;
+    color: var(--amber);
+    text-shadow: 0 0 8px rgba(var(--amber-rgb), 0.55);
+    letter-spacing: 0.08em;
 }
-.lcd-text.big { font-size: 1.7rem; line-height: 1; }
+.lcd-text.big {
+    font-size: 1.7rem;
+    line-height: 1;
+}
 .lcd-slot {
-  font-family: "Share Tech Mono", monospace;
-  color: var(--amber-hi); font-size: .85rem;
-  border: 1px solid var(--amber-dk); border-radius: 3px;
-  padding: .1rem .4rem; align-self: center;
+    font-family: "Share Tech Mono", monospace;
+    color: var(--amber-hi);
+    font-size: 0.85rem;
+    border: 1px solid var(--amber-dk);
+    border-radius: 3px;
+    padding: 0.1rem 0.4rem;
+    align-self: center;
 }
-.lcd-sub { font-size: .7rem; color: var(--amber-dk); letter-spacing: .1em; align-self: center; }
+.lcd-sub {
+    font-size: 0.7rem;
+    color: var(--amber-dk);
+    letter-spacing: 0.1em;
+    align-self: center;
+}
 
 /* hardware push-button */
 .hw-btn {
-  appearance: none; border: 0; background: none; padding: 0; cursor: pointer;
-  text-decoration: none; display: inline-block;
+    appearance: none;
+    border: 0;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
 }
 .hw-btn-cap {
-  display: inline-block;
-  font: 600 .68rem/1 "Chakra Petch", sans-serif;
-  letter-spacing: .14em; color: var(--ink);
-  background: linear-gradient(180deg, var(--steel-3), #141417);
-  border: 1px solid var(--line);
-  border-top-color: var(--line-hi);
-  border-radius: 4px;
-  padding: .55rem .85rem;
-  box-shadow: 0 2px 0 #000, inset 0 1px 0 rgba(255,255,255,.05);
-  transition: transform .06s, box-shadow .06s, color .15s;
-  white-space: nowrap;            /* a button label never stacks icon over text */
+    display: inline-block;
+    font:
+        600 0.68rem/1 "Chakra Petch",
+        sans-serif;
+    letter-spacing: 0.14em;
+    color: var(--ink);
+    background: linear-gradient(180deg, var(--steel-3), #141417);
+    border: 1px solid var(--line);
+    border-top-color: var(--line-hi);
+    border-radius: 4px;
+    padding: 0.55rem 0.85rem;
+    box-shadow:
+        0 2px 0 #000,
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    transition:
+        transform 0.06s,
+        box-shadow 0.06s,
+        color 0.15s;
+    white-space: nowrap; /* a button label never stacks icon over text */
 }
-.hw-btn:not(:disabled):hover .hw-btn-cap { color: var(--amber-hi); }
-.hw-btn:not(:disabled):active .hw-btn-cap { transform: translateY(2px); box-shadow: 0 0 0 #000; }
-.hw-btn:disabled { cursor: not-allowed; }
-.hw-btn:disabled .hw-btn-cap { opacity: .4; }
+.hw-btn:not(:disabled):hover .hw-btn-cap {
+    color: var(--amber-hi);
+}
+.hw-btn:not(:disabled):active .hw-btn-cap {
+    transform: translateY(2px);
+    box-shadow: 0 0 0 #000;
+}
+.hw-btn:disabled {
+    cursor: not-allowed;
+}
+.hw-btn:disabled .hw-btn-cap {
+    opacity: 0.4;
+}
 .hw-btn.accent .hw-btn-cap {
-  color: #1a0d00;
-  background: linear-gradient(180deg, var(--amber-hi), var(--amber) 60%,
-              color-mix(in srgb, rgb(var(--amber-rgb)) 82%, #000));
-  border-color: var(--amber-dk); text-shadow: 0 1px 0 rgba(255,255,255,.25);
+    color: #1a0d00;
+    background: linear-gradient(180deg, var(--amber-hi), var(--amber) 60%, color-mix(in srgb, rgb(var(--amber-rgb)) 82%, #000));
+    border-color: var(--amber-dk);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 /* accent caps stay dark-on-amber; the generic hover recolours the cap to light
    amber, which vanishes on the amber fill — keep it dark and signal hover with a
    brighter fill + glow instead */
 .hw-btn.accent:not(:disabled):hover .hw-btn-cap {
-  color: #1a0d00;
-  background: linear-gradient(180deg,
-              color-mix(in srgb, #fff 26%, var(--amber-hi)), var(--amber) 60%,
-              color-mix(in srgb, rgb(var(--amber-rgb)) 82%, #000));
-  box-shadow: 0 2px 0 #000, inset 0 1px 0 rgba(255,255,255,.1),
-              0 0 12px rgba(var(--amber-rgb),.4);
+    color: #1a0d00;
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, #fff 26%, var(--amber-hi)),
+        var(--amber) 60%,
+        color-mix(in srgb, rgb(var(--amber-rgb)) 82%, #000)
+    );
+    box-shadow:
+        0 2px 0 #000,
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        0 0 12px rgba(var(--amber-rgb), 0.4);
 }
-.hw-btn[aria-busy="true"] .hw-btn-cap { opacity: .5; pointer-events: none; }
+.hw-btn[aria-busy="true"] .hw-btn-cap {
+    opacity: 0.5;
+    pointer-events: none;
+}
 
 /* PLAY/STOP icon buttons (sample audition + pattern cards): matched-size SVG
    icons — the ▶/■ glyphs render at different sizes across fonts. The .playing
    class on the button swaps which icon shows. */
 .ai-cap {
-  display: inline-flex; align-items: center; justify-content: center; gap: .42em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.42em;
 }
-.ai-ico { width: .82em; height: .82em; fill: currentColor; flex: none; }
+.ai-ico {
+    width: 0.82em;
+    height: 0.82em;
+    fill: currentColor;
+    flex: none;
+}
 /* fixed-width centered label so PLAY/STOP occupy identical space (no jiggle) */
-.ai-lbl { display: inline-block; min-width: 3.2em; text-align: center; }
-.ai-stop { display: none; }
-.playing .ai-play { display: none; }
-.playing .ai-stop { display: inline-block; }
+.ai-lbl {
+    display: inline-block;
+    min-width: 3.2em;
+    text-align: center;
+}
+.ai-stop {
+    display: none;
+}
+.playing .ai-play {
+    display: none;
+}
+.playing .ai-stop {
+    display: inline-block;
+}
 
 /* keyboard focus ring — only for keyboard focus (mouse clicks don't trigger
    :focus-visible), so it never shows on click but is clear when tabbing. Field
    :focus rules (inputs) are more specific and keep their own ring. */
-:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+:focus-visible {
+    outline: 2px solid var(--amber);
+    outline-offset: 2px;
+}
 
 /* inline button icons (CSS-masked SVG) — for the up/down/reset glyphs the fonts
    render inconsistently (⇧ wider than ⇩, ↺ undersized). Same idea as the SVG
    play/stop; recolours via currentColor, so theming + hover just work. */
 .ico {
-  display: inline-block; width: .92em; height: .92em; vertical-align: -.16em;
-  margin-right: .42em; flex: none; background-color: currentColor;
-  -webkit-mask: center / contain no-repeat var(--ico);
-          mask: center / contain no-repeat var(--ico);
+    display: inline-block;
+    width: 0.92em;
+    height: 0.92em;
+    vertical-align: -0.16em;
+    margin-right: 0.42em;
+    flex: none;
+    background-color: currentColor;
+    -webkit-mask: center / contain no-repeat var(--ico);
+    mask: center / contain no-repeat var(--ico);
 }
 .ico-up {
-  --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 19V5M5 12l7-7 7 7'/%3E%3C/svg%3E");
+    --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 19V5M5 12l7-7 7 7'/%3E%3C/svg%3E");
 }
 .ico-dn {
-  --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 5v14M5 12l7 7 7-7'/%3E%3C/svg%3E");
+    --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 5v14M5 12l7 7 7-7'/%3E%3C/svg%3E");
 }
 .ico-reset {
-  --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='1 4 1 10 7 10'/%3E%3Cpath d='M3.51 15a9 9 0 1 0 2.13-9.36L1 10'/%3E%3C/svg%3E");
+    --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='1 4 1 10 7 10'/%3E%3Cpath d='M3.51 15a9 9 0 1 0 2.13-9.36L1 10'/%3E%3C/svg%3E");
 }
-

@@ -33,7 +33,7 @@ commit on `main`) to be sure you have the latest fixes.
 Report privately through GitHub's built-in advisory flow:
 
 1. Go to the repository's **Security** tab.
-2. Click **Report a vulnerability** (under *Advisories*) to open a private
+2. Click **Report a vulnerability** (under _Advisories_) to open a private
    draft only you and the maintainer can see.
 3. Include as much detail as you can: affected file/endpoint, reproduction
    steps, impact, and a proof-of-concept if you have one.

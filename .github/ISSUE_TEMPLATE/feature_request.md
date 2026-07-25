@@ -3,8 +3,7 @@ name: Feature request
 about: Suggest an improvement to the editor / librarian
 title: "[Feature] "
 labels: enhancement
-assignees: ''
-
+assignees: ""
 ---
 
 **What would you like to be able to do?**
@@ -14,6 +13,7 @@ A clear and concise description of the feature or improvement.
 What's awkward or missing today? <!-- e.g. "I have to … every time I want to …" -->
 
 **Which area does it relate to?**
+
 - [ ] SAMPLES (pads, waveform, upload/download, parameters)
 - [ ] EFFECT
 - [ ] PATTERNS

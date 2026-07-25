@@ -2,24 +2,50 @@
 
 /* ── memory meters ───────────────────────────────────────────────────── */
 .mem-block {
-  margin-top: 1rem; padding-top: .8rem;
-  border-top: 1px solid rgba(var(--amber-rgb),.12);
-  display: flex; flex-direction: column; gap: .45rem;
+    margin-top: 1rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid rgba(var(--amber-rgb), 0.12);
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
 }
-.mem-row { display: flex; align-items: center; gap: .55rem; }
-.mem-label { font-size: .58rem; letter-spacing: .22em; color: var(--ink-dim); width: 2.6rem; }
+.mem-row {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+}
+.mem-label {
+    font-size: 0.58rem;
+    letter-spacing: 0.22em;
+    color: var(--ink-dim);
+    width: 2.6rem;
+}
 .mem-bar {
-  flex: 1; height: 7px; border-radius: 3px; overflow: hidden;
-  background: var(--phos-bg); border: 1px solid rgba(var(--amber-rgb),.22);
+    flex: 1;
+    height: 7px;
+    border-radius: 3px;
+    overflow: hidden;
+    background: var(--phos-bg);
+    border: 1px solid rgba(var(--amber-rgb), 0.22);
 }
 .mem-fill {
-  height: 100%; width: 0; background: var(--amber);
-  box-shadow: 0 0 8px rgba(var(--amber-rgb),.5);
-  transition: width .35s ease;
+    height: 100%;
+    width: 0;
+    background: var(--amber);
+    box-shadow: 0 0 8px rgba(var(--amber-rgb), 0.5);
+    transition: width 0.35s ease;
 }
-.mem-fill.warn { background: #ffc34d; }
-.mem-fill.crit { background: #ff5436; box-shadow: 0 0 8px rgba(255,84,54,.6); }
+.mem-fill.warn {
+    background: #ffc34d;
+}
+.mem-fill.crit {
+    background: #ff5436;
+    box-shadow: 0 0 8px rgba(255, 84, 54, 0.6);
+}
 .mem-val {
-  font-family: "Share Tech Mono", monospace; font-size: .62rem;
-  color: var(--amber); min-width: 6.4rem; text-align: right;
+    font-family: "Share Tech Mono", monospace;
+    font-size: 0.62rem;
+    color: var(--amber);
+    min-width: 6.4rem;
+    text-align: right;
 }

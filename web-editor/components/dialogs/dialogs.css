@@ -2,100 +2,218 @@
 
 /* ── dialogs ─────────────────────────────────────────────────────────── */
 .hw-dialog {
-  background: var(--steel-1); color: var(--ink);
-  border: 1px solid var(--line-hi); border-radius: var(--r);
-  box-shadow: 0 30px 80px rgba(0,0,0,.8);
-  padding: 1.3rem 1.4rem; min-width: 360px;
-  font-family: "Chakra Petch", sans-serif;
+    background: var(--steel-1);
+    color: var(--ink);
+    border: 1px solid var(--line-hi);
+    border-radius: var(--r);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+    padding: 1.3rem 1.4rem;
+    min-width: 360px;
+    font-family: "Chakra Petch", sans-serif;
 }
 /* NB: no backdrop-filter:blur — a full-viewport blur re-runs every frame
    over the continuously-animating waveform behind it, which froze input
    while a dialog was open. The dark dim alone reads fine. */
-.hw-dialog::backdrop { background: rgba(5,5,7,.8); }
-.hw-dialog h3 { margin: 0 0 .8rem; font-size: .9rem; letter-spacing: .18em; color: #fff; }
-.hw-dialog h3 span { color: var(--amber); }
+.hw-dialog::backdrop {
+    background: rgba(5, 5, 7, 0.8);
+}
+.hw-dialog h3 {
+    margin: 0 0 0.8rem;
+    font-size: 0.9rem;
+    letter-spacing: 0.18em;
+    color: #fff;
+}
+.hw-dialog h3 span {
+    color: var(--amber);
+}
 /* cap the width so a longer warning wraps instead of stretching the dialog
    (matches .confirm-body / .help-body, which constrain their body content) */
-.hw-dialog .warn { font-size: .68rem; color: #ffb35c; letter-spacing: .06em; max-width: 26rem; }
-.confirm-body { font-size: .8rem; line-height: 1.5; color: var(--ink); max-width: 26rem; }
+.hw-dialog .warn {
+    font-size: 0.68rem;
+    color: #ffb35c;
+    letter-spacing: 0.06em;
+    max-width: 26rem;
+}
+.confirm-body {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--ink);
+    max-width: 26rem;
+}
 .hw-dialog label {
-  display: flex; align-items: center; gap: .8rem;
-  font-size: .6rem; letter-spacing: .2em; color: var(--ink-dim);
-  margin: .7rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--ink-dim);
+    margin: 0.7rem 0;
 }
 .hw-dialog input {
-  flex: 1; background: var(--phos-bg); color: var(--amber);
-  font-family: "Share Tech Mono", monospace; font-size: .9rem;
-  border: 1px solid #000; border-radius: 3px; padding: .45rem .6rem;
-  box-shadow: inset 0 2px 6px rgba(0,0,0,.8);
+    flex: 1;
+    background: var(--phos-bg);
+    color: var(--amber);
+    font-family: "Share Tech Mono", monospace;
+    font-size: 0.9rem;
+    border: 1px solid #000;
+    border-radius: 3px;
+    padding: 0.45rem 0.6rem;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.8);
 }
-.hw-dialog input:focus { outline: 1px solid var(--amber-dk); }
-.hw-dialog .dlg-actions { display: flex; justify-content: flex-end; gap: .6rem; margin: 1rem 0 0; padding: 0; }
+.hw-dialog input:focus {
+    outline: 1px solid var(--amber-dk);
+}
+.hw-dialog .dlg-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    margin: 1rem 0 0;
+    padding: 0;
+}
 .ud-progress {
-  height: 6px; border-radius: 3px; background: #0c0c0f; overflow: hidden;
-  box-shadow: inset 0 1px 4px rgba(0,0,0,.9);
+    height: 6px;
+    border-radius: 3px;
+    background: #0c0c0f;
+    overflow: hidden;
+    box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.9);
 }
 .ud-progress div {
-  height: 100%; width: 30%;
-  background: linear-gradient(90deg, var(--amber-dk), var(--amber));
-  animation: scan 1s linear infinite;
+    height: 100%;
+    width: 30%;
+    background: linear-gradient(90deg, var(--amber-dk), var(--amber));
+    animation: scan 1s linear infinite;
 }
-@keyframes scan { from { transform: translateX(-100%);} to { transform: translateX(430%);} }
-
+@keyframes scan {
+    from {
+        transform: translateX(-100%);
+    }
+    to {
+        transform: translateX(430%);
+    }
+}
 
 .ud-mem {
-  font-family: "Share Tech Mono", monospace; font-size: .68rem;
-  color: var(--ink-dim); letter-spacing: .04em;
+    font-family: "Share Tech Mono", monospace;
+    font-size: 0.68rem;
+    color: var(--ink-dim);
+    letter-spacing: 0.04em;
 }
-.ud-mem.over { color: var(--err); text-shadow: 0 0 8px rgba(255,79,61,.4); }
+.ud-mem.over {
+    color: var(--err);
+    text-shadow: 0 0 8px rgba(255, 79, 61, 0.4);
+}
 
 /* upload audio-tools panel */
 .ud-tools {
-  border: 1px solid var(--line); border-radius: 5px;
-  padding: .35rem .75rem .65rem; margin: .85rem 0 .2rem;
-  background: rgba(0,0,0,.18);
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    padding: 0.35rem 0.75rem 0.65rem;
+    margin: 0.85rem 0 0.2rem;
+    background: rgba(0, 0, 0, 0.18);
 }
 .ud-tools-head {
-  font-size: .56rem; letter-spacing: .22em; color: var(--amber-dk);
-  margin: .25rem 0 .1rem;
+    font-size: 0.56rem;
+    letter-spacing: 0.22em;
+    color: var(--amber-dk);
+    margin: 0.25rem 0 0.1rem;
 }
-.ud-tools-head span { color: var(--ink-dim); letter-spacing: .08em; margin-left: .5rem; }
-.ud-tools label { margin: .5rem 0; }
+.ud-tools-head span {
+    color: var(--ink-dim);
+    letter-spacing: 0.08em;
+    margin-left: 0.5rem;
+}
+.ud-tools label {
+    margin: 0.5rem 0;
+}
 /* one phosphor <select> for EVERY dialog (was triplicated per-dialog, with
    the copies silently overriding each other across sheets) */
 .hw-dialog select {
-  flex: 1; background: var(--phos-bg); color: var(--amber);
-  font-family: "Share Tech Mono", monospace; font-size: .8rem;
-  border: 1px solid #000; border-radius: 3px; padding: .45rem .5rem;
-  box-shadow: inset 0 2px 6px rgba(0,0,0,.8); cursor: pointer;
+    flex: 1;
+    background: var(--phos-bg);
+    color: var(--amber);
+    font-family: "Share Tech Mono", monospace;
+    font-size: 0.8rem;
+    border: 1px solid #000;
+    border-radius: 3px;
+    padding: 0.45rem 0.5rem;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.8);
+    cursor: pointer;
 }
-.ud-tools input[type="number"] { flex: 0 0 5rem; }
-.ud-check { justify-content: flex-start; gap: .55rem; cursor: pointer; }
+.ud-tools input[type="number"] {
+    flex: 0 0 5rem;
+}
+.ud-check {
+    justify-content: flex-start;
+    gap: 0.55rem;
+    cursor: pointer;
+}
 
 /* slice-across-pads dialog */
 .sl-src {
-  font-family: "Share Tech Mono", monospace; font-size: .72rem;
-  color: var(--amber-hi); margin: .2rem 0 .6rem;
+    font-family: "Share Tech Mono", monospace;
+    font-size: 0.72rem;
+    color: var(--amber-hi);
+    margin: 0.2rem 0 0.6rem;
 }
-.sl-mode { display: flex; gap: 1.4rem; margin: .3rem 0 .6rem; }
-.sl-mode .ud-check { margin: 0; }
-#sl-sens-row input[type="range"] { flex: 1; accent-color: var(--amber); }
+.sl-mode {
+    display: flex;
+    gap: 1.4rem;
+    margin: 0.3rem 0 0.6rem;
+}
+.sl-mode .ud-check {
+    margin: 0;
+}
+#sl-sens-row input[type="range"] {
+    flex: 1;
+    accent-color: var(--amber);
+}
 
 .ud-check input {
-  flex: 0 0 auto; width: 15px; height: 15px; padding: 0;
-  box-shadow: none; accent-color: var(--amber);
+    flex: 0 0 auto;
+    width: 15px;
+    height: 15px;
+    padding: 0;
+    box-shadow: none;
+    accent-color: var(--amber);
 }
-.ud-fades { display: flex; gap: .9rem; }
-.ud-fades label { flex: 1; }
-.ud-tools input:disabled, .ud-tools select:disabled { opacity: .4; cursor: default; }
-.ud-tools-note { font-size: .64rem; color: #ffb35c; letter-spacing: .04em; margin-top: .45rem; }
+.ud-fades {
+    display: flex;
+    gap: 0.9rem;
+}
+.ud-fades label {
+    flex: 1;
+}
+.ud-tools input:disabled,
+.ud-tools select:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+.ud-tools-note {
+    font-size: 0.64rem;
+    color: #ffb35c;
+    letter-spacing: 0.04em;
+    margin-top: 0.45rem;
+}
 
 /* help overlay */
-.help-body { max-width: 42rem; font-size: .8rem; line-height: 1.5; color: var(--ink); }
-.help-body p { margin: .5rem 0; }
-.help-body b { color: var(--amber-hi); }
+.help-body {
+    max-width: 42rem;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--ink);
+}
+.help-body p {
+    margin: 0.5rem 0;
+}
+.help-body b {
+    color: var(--amber-hi);
+}
 .help-body kbd {
-  font-family: "Share Tech Mono", monospace; font-size: .72rem;
-  background: var(--phos-bg); color: var(--amber);
-  border: 1px solid var(--amber-dk); border-radius: 3px; padding: .05rem .3rem;
+    font-family: "Share Tech Mono", monospace;
+    font-size: 0.72rem;
+    background: var(--phos-bg);
+    color: var(--amber);
+    border: 1px solid var(--amber-dk);
+    border-radius: 3px;
+    padding: 0.05rem 0.3rem;
 }

@@ -6,45 +6,44 @@
 // unlike the bank slot objects — PERSISTS across refreshBank(); reapplyFormats()
 // re-stamps it onto the fresh bank so a focus re-sync doesn't lose load state
 // or reset the memory meter (it would otherwise revert to unknown on focus).
-import { slotData, state } from 'functions/state.js';
-import { api, wavFormat } from 'functions/util.js';
+import { slotData, state } from "functions/state.js";
+import { api, wavFormat } from "functions/util.js";
 
 export async function loadSampleAudio(i) {
-  if (state.buffers.has(i)) return state.buffers.get(i);   // already loaded
-  const s = slotData(i);
-  if (s.empty) return null;
-  const resp = await api(`/api/sample/${i}.wav`);
-  // sample's original BPM rides a response header (it's in the device sample
-  // header, not the bank blob) — used for the BPM chip + BPM-synced playhead
-  const tempo = parseFloat(resp.headers.get('X-Sample-Tempo'));
-  const wav = await resp.arrayBuffer();
-  const byteLen = wav.byteLength;                 // read BEFORE decode —
-  const fmt = wavFormat(wav.slice(0, 44));        // decodeAudioData may detach
-  state.audio = state.audio || new AudioContext();
-  const buf = await state.audio.decodeAudioData(wav);
-  state.buffers.set(i, buf);
-  if (fmt) {
-    const frames = Math.floor((byteLen - 44) / (fmt.channels * 2));
-    const f = { rate_hz: fmt.rate, stereo: fmt.channels === 2,
-                frames, seconds: frames / fmt.rate };
-    if (tempo > 0) f.tempo_bpm = tempo;
-    state.formats.set(i, f);
-    Object.assign(s, f);
-  }
-  return buf;
+    if (state.buffers.has(i)) return state.buffers.get(i); // already loaded
+    const s = slotData(i);
+    if (s.empty) return null;
+    const resp = await api(`/api/sample/${i}.wav`);
+    // sample's original BPM rides a response header (it's in the device sample
+    // header, not the bank blob) — used for the BPM chip + BPM-synced playhead
+    const tempo = parseFloat(resp.headers.get("X-Sample-Tempo"));
+    const wav = await resp.arrayBuffer();
+    const byteLen = wav.byteLength; // read BEFORE decode —
+    const fmt = wavFormat(wav.slice(0, 44)); // decodeAudioData may detach
+    state.audio = state.audio || new AudioContext();
+    const buf = await state.audio.decodeAudioData(wav);
+    state.buffers.set(i, buf);
+    if (fmt) {
+        const frames = Math.floor((byteLen - 44) / (fmt.channels * 2));
+        const f = { rate_hz: fmt.rate, stereo: fmt.channels === 2, frames, seconds: frames / fmt.rate };
+        if (tempo > 0) f.tempo_bpm = tempo;
+        state.formats.set(i, f);
+        Object.assign(s, f);
+    }
+    return buf;
 }
 
 // re-stamp persisted formats onto the current (freshly fetched) bank slots
 export function reapplyFormats() {
-  if (!state.bank) return;
-  for (const [slot, f] of state.formats) {
-    const s = state.bank.slots[slot];
-    if (s && !s.empty) Object.assign(s, f);
-  }
+    if (!state.bank) return;
+    for (const [slot, f] of state.formats) {
+        const s = state.bank.slots[slot];
+        if (s && !s.empty) Object.assign(s, f);
+    }
 }
 
 // drop cached audio + format for a slot (its content changed: upload)
 export function forgetSample(i) {
-  state.buffers.delete(i);
-  state.formats.delete(i);
+    state.buffers.delete(i);
+    state.formats.delete(i);
 }

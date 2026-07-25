@@ -27,66 +27,66 @@ has launchers for macOS, Linux and Windows, needing only Python 3.
 ## Features
 
 - **SAMPLES**:
-  - 36-slot bank overview
-  - Audition on the device (honors start/end points) with a playhead on the waveform
-  - On-screen keyboard mirroring the 36 pads. Click to play, or tick **⌨ TYPE TO
-    PLAY** to play from your computer keyboard (Z/X shift octave). A **SAMPLE /
-    KEYBOARD** toggle switches between triggering one sample per key (empty keys
-    dimmed) and playing the selected sample pitched across the keyboard
-  - **MIDI IN**: play the device from a connected MIDI keyboard, with velocity,
-    pitch bend and sustain pedal (uses the browser's Web MIDI, and honors the
-    SAMPLE / KEYBOARD mode)
-  - WAV download/upload (auto-resample to 48/24/12/6 kHz). Drop several WAVs
-    onto the pads to bulk-fill consecutive slots
-  - Auto-slice: chop one long sample across consecutive pads, by equal pieces
-    or detected transients (great for drum breaks and loops)
-  - Audio tools on upload: normalize, gain, trim silence, fade in/out,
-    mono ↔ stereo (processed in-browser before transfer)
-  - Filter pads by name
-  - Live editing of all sample parameters
-  - Draggable START/END markers on the waveform (or type exact frame values),
-    with optional zero-crossing snap so trims don't click
-  - Editable original BPM (the sample tempo used for BPM-sync). Applying it
-    re-uploads the sample, keeping its audio and other settings
-  - Zoomable / pannable waveform (scroll to zoom, drag to pan) for
-    sample-accurate trimming. Stereo samples show as two half-height lanes
-    (left above right) so each channel reads on its own
-  - Renaming banks and samples
-  - All samples preload on connect, and again when you switch banks on the
-    device (re-synced when you return to the app). Progress is shown, so the
-    memory meter is exact and waveforms are instant
-  - **FOLLOW** toggle (on by default): the selection tracks the last sample
-    triggered on the device, whether you play it or a pattern does
+    - 36-slot bank overview
+    - Audition on the device (honors start/end points) with a playhead on the waveform
+    - On-screen keyboard mirroring the 36 pads. Click to play, or tick **⌨ TYPE TO
+      PLAY** to play from your computer keyboard (Z/X shift octave). A **SAMPLE /
+      KEYBOARD** toggle switches between triggering one sample per key (empty keys
+      dimmed) and playing the selected sample pitched across the keyboard
+    - **MIDI IN**: play the device from a connected MIDI keyboard, with velocity,
+      pitch bend and sustain pedal (uses the browser's Web MIDI, and honors the
+      SAMPLE / KEYBOARD mode)
+    - WAV download/upload (auto-resample to 48/24/12/6 kHz). Drop several WAVs
+      onto the pads to bulk-fill consecutive slots
+    - Auto-slice: chop one long sample across consecutive pads, by equal pieces
+      or detected transients (great for drum breaks and loops)
+    - Audio tools on upload: normalize, gain, trim silence, fade in/out,
+      mono ↔ stereo (processed in-browser before transfer)
+    - Filter pads by name
+    - Live editing of all sample parameters
+    - Draggable START/END markers on the waveform (or type exact frame values),
+      with optional zero-crossing snap so trims don't click
+    - Editable original BPM (the sample tempo used for BPM-sync). Applying it
+      re-uploads the sample, keeping its audio and other settings
+    - Zoomable / pannable waveform (scroll to zoom, drag to pan) for
+      sample-accurate trimming. Stereo samples show as two half-height lanes
+      (left above right) so each channel reads on its own
+    - Renaming banks and samples
+    - All samples preload on connect, and again when you switch banks on the
+      device (re-synced when you return to the app). Progress is shown, so the
+      memory meter is exact and waveforms are instant
+    - **FOLLOW** toggle (on by default): the selection tracks the last sample
+      triggered on the device, whether you play it or a pattern does
 - **EFFECT**:
-  - All 22 effect types with their full parameter sets
-  - Hover any parameter to see its range and default
-  - The two assignable FX knobs (panel knob movements tracked live)
-  - Conditional parameter graying/swapping exactly like the hardware
+    - All 22 effect types with their full parameter sets
+    - Hover any parameter to see its range and default
+    - The two assignable FX knobs (panel knob movements tracked live)
+    - Conditional parameter graying/swapping exactly like the hardware
 - **PATTERNS**:
-  - Receive all 16 patterns
-  - Mini piano-roll preview + play patterns on the device (per-pattern ▶)
-  - In-app **piano-roll editor** over both the sample-mode (pad) and
-    keyboard-mode (pitched) tracks:
-    - **Draw / Erase / Select** tools (the cursor changes to match), with
-      move/resize, drag-to-erase and a marquee for multi-select
-    - **Multi-select** (Shift/⌘-click), **undo/redo**, and **copy/paste** whose
-      clipboard persists across patterns (copy from one, paste into another)
-    - Per-note velocity shown as note brightness. Arrow keys nudge or resize
-    - **Space** plays/stops the pattern on the device. Clicking outside the
-      dialog saves and closes
-    - Set the bar count, grid snap and the keyboard track's sample, then save
-      back to the device (build a pattern from scratch on an empty slot, too)
-  - Import and Export MIDI files
-  - Remote record trigger (presses the device's [REC] over MIDI, so watch the
-    device screen)
+    - Receive all 16 patterns
+    - Mini piano-roll preview + play patterns on the device (per-pattern ▶)
+    - In-app **piano-roll editor** over both the sample-mode (pad) and
+      keyboard-mode (pitched) tracks:
+        - **Draw / Erase / Select** tools (the cursor changes to match), with
+          move/resize, drag-to-erase and a marquee for multi-select
+        - **Multi-select** (Shift/⌘-click), **undo/redo**, and **copy/paste** whose
+          clipboard persists across patterns (copy from one, paste into another)
+        - Per-note velocity shown as note brightness. Arrow keys nudge or resize
+        - **Space** plays/stops the pattern on the device. Clicking outside the
+          dialog saves and closes
+        - Set the bar count, grid snap and the keyboard track's sample, then save
+          back to the device (build a pattern from scratch on an empty slot, too)
+    - Import and Export MIDI files
+    - Remote record trigger (presses the device's [REC] over MIDI, so watch the
+      device screen)
 - **UTILITY**:
-  - Full bank backup/restore (RAM or persistent user banks)
-  - Cherry-pick restore: copy a single sample out of a backup into any pad
-    of the current bank
-  - Remote sampling trigger (input select + [SAMPLING] over MIDI, with no
-    device-state readback, so watch the device screen)
+    - Full bank backup/restore (RAM or persistent user banks)
+    - Cherry-pick restore: copy a single sample out of a backup into any pad
+      of the current bank
+    - Remote sampling trigger (input select + [SAMPLING] over MIDI, with no
+      device-state readback, so watch the device screen)
 - **Live two-way sync**:
-  - Panel edits on the device show up in the app instantly
+    - Panel edits on the device show up in the app instantly
 - **Master volume** slider for the device output, and a **panic** button
   (all sound off / stop) for stuck notes
 - **12 accent themes** picked from a swatch dropdown. The whole interface
@@ -128,7 +128,7 @@ and double-click **`microSAMPLER Editor Librarian`** (`.command` / `.sh` /
 
 - **macOS:** the launcher is unsigned, so the first run is blocked ("unidentified
   developer"). Approve it once: right-click (Control-click) the launcher →
-  **Open** → **Open**. On newer macOS without an *Open* option, double-click once,
+  **Open** → **Open**. On newer macOS without an _Open_ option, double-click once,
   then **System Settings → Privacy & Security → Open Anyway**. (Or clear the
   quarantine in a terminal: `xattr -dr com.apple.quarantine "<unzipped folder>"`.)
 - **Linux:** mark the `.sh` executable / "Allow launching" first, or run
@@ -296,12 +296,12 @@ macOS DMGs and the Linux AppImage + tar.gz. Both verify the tag matches
 ## Disclaimer
 
 This is an **independent, unofficial project**. It is not affiliated with, endorsed, sponsored, or supported by Korg Inc.
-*microSAMPLER* and *Korg* are trademarks of Korg Inc., used here only to identify the hardware this software interoperates with.
+_microSAMPLER_ and _Korg_ are trademarks of Korg Inc., used here only to identify the hardware this software interoperates with.
 
 This repository contains **no Korg software, firmware, or other Korg copyrighted material**.
 The communication protocol was independently reverse-engineered for the sole purpose of **interoperability** with hardware owned by the user (as permitted by, e.g., Directive 2009/24/EC art. 6 in the EU/EEA).
 
-**Use at your own risk.** This software is provided *“as is”*, without warranty of any kind, as set out in sections 15–16 of the [GNU GPL v3](LICENSE).
+**Use at your own risk.** This software is provided _“as is”_, without warranty of any kind, as set out in sections 15–16 of the [GNU GPL v3](LICENSE).
 The author accepts **no responsibility or liability** for any damage to your device, loss of samples, patterns or other data, or any other consequence of using this software.
 It writes to the device's memory, so **back up your bank** (UTILITY → BACKUP) before bulk operations, and never disconnect the device mid-transfer.
 

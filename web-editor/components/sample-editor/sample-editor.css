@@ -2,122 +2,257 @@
 
 /* ── editor panel ─────────────────────────────────────────────────────── */
 .editor {
-  position: relative;
-  /* matte faceplate: a soft top-lit sheen (steel-2 → steel-1) reads as a
+    position: relative;
+    /* matte faceplate: a soft top-lit sheen (steel-2 → steel-1) reads as a
      physical panel catching light, not a flat fill */
-  background: linear-gradient(178deg, var(--steel-2), var(--steel-1) 44%);
-  border: 1px solid var(--line);
-  border-radius: var(--r);
-  box-shadow: inset 0 1px 0 var(--line-hi), 0 10px 30px rgba(0,0,0,.45);
-  padding: 1.2rem 1.3rem 1.1rem;
-  min-height: 540px;
+    background: linear-gradient(178deg, var(--steel-2), var(--steel-1) 44%);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    box-shadow:
+        inset 0 1px 0 var(--line-hi),
+        0 10px 30px rgba(0, 0, 0, 0.45);
+    padding: 1.2rem 1.3rem 1.1rem;
+    min-height: 540px;
 }
 .screw {
-  position: absolute; width: 11px; height: 11px; border-radius: 50%;
-  background:
-    linear-gradient(135deg, transparent 44%, #555 46%, #555 54%, transparent 56%),
-    radial-gradient(circle at 35% 30%, #4e4e56, #1c1c20 70%);
-  box-shadow: inset 0 1px 2px rgba(0,0,0,.9), 0 1px 0 rgba(255,255,255,.06);
+    position: absolute;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background:
+        linear-gradient(135deg, transparent 44%, #555 46%, #555 54%, transparent 56%), radial-gradient(circle at 35% 30%, #4e4e56, #1c1c20 70%);
+    box-shadow:
+        inset 0 1px 2px rgba(0, 0, 0, 0.9),
+        0 1px 0 rgba(255, 255, 255, 0.06);
 }
-.screw.tl { top: 8px; left: 8px; }   .screw.tr { top: 8px; right: 8px; transform: rotate(40deg); }
-.screw.bl { bottom: 8px; left: 8px; transform: rotate(70deg); } .screw.br { bottom: 8px; right: 8px; transform: rotate(15deg); }
+.screw.tl {
+    top: 8px;
+    left: 8px;
+}
+.screw.tr {
+    top: 8px;
+    right: 8px;
+    transform: rotate(40deg);
+}
+.screw.bl {
+    bottom: 8px;
+    left: 8px;
+    transform: rotate(70deg);
+}
+.screw.br {
+    bottom: 8px;
+    right: 8px;
+    transform: rotate(15deg);
+}
 
-.editor-empty { display: grid; place-items: center; min-height: 500px; }
-.editor-empty-inner { text-align: center; letter-spacing: .2em; font-size: .8rem; color: var(--ink-dim); }
-.ghost-wave {
-  width: 260px; height: 64px; margin: 0 auto 1.4rem;
-  background:
-    repeating-linear-gradient(90deg, var(--line) 0 2px, transparent 2px 7px);
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 20%, #000 80%, transparent);
-          mask-image: linear-gradient(90deg, transparent, #000 20%, #000 80%, transparent);
-  animation: ghost 2.4s ease-in-out infinite alternate;
+.editor-empty {
+    display: grid;
+    place-items: center;
+    min-height: 500px;
 }
-@keyframes ghost { from { transform: scaleY(.4); opacity: .4; } to { transform: scaleY(1); opacity: .9; } }
+.editor-empty-inner {
+    text-align: center;
+    letter-spacing: 0.2em;
+    font-size: 0.8rem;
+    color: var(--ink-dim);
+}
+.ghost-wave {
+    width: 260px;
+    height: 64px;
+    margin: 0 auto 1.4rem;
+    background: repeating-linear-gradient(90deg, var(--line) 0 2px, transparent 2px 7px);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 20%, #000 80%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 20%, #000 80%, transparent);
+    animation: ghost 2.4s ease-in-out infinite alternate;
+}
+@keyframes ghost {
+    from {
+        transform: scaleY(0.4);
+        opacity: 0.4;
+    }
+    to {
+        transform: scaleY(1);
+        opacity: 0.9;
+    }
+}
 
 /* name row */
-.name-row { display: flex; gap: 1rem; align-items: stretch; flex-wrap: wrap; }
-.name-lcd { flex: 1 1 280px; }
-.chips { display: flex; gap: .4rem; align-items: center; flex-wrap: wrap; }
-.chip {
-  font-family: "Share Tech Mono", monospace; font-size: .66rem;
-  color: var(--ink); background: var(--steel-3);
-  border: 1px solid var(--line); border-radius: 3px;
-  padding: .3rem .45rem; letter-spacing: .05em;
+.name-row {
+    display: flex;
+    gap: 1rem;
+    align-items: stretch;
+    flex-wrap: wrap;
 }
-.chip b { color: var(--amber); font-weight: 400; }
+.name-lcd {
+    flex: 1 1 280px;
+}
+.chips {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.chip {
+    font-family: "Share Tech Mono", monospace;
+    font-size: 0.66rem;
+    color: var(--ink);
+    background: var(--steel-3);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 0.3rem 0.45rem;
+    letter-spacing: 0.05em;
+}
+.chip b {
+    color: var(--amber);
+    font-weight: 400;
+}
 /* editable ORIG BPM chip — a button that opens the tempo dialog (same box as the
    read-only chips, so it lines up exactly) */
 /* editable, so it carries a faint accent border at rest (vs the static chips) */
-.chip-btn { appearance: none; cursor: pointer; border-color: var(--amber-dk); transition: border-color .12s, color .12s; }
-.chip-btn:hover { border-color: var(--amber); color: var(--amber-hi); }
-.name-actions { display: flex; gap: .5rem; align-items: center; }
+.chip-btn {
+    appearance: none;
+    cursor: pointer;
+    border-color: var(--amber-dk);
+    transition:
+        border-color 0.12s,
+        color 0.12s;
+}
+.chip-btn:hover {
+    border-color: var(--amber);
+    color: var(--amber-hi);
+}
+.name-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
 
 /* waveform screen */
 .screen {
-  position: relative; margin-top: 1rem;
-  height: 240px;
-  background: var(--phos-bg);
-  border: 1px solid #000; border-radius: 5px;
-  box-shadow:
-    inset 0 4px 18px rgba(0,0,0,.95),
-    inset 0 0 60px rgba(var(--amber-rgb),.05),
-    0 1px 0 var(--line-hi);
-  overflow: hidden;
+    position: relative;
+    margin-top: 1rem;
+    height: 240px;
+    background: var(--phos-bg);
+    border: 1px solid #000;
+    border-radius: 5px;
+    box-shadow:
+        inset 0 4px 18px rgba(0, 0, 0, 0.95),
+        inset 0 0 60px rgba(var(--amber-rgb), 0.05),
+        0 1px 0 var(--line-hi);
+    overflow: hidden;
 }
-.screen canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.screen canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
 .screen-status {
-  position: absolute; inset: 0; display: grid; place-items: center;
-  font-family: "Share Tech Mono", monospace; letter-spacing: .3em;
-  color: var(--amber-dk); font-size: .8rem;
-  animation: blink 1.1s steps(2) infinite;
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-family: "Share Tech Mono", monospace;
+    letter-spacing: 0.3em;
+    color: var(--amber-dk);
+    font-size: 0.8rem;
+    animation: blink 1.1s steps(2) infinite;
 }
 .screen-glass {
-  position: absolute; inset: 0; pointer-events: none;
-  background:
-    repeating-linear-gradient(180deg, rgba(255,255,255,.012) 0 1px, transparent 1px 3px),
-    linear-gradient(165deg, rgba(255,255,255,.05), transparent 30%);
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.012) 0 1px, transparent 1px 3px),
+        linear-gradient(165deg, rgba(255, 255, 255, 0.05), transparent 30%);
 }
 /* audition playhead — a thin glowing line that tracks browser playback,
    moved via requestAnimationFrame (no canvas redraw) */
 .playhead {
-  position: absolute; top: 0; bottom: 0; width: 2px; left: 0; z-index: 2;
-  margin-left: -1px; pointer-events: none;
-  background: #fff;                                  /* bright core reads on any
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    left: 0;
+    z-index: 2;
+    margin-left: -1px;
+    pointer-events: none;
+    background: #fff; /* bright core reads on any
                                                         theme + over the wave */
-  box-shadow: 0 0 7px 1px rgba(var(--amber-rgb), .9);  /* themed glow */
+    box-shadow: 0 0 7px 1px rgba(var(--amber-rgb), 0.9); /* themed glow */
 }
 /* zoom controls overlaying the waveform (top-right) */
 .wave-zoom {
-  position: absolute; top: 8px; right: 8px; z-index: 3;
-  display: flex; align-items: center; gap: 4px;
-  padding: 3px 4px; border-radius: 6px;
-  background: rgba(8,8,10,.6); border: 1px solid var(--line-hi);
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 4px;
+    border-radius: 6px;
+    background: rgba(8, 8, 10, 0.6);
+    border: 1px solid var(--line-hi);
 }
 .wz-btn {
-  appearance: none; cursor: pointer;
-  min-width: 22px; height: 20px; padding: 0 6px;
-  border: 1px solid var(--line-hi); border-radius: 4px;
-  background: var(--steel-3); color: var(--ink);
-  font: 600 .68rem/1 "Chakra Petch", sans-serif; letter-spacing: .06em;
-  transition: color .12s, box-shadow .12s;
+    appearance: none;
+    cursor: pointer;
+    min-width: 22px;
+    height: 20px;
+    padding: 0 6px;
+    border: 1px solid var(--line-hi);
+    border-radius: 4px;
+    background: var(--steel-3);
+    color: var(--ink);
+    font:
+        600 0.68rem/1 "Chakra Petch",
+        sans-serif;
+    letter-spacing: 0.06em;
+    transition:
+        color 0.12s,
+        box-shadow 0.12s;
 }
-.wz-btn:hover:not(:disabled) { color: var(--amber-hi); box-shadow: 0 0 0 1px var(--amber-dk); }
-.wz-btn:disabled { opacity: .4; cursor: default; }
+.wz-btn:hover:not(:disabled) {
+    color: var(--amber-hi);
+    box-shadow: 0 0 0 1px var(--amber-dk);
+}
+.wz-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
 .wz-level {
-  min-width: 36px; text-align: center;
-  font-family: "Share Tech Mono", monospace; font-size: .64rem;
-  color: var(--amber); letter-spacing: .04em;
+    min-width: 36px;
+    text-align: center;
+    font-family: "Share Tech Mono", monospace;
+    font-size: 0.64rem;
+    color: var(--amber);
+    letter-spacing: 0.04em;
 }
 .screen-meta {
-  display: flex; justify-content: space-between; align-items: center;
-  font-family: "Share Tech Mono", monospace;
-  font-size: .66rem; color: var(--amber-dk);
-  letter-spacing: .12em; margin-top: .35rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: "Share Tech Mono", monospace;
+    font-size: 0.66rem;
+    color: var(--amber-dk);
+    letter-spacing: 0.12em;
+    margin-top: 0.35rem;
 }
 .zsnap-toggle {
-  display: inline-flex; align-items: center; gap: .3em; cursor: pointer;
-  color: var(--ink-dim); white-space: nowrap; letter-spacing: .1em;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    cursor: pointer;
+    color: var(--ink-dim);
+    white-space: nowrap;
+    letter-spacing: 0.1em;
 }
-.zsnap-toggle input { accent-color: var(--amber); cursor: pointer; margin: 0; }
-.zsnap-toggle:hover { color: var(--ink); }
-
+.zsnap-toggle input {
+    accent-color: var(--amber);
+    cursor: pointer;
+    margin: 0;
+}
+.zsnap-toggle:hover {
+    color: var(--ink);
+}

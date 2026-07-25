@@ -1,100 +1,262 @@
 /* GENERATED SPLIT of the former app.css — component stylesheet. */
 
 /* ── utility view ─────────────────────────────────────────────────────── */
-.utility-deck { grid-template-columns: 1fr; }
-.util-cols { display: grid; grid-template-columns: 1fr 1.2fr; gap: 2rem; }
-@media (max-width: 900px) { .util-cols { grid-template-columns: 1fr; } }
+.utility-deck {
+    grid-template-columns: 1fr;
+}
+.util-cols {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 2rem;
+}
+@media (max-width: 900px) {
+    .util-cols {
+        grid-template-columns: 1fr;
+    }
+}
 .util-note {
-  font-size: .72rem; line-height: 1.55; color: var(--ink-dim);
-  letter-spacing: .04em; margin: .4rem 0 1rem;
+    font-size: 0.72rem;
+    line-height: 1.55;
+    color: var(--ink-dim);
+    letter-spacing: 0.04em;
+    margin: 0.4rem 0 1rem;
 }
 .util-note code {
-  font-family: "Share Tech Mono", monospace; color: var(--amber-dk);
+    font-family: "Share Tech Mono", monospace;
+    color: var(--amber-dk);
 }
-.util-note b { color: var(--amber-hi); }
+.util-note b {
+    color: var(--amber-hi);
+}
 
-.backup-list { display: flex; flex-direction: column; gap: .5rem; }
+.backup-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
 .backup-row {
-  display: flex; align-items: center; gap: .9rem;
-  background: linear-gradient(180deg, var(--steel-2), #131316);
-  border: 1px solid var(--line); border-top-color: var(--line-hi);
-  border-radius: 5px; padding: .6rem .8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    background: linear-gradient(180deg, var(--steel-2), #131316);
+    border: 1px solid var(--line);
+    border-top-color: var(--line-hi);
+    border-radius: 5px;
+    padding: 0.6rem 0.8rem;
 }
 .backup-row .b-name {
-  font-family: "Share Tech Mono", monospace; color: var(--amber);
-  text-shadow: 0 0 6px rgba(var(--amber-rgb),.35);
+    font-family: "Share Tech Mono", monospace;
+    color: var(--amber);
+    text-shadow: 0 0 6px rgba(var(--amber-rgb), 0.35);
 }
-.backup-row .b-meta { font-size: .62rem; color: var(--ink-dim); letter-spacing: .08em; }
+.backup-row .b-meta {
+    font-size: 0.62rem;
+    color: var(--ink-dim);
+    letter-spacing: 0.08em;
+}
 /* empty / first-run prompt — centered with breathing room so it reads as an
    intentional "do this next" state, not a stray dim line. grid-column spans the
    whole grid where the parent is one (#pattern-grid, #fx-params); ignored else. */
 .backup-empty {
-  grid-column: 1 / -1; text-align: center;
-  padding: 2.4rem 1rem; line-height: 1.6;
-  font-size: .72rem; color: var(--ink-dim); letter-spacing: .12em;
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 2.4rem 1rem;
+    line-height: 1.6;
+    font-size: 0.72rem;
+    color: var(--ink-dim);
+    letter-spacing: 0.12em;
 }
 
 .op-console {
-  font-family: "Share Tech Mono", monospace; font-size: .72rem;
-  color: var(--amber); background: var(--phos-bg);
-  border: 1px solid #000; border-radius: 5px;
-  box-shadow: inset 0 4px 14px rgba(0,0,0,.9), 0 1px 0 var(--line-hi);
-  padding: .8rem 1rem; min-height: 7rem; max-height: 16rem;
-  overflow-y: auto; white-space: pre-wrap;
-  text-shadow: 0 0 6px rgba(var(--amber-rgb),.35);
+    font-family: "Share Tech Mono", monospace;
+    font-size: 0.72rem;
+    color: var(--amber);
+    background: var(--phos-bg);
+    border: 1px solid #000;
+    border-radius: 5px;
+    box-shadow:
+        inset 0 4px 14px rgba(0, 0, 0, 0.9),
+        0 1px 0 var(--line-hi);
+    padding: 0.8rem 1rem;
+    min-height: 7rem;
+    max-height: 16rem;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    text-shadow: 0 0 6px rgba(var(--amber-rgb), 0.35);
 }
-.op-console.err { color: #ff7a66; text-shadow: 0 0 6px rgba(255,80,60,.4); }
-
-
+.op-console.err {
+    color: #ff7a66;
+    text-shadow: 0 0 6px rgba(255, 80, 60, 0.4);
+}
 
 /* backup zip import row */
-.backup-import { display: flex; align-items: center; gap: .7rem; margin-top: .8rem; }
+.backup-import {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-top: 0.8rem;
+}
 
 /* remote sampling controls */
-.sampling-row { display: flex; align-items: center; gap: .9rem; margin-top: .4rem; flex-wrap: wrap; }
-.sampling-row .seg { max-width: none; }
+.sampling-row {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    margin-top: 0.4rem;
+    flex-wrap: wrap;
+}
+.sampling-row .seg {
+    max-width: none;
+}
 
 /* ── LIBRARY view (hardware-free sample librarian) ─────────────────────── */
-.lib-bar { display: flex; align-items: center; gap: .8rem; margin-bottom: 1rem; flex-wrap: wrap; }
-.lib-hint { font-size: .6rem; color: var(--ink-dim); letter-spacing: .06em; }
-.lib-hint code { color: var(--amber-dk); }
-.lib-cols { display: grid; grid-template-columns: 220px 1fr; gap: 1.2rem; align-items: start; }
-.lib-banks { display: flex; flex-direction: column; gap: .4rem; }
-.lib-bank {
-  text-align: left; appearance: none; cursor: pointer;
-  background: var(--steel-1); border: 1px solid var(--line); border-radius: 5px;
-  padding: .55rem .7rem; color: var(--ink);
+.lib-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
 }
-.lib-bank:hover { border-color: var(--line-hi); }
-.lib-bank.sel { border-color: var(--amber-dk);
-  box-shadow: 0 0 0 1px var(--amber-dk), 0 0 14px rgba(var(--amber-rgb),.15); }
-.lib-bank-name { display: block; font-family: "Share Tech Mono", monospace;
-  color: var(--amber-hi); letter-spacing: .05em; }
-.lib-bank-meta { display: block; font-size: .58rem; color: var(--ink-dim);
-  letter-spacing: .04em; margin-top: .15rem; }
-.lib-detail-head { display: flex; align-items: center; justify-content: space-between;
-  gap: .6rem; margin-bottom: .7rem; font-size: .62rem; letter-spacing: .1em; color: var(--ink-dim); }
-.lib-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-.lib-pad { cursor: default; }
-.lib-pad.used { cursor: pointer; }
-.lib-pad.sounding { border-color: var(--amber);
-  box-shadow: 0 0 14px rgba(var(--amber-rgb),.5), 0 2px 0 #000; }
-.lib-pad.sounding .pad-name { color: var(--amber); }
-.lib-dl { position: absolute; bottom: 2px; right: 5px; color: var(--ink-dim);
-  font-size: .95rem; line-height: 1; text-decoration: none; opacity: .5; }
-.lib-dl .ico { margin-right: 0; }          /* icon-only — no trailing gap */
-.lib-pad:hover .lib-dl { opacity: 1; }
-.lib-dl:hover { color: var(--amber-hi); }
-@media (max-width: 760px) { .lib-cols { grid-template-columns: 1fr; } }
+.lib-hint {
+    font-size: 0.6rem;
+    color: var(--ink-dim);
+    letter-spacing: 0.06em;
+}
+.lib-hint code {
+    color: var(--amber-dk);
+}
+.lib-cols {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 1.2rem;
+    align-items: start;
+}
+.lib-banks {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+.lib-bank {
+    text-align: left;
+    appearance: none;
+    cursor: pointer;
+    background: var(--steel-1);
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    padding: 0.55rem 0.7rem;
+    color: var(--ink);
+}
+.lib-bank:hover {
+    border-color: var(--line-hi);
+}
+.lib-bank.sel {
+    border-color: var(--amber-dk);
+    box-shadow:
+        0 0 0 1px var(--amber-dk),
+        0 0 14px rgba(var(--amber-rgb), 0.15);
+}
+.lib-bank-name {
+    display: block;
+    font-family: "Share Tech Mono", monospace;
+    color: var(--amber-hi);
+    letter-spacing: 0.05em;
+}
+.lib-bank-meta {
+    display: block;
+    font-size: 0.58rem;
+    color: var(--ink-dim);
+    letter-spacing: 0.04em;
+    margin-top: 0.15rem;
+}
+.lib-detail-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    margin-bottom: 0.7rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    color: var(--ink-dim);
+}
+.lib-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+}
+.lib-pad {
+    cursor: default;
+}
+.lib-pad.used {
+    cursor: pointer;
+}
+.lib-pad.sounding {
+    border-color: var(--amber);
+    box-shadow:
+        0 0 14px rgba(var(--amber-rgb), 0.5),
+        0 2px 0 #000;
+}
+.lib-pad.sounding .pad-name {
+    color: var(--amber);
+}
+.lib-dl {
+    position: absolute;
+    bottom: 2px;
+    right: 5px;
+    color: var(--ink-dim);
+    font-size: 0.95rem;
+    line-height: 1;
+    text-decoration: none;
+    opacity: 0.5;
+}
+.lib-dl .ico {
+    margin-right: 0;
+} /* icon-only — no trailing gap */
+.lib-pad:hover .lib-dl {
+    opacity: 1;
+}
+.lib-dl:hover {
+    color: var(--amber-hi);
+}
+@media (max-width: 760px) {
+    .lib-cols {
+        grid-template-columns: 1fr;
+    }
+}
 
 /* library: pattern (MIDI) download list */
-.lib-pats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
-.lib-pat {
-  display: flex; align-items: center; justify-content: space-between; gap: .6rem;
-  text-decoration: none; padding: .5rem .7rem;
-  background: var(--steel-1); border: 1px solid var(--line); border-radius: 4px;
+.lib-pats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
 }
-.lib-pat:hover { border-color: var(--amber-dk); box-shadow: 0 0 12px rgba(var(--amber-rgb),.12); }
-.lib-pat-name { font-family: "Share Tech Mono", monospace; color: var(--amber-hi); font-size: .76rem; }
-.lib-pat-meta { font-size: .58rem; color: var(--ink-dim); letter-spacing: .04em; white-space: nowrap; }
-@media (max-width: 760px) { .lib-pats { grid-template-columns: 1fr; } }
+.lib-pat {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    text-decoration: none;
+    padding: 0.5rem 0.7rem;
+    background: var(--steel-1);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+}
+.lib-pat:hover {
+    border-color: var(--amber-dk);
+    box-shadow: 0 0 12px rgba(var(--amber-rgb), 0.12);
+}
+.lib-pat-name {
+    font-family: "Share Tech Mono", monospace;
+    color: var(--amber-hi);
+    font-size: 0.76rem;
+}
+.lib-pat-meta {
+    font-size: 0.58rem;
+    color: var(--ink-dim);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+@media (max-width: 760px) {
+    .lib-pats {
+        grid-template-columns: 1fr;
+    }
+}

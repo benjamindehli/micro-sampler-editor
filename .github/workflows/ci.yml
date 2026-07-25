@@ -1,124 +1,126 @@
 name: CI
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
 
 # least privilege: both jobs only check out the repo and run offline tests
 permissions:
-  contents: read
+    contents: read
 
 jobs:
-  tests:
-    name: offline suite (python ${{ matrix.python }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          # 3.8 = the oldest supported interpreter (see README); only
-          # ubuntu-22.04 still carries it
-          - { python: "3.8", os: ubuntu-22.04 }
-          - { python: "3.12", os: ubuntu-latest }
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
-        with:
-          python-version: ${{ matrix.python }}
-      # the offline suite is dependency-free: pyusb/libusb are imported
-      # lazily and only needed when real hardware is opened
-      - name: protocol self-test
-        run: python protocol.py
-        working-directory: native-tools
-      - name: download flow (mock device)
-        run: python test_download.py
-        working-directory: native-tools
-      - name: upload flow (mock device)
-        run: python test_upload.py
-        working-directory: native-tools
-      - name: bank backup/restore (mock device)
-        run: python test_bank.py
-        working-directory: native-tools
-      - name: bridge HTTP/SSE round-trips (mock device)
-        run: python test_bridge.py
-        working-directory: native-tools
-      - name: original .msmpl_bank reader
-        run: python test_msmpl.py
-        working-directory: native-tools
+    tests:
+        name: offline suite (python ${{ matrix.python }})
+        runs-on: ${{ matrix.os }}
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    # 3.8 = the oldest supported interpreter (see README); only
+                    # ubuntu-22.04 still carries it
+                    - { python: "3.8", os: ubuntu-22.04 }
+                    - { python: "3.12", os: ubuntu-latest }
+        steps:
+            - uses: actions/checkout@v5
+            - uses: actions/setup-python@v6
+              with:
+                  python-version: ${{ matrix.python }}
+            # the offline suite is dependency-free: pyusb/libusb are imported
+            # lazily and only needed when real hardware is opened
+            - name: protocol self-test
+              run: python protocol.py
+              working-directory: native-tools
+            - name: download flow (mock device)
+              run: python test_download.py
+              working-directory: native-tools
+            - name: upload flow (mock device)
+              run: python test_upload.py
+              working-directory: native-tools
+            - name: bank backup/restore (mock device)
+              run: python test_bank.py
+              working-directory: native-tools
+            - name: bridge HTTP/SSE round-trips (mock device)
+              run: python test_bridge.py
+              working-directory: native-tools
+            - name: original .msmpl_bank reader
+              run: python test_msmpl.py
+              working-directory: native-tools
 
-  frontend:
-    name: frontend syntax
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
-        with:
-          node-version: "24.18.0"
-          cache: npm
-      - name: JS syntax check
-        run: |
-          find web-editor -name '*.js' -print0 | while IFS= read -r -d '' f; do
-            echo "checking $f"
-            node --check "$f"
-          done
-      - name: ES module imports resolve
-        run: node --input-type=module -e "
-          import('./web-editor/functions/valueTables.js').then(m =>
-            console.log('valueTables:', Object.keys(m.VALUE_TABLES).length, 'tables'));
-          import('./web-editor/functions/fxData.js').then(m =>
-            console.log('fxData:', m.FX_TYPES.length, 'fx types'));"
-      - name: unit tests (pure modules)
-        run: |
-          npm ci
-          npm test
+    frontend:
+        name: frontend syntax
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v5
+            - uses: actions/setup-node@v5
+              with:
+                  node-version: "24.18.0"
+                  cache: npm
+            - name: JS syntax check
+              run: |
+                  find web-editor -name '*.js' -print0 | while IFS= read -r -d '' f; do
+                    echo "checking $f"
+                    node --check "$f"
+                  done
+            - name: ES module imports resolve
+              run: node --input-type=module -e "
+                  import('./web-editor/functions/valueTables.js').then(m =>
+                  console.log('valueTables:', Object.keys(m.VALUE_TABLES).length, 'tables'));
+                  import('./web-editor/functions/fxData.js').then(m =>
+                  console.log('fxData:', m.FX_TYPES.length, 'fx types'));"
+            - name: unit tests (pure modules)
+              run: |
+                  npm ci
+                  npm test
 
-  lint:
-    name: lint (ruff + eslint)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.12"
-      - name: Ruff (python)
-        run: |
-          pip install 'ruff==0.15.*'
-          ruff check
-      - uses: actions/setup-node@v5
-        with:
-          node-version: "24.18.0"   # ESLint 10 needs ^20.19 || ^22.13 || >=24
-          cache: npm
-      - name: ESLint (js)
-        run: |
-          npm ci
-          npm run lint:js
-      # the docs download link / structured data must match package.json's
-      # version (npm version stamps it; this catches a manual bump that forgot)
-      - name: docs version in sync
-        run: node tools/stamp-docs-version.mjs --check
+    lint:
+        name: lint (ruff + eslint)
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v5
+            - uses: actions/setup-python@v6
+              with:
+                  python-version: "3.12"
+            - name: Ruff (python)
+              run: |
+                  pip install 'ruff==0.15.*'
+                  ruff check
+            - uses: actions/setup-node@v5
+              with:
+                  node-version: "24.18.0" # ESLint 10 needs ^20.19 || ^22.13 || >=24
+                  cache: npm
+            - name: ESLint (js)
+              run: |
+                  npm ci
+                  npm run lint:js
+            - name: Prettier (format check)
+              run: npm run format:check
+            # the docs download link / structured data must match package.json's
+            # version (npm version stamps it; this catches a manual bump that forgot)
+            - name: docs version in sync
+              run: node tools/stamp-docs-version.mjs --check
 
-  e2e:
-    name: e2e smoke (playwright)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.12"
-      - name: Install Playwright
-        run: pip install playwright
-      - name: Get Playwright version
-        id: pw
-        run: echo "version=$(python -c 'import playwright; print(playwright.__version__)')" >> "$GITHUB_OUTPUT"
-      - uses: actions/cache@v6
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ steps.pw.outputs.version }}
-      - name: Install Chromium
-        run: python -m playwright install --with-deps chromium   # no-op download on cache hit
-      # smoke.py boots the mock bridge itself, drives the app headless, and
-      # fails on any page/console error or broken core interaction
-      - name: Browser smoke (mock device)
-        run: python e2e/smoke.py
+    e2e:
+        name: e2e smoke (playwright)
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v5
+            - uses: actions/setup-python@v6
+              with:
+                  python-version: "3.12"
+            - name: Install Playwright
+              run: pip install playwright
+            - name: Get Playwright version
+              id: pw
+              run: echo "version=$(python -c 'import playwright; print(playwright.__version__)')" >> "$GITHUB_OUTPUT"
+            - uses: actions/cache@v6
+              with:
+                  path: ~/.cache/ms-playwright
+                  key: ${{ runner.os }}-playwright-${{ steps.pw.outputs.version }}
+            - name: Install Chromium
+              run: python -m playwright install --with-deps chromium # no-op download on cache hit
+            # smoke.py boots the mock bridge itself, drives the app headless, and
+            # fails on any page/console error or broken core interaction
+            - name: Browser smoke (mock device)
+              run: python e2e/smoke.py

@@ -1,14 +1,14 @@
 # Architecture
 
-How the pieces fit together, for contributors. For *what* the app does see the
-[README](README.md). For *how to contribute* see [CONTRIBUTING](CONTRIBUTING.md).
+How the pieces fit together, for contributors. For _what_ the app does see the
+[README](README.md). For _how to contribute_ see [CONTRIBUTING](CONTRIBUTING.md).
 
 ## The big picture
 
 The microSAMPLER only speaks **USB**, and on macOS its USB-MIDI interface is claimed by CoreMIDI, so the browser can't reach it directly (WebUSB is blocked for audio-class interfaces).
 The solution is a small **local bridge** that owns the device and exposes a plain HTTP/SSE API the browser app talks to.
 
-``` text
+```text
    ┌───────────────────-──────┐        HTTP + SSE (localhost:8765)        ┌──────────────────────┐
    │   Browser app            │ ────────────────────────────-───────────▶ │  Bridge (Python)     │
    │   web-editor/  (ES mods) │   GET /api/bank, POST /api/param,         │  native-tools/       │
@@ -47,16 +47,16 @@ offline self-test). The USB transport is **`native-tools/msusb.py`**.
 
 ## Components
 
-| Path | Role |
-| --- | --- |
-| `native-tools/bridge.py` | HTTP/SSE server + device manager. Owns the USB session. |
-| `native-tools/protocol.py` | Korg SysEx/bulk codec + builders (pure). |
-| `native-tools/msusb.py` | libusb transport (USB-MIDI packetisation, inquiry). |
-| `native-tools/{download,upload,bank}.py` | Single-sample + full-bank transfer flows (also CLIs). |
-| `native-tools/msmpl_bank.py` | Reader for original Korg `.msmpl_bank` backups (library mode + CLI). |
-| `web-editor/` | The browser app, using ES modules with no build step: `app.js` entry, pure leaves in `functions/`, one folder per feature in `components/<name>/` (JS + CSS), globals in `styles/`. |
-| `tools/bundle/` | The packaged desktop apps: PyInstaller specs + entry scripts, the Swift menu-bar shell for the macOS Editor app, AppImage/DMG/notarization scripts (built by `.github/workflows/package.yml`). |
-| `tools/re/` | Reverse-engineering toolkit (needs Korg's `.pkg`, not distributed). |
+| Path                                     | Role                                                                                                                                                                                           |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `native-tools/bridge.py`                 | HTTP/SSE server + device manager. Owns the USB session.                                                                                                                                        |
+| `native-tools/protocol.py`               | Korg SysEx/bulk codec + builders (pure).                                                                                                                                                       |
+| `native-tools/msusb.py`                  | libusb transport (USB-MIDI packetisation, inquiry).                                                                                                                                            |
+| `native-tools/{download,upload,bank}.py` | Single-sample + full-bank transfer flows (also CLIs).                                                                                                                                          |
+| `native-tools/msmpl_bank.py`             | Reader for original Korg `.msmpl_bank` backups (library mode + CLI).                                                                                                                           |
+| `web-editor/`                            | The browser app, using ES modules with no build step: `app.js` entry, pure leaves in `functions/`, one folder per feature in `components/<name>/` (JS + CSS), globals in `styles/`.            |
+| `tools/bundle/`                          | The packaged desktop apps: PyInstaller specs + entry scripts, the Swift menu-bar shell for the macOS Editor app, AppImage/DMG/notarization scripts (built by `.github/workflows/package.yml`). |
+| `tools/re/`                              | Reverse-engineering toolkit (needs Korg's `.pkg`, not distributed).                                                                                                                            |
 
 ### Bridge internals (`bridge.py`)
 
@@ -79,7 +79,7 @@ offline self-test). The USB transport is **`native-tools/msusb.py`**.
   bridge: the device starts **unclaimed**, is claimed lazily when the editor
   page opens, and is auto-released after a few idle minutes with no UI, so
   the always-on daemon doesn't hog the microSAMPLER from DAWs. `POST
-  /api/release` releases it on demand (the menu bar's *Release Device*).
+/api/release` releases it on demand (the menu bar's _Release Device_).
 
 ### Frontend (`web-editor/`)
 
@@ -156,14 +156,14 @@ Standard MIDI Files.
 - Audition / pad-play: `POST /api/note` → MIDI note on/off (`note = 48 + slot`).
 - Pattern transport: `POST /api/pattern/N/play` selects the pattern (NRPN) and
   starts the sequencer, with the bridge streaming MIDI clock. `POST
-  /api/transport/stop` stops it.
+/api/transport/stop` stops it.
 
 ## Key constraints worth knowing
 
 - **One USB owner at a time.** The bridge and any other MIDI software can't
   hold the device together.
-- **RAM vs flash.** Sample/parameter transfers target the device's *current
-  bank (RAM)*, lost on power-off/bank-switch. Persisting means a panel WRITE or
+- **RAM vs flash.** Sample/parameter transfers target the device's _current
+  bank (RAM)_, lost on power-off/bank-switch. Persisting means a panel WRITE or
   restoring to a user bank.
 - **Hardware is largely unverifiable in CI.** The maintainer can't
   packet-capture. Protocol changes are confirmed by hand on a real device. Lean

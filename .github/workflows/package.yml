@@ -18,236 +18,236 @@ name: Package apps
 #   APPLE_APP_PASSWORD    app-specific password (appleid.apple.com)
 # Without them the jobs still build + smoke-test unsigned artifacts.
 on:
-  workflow_dispatch:
-  release:
-    types: [published]
+    workflow_dispatch:
+    release:
+        types: [published]
 
 permissions:
-  contents: write        # attach release assets (read-only for the build itself)
+    contents: write # attach release assets (read-only for the build itself)
 
 jobs:
-  linux:
-    name: Library app (Linux x86_64)
-    runs-on: ubuntu-22.04        # oldest LTS runner = widest glibc compatibility
-    steps:
-      - uses: actions/checkout@v5
-      - name: Check tag matches package.json
-        if: github.event_name == 'release'
-        env:
-          TAG: ${{ github.event.release.tag_name }}   # env, not inline: tag
-        run: |                                        #  names can carry shell
-          PKG="v$(node -p "require('./package.json').version")"
-          test "$TAG" = "$PKG" || { echo "::error::tag $TAG does not match package.json $PKG (run npm version first)"; exit 1; }
-          node tools/stamp-docs-version.mjs --check
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.12"
-      - run: pip install 'pyinstaller==6.*'   # majors change onedir layout
-      - name: Build (PyInstaller onedir)
-        run: pyinstaller --noconfirm --distpath dist/bundle --workpath build/bundle tools/bundle/library.spec
-      - name: Smoke test the frozen binary
-        env:
-          MSMPL_NO_OPEN: "1"        # no browser on a headless runner
-        run: |
-          "./dist/bundle/microSAMPLER Library/microSAMPLER Library" &
-          for i in $(seq 1 40); do
-            curl -sf http://localhost:8766/api/status > /dev/null && break
-            sleep 0.5
-          done
-          curl -sf http://localhost:8766/api/status | grep -q '"library": true'
-          curl -sf http://localhost:8766/app.html | grep -q microSAMPLER
-          curl -sf -X POST http://localhost:8766/api/shutdown | grep -q '"ok": true'
-      - name: Dump the Library log on failure
-        if: failure()
-        run: cat "$HOME/.local/share/DehliMusikk/microSAMPLER Library/library.log" || true
-      - name: Build AppImage
-        run: tools/bundle/make_appimage.sh
-      - name: Tarball (for users who avoid AppImages)
-        run: tar -C dist/bundle -czf "dist/bundle/microSAMPLER_Library-linux-x86_64.tar.gz" "microSAMPLER Library"
-      - uses: actions/upload-artifact@v7
-        with:
-          name: microSAMPLER-Library-linux-x86_64
-          path: |
-            dist/bundle/microSAMPLER_Library-x86_64.AppImage
-            dist/bundle/microSAMPLER_Library-linux-x86_64.tar.gz
-      - name: Attach to the release
-        if: github.event_name == 'release'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          TAG: ${{ github.event.release.tag_name }}
-        run: |
-          gh release upload "$TAG" \
-            "dist/bundle/microSAMPLER_Library-x86_64.AppImage" \
-            "dist/bundle/microSAMPLER_Library-linux-x86_64.tar.gz" --clobber
+    linux:
+        name: Library app (Linux x86_64)
+        runs-on: ubuntu-22.04 # oldest LTS runner = widest glibc compatibility
+        steps:
+            - uses: actions/checkout@v5
+            - name: Check tag matches package.json
+              if: github.event_name == 'release'
+              env:
+                  TAG: ${{ github.event.release.tag_name }} # env, not inline: tag
+              run: | #  names can carry shell
+                  PKG="v$(node -p "require('./package.json').version")"
+                  test "$TAG" = "$PKG" || { echo "::error::tag $TAG does not match package.json $PKG (run npm version first)"; exit 1; }
+                  node tools/stamp-docs-version.mjs --check
+            - uses: actions/setup-python@v6
+              with:
+                  python-version: "3.12"
+            - run: pip install 'pyinstaller==6.*' # majors change onedir layout
+            - name: Build (PyInstaller onedir)
+              run: pyinstaller --noconfirm --distpath dist/bundle --workpath build/bundle tools/bundle/library.spec
+            - name: Smoke test the frozen binary
+              env:
+                  MSMPL_NO_OPEN: "1" # no browser on a headless runner
+              run: |
+                  "./dist/bundle/microSAMPLER Library/microSAMPLER Library" &
+                  for i in $(seq 1 40); do
+                    curl -sf http://localhost:8766/api/status > /dev/null && break
+                    sleep 0.5
+                  done
+                  curl -sf http://localhost:8766/api/status | grep -q '"library": true'
+                  curl -sf http://localhost:8766/app.html | grep -q microSAMPLER
+                  curl -sf -X POST http://localhost:8766/api/shutdown | grep -q '"ok": true'
+            - name: Dump the Library log on failure
+              if: failure()
+              run: cat "$HOME/.local/share/DehliMusikk/microSAMPLER Library/library.log" || true
+            - name: Build AppImage
+              run: tools/bundle/make_appimage.sh
+            - name: Tarball (for users who avoid AppImages)
+              run: tar -C dist/bundle -czf "dist/bundle/microSAMPLER_Library-linux-x86_64.tar.gz" "microSAMPLER Library"
+            - uses: actions/upload-artifact@v7
+              with:
+                  name: microSAMPLER-Library-linux-x86_64
+                  path: |
+                      dist/bundle/microSAMPLER_Library-x86_64.AppImage
+                      dist/bundle/microSAMPLER_Library-linux-x86_64.tar.gz
+            - name: Attach to the release
+              if: github.event_name == 'release'
+              env:
+                  GH_TOKEN: ${{ github.token }}
+                  TAG: ${{ github.event.release.tag_name }}
+              run: |
+                  gh release upload "$TAG" \
+                    "dist/bundle/microSAMPLER_Library-x86_64.AppImage" \
+                    "dist/bundle/microSAMPLER_Library-linux-x86_64.tar.gz" --clobber
 
-  macos:
-    name: Apps (macOS ${{ matrix.arch }})
-    runs-on: ${{ matrix.runner }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - { runner: macos-14, arch: arm64 }
-          # macos-13 (the old Intel label) is retired — macos-15-intel is
-          # GitHub's current x86_64 image; update again when that one goes
-          - { runner: macos-15-intel, arch: x86_64 }
-    env:
-      HAVE_SIGNING: ${{ secrets.MACOS_CERT_P12 != '' }}
-      APP_LIB: dist/bundle/microSAMPLER Library.app
-      APP_ED: dist/bundle/microSAMPLER Editor Librarian.app
-    steps:
-      - uses: actions/checkout@v5
-      - name: Check tag matches package.json
-        if: github.event_name == 'release'
+    macos:
+        name: Apps (macOS ${{ matrix.arch }})
+        runs-on: ${{ matrix.runner }}
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - { runner: macos-14, arch: arm64 }
+                    # macos-13 (the old Intel label) is retired — macos-15-intel is
+                    # GitHub's current x86_64 image; update again when that one goes
+                    - { runner: macos-15-intel, arch: x86_64 }
         env:
-          TAG: ${{ github.event.release.tag_name }}   # env, not inline: tag
-        run: |                                        #  names can carry shell
-          PKG="v$(node -p "require('./package.json').version")"
-          test "$TAG" = "$PKG" || { echo "::error::tag $TAG does not match package.json $PKG (run npm version first)"; exit 1; }
-          node tools/stamp-docs-version.mjs --check
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.12"
-      - run: pip install 'pyinstaller==6.*'   # majors change onedir layout
-      - name: Make .icns from AppIcon.png
-        run: |
-          mkdir -p build/icon.iconset
-          for s in 16 32 128 256 512; do
-            sips -z $s $s web-editor/assets/AppIcon.png --out "build/icon.iconset/icon_${s}x${s}.png" > /dev/null
-            sips -z $((s*2)) $((s*2)) web-editor/assets/AppIcon.png --out "build/icon.iconset/icon_${s}x${s}@2x.png" > /dev/null
-          done
-          iconutil -c icns build/icon.iconset -o build/AppIcon.icns
-          echo "MSMPL_ICNS=$PWD/build/AppIcon.icns" >> "$GITHUB_ENV"
-      - name: Build Library bridge (PyInstaller onedir) + assemble the .app
-        run: |
-          pyinstaller --noconfirm --distpath dist/bundle --workpath build/bundle tools/bundle/library.spec
-          tools/bundle/make_library_app.sh
-      - name: Build Editor bridge (PyInstaller onedir) + assemble the .app
-        run: |
-          pyinstaller --noconfirm --distpath dist/bundle --workpath build/bundle tools/bundle/editor.spec
-          tools/bundle/make_editor_app.sh
-      - name: Smoke test both frozen bridges
-        env:
-          MSMPL_NO_OPEN: "1"        # no browser on a headless runner
-        run: |
-          "./$APP_LIB/Contents/Resources/bridge/microSAMPLER Library" &
-          for i in $(seq 1 40); do
-            curl -sf http://localhost:8766/api/status > /dev/null && break
-            sleep 0.5
-          done
-          curl -sf http://localhost:8766/api/status | grep -q '"library": true'
-          curl -sf http://localhost:8766/app.html | grep -q microSAMPLER
-          curl -sf -X POST http://localhost:8766/api/shutdown | grep -q '"ok": true'
-          # editor daemon: no device on the runner — must still serve, report
-          # daemon mode, and survive a claim attempt + release
-          "./$APP_ED/Contents/Resources/bridge/msmpl-bridge" &
-          ED_PID=$!
-          for i in $(seq 1 40); do
-            curl -sf http://localhost:8765/api/status > /dev/null && break
-            sleep 0.5
-          done
-          curl -sf http://localhost:8765/api/status | grep -q '"daemon": true'
-          curl -sf http://localhost:8765/app.html | grep -q microSAMPLER
-          curl -sf -X POST http://localhost:8765/api/release | grep -q '"released": true'
-          kill $ED_PID
-      - name: Dump the Library log on failure
-        if: failure()
-        run: cat "$HOME/Library/Application Support/DehliMusikk/microSAMPLER Library/library.log" || true
+            HAVE_SIGNING: ${{ secrets.MACOS_CERT_P12 != '' }}
+            APP_LIB: dist/bundle/microSAMPLER Library.app
+            APP_ED: dist/bundle/microSAMPLER Editor Librarian.app
+        steps:
+            - uses: actions/checkout@v5
+            - name: Check tag matches package.json
+              if: github.event_name == 'release'
+              env:
+                  TAG: ${{ github.event.release.tag_name }} # env, not inline: tag
+              run: | #  names can carry shell
+                  PKG="v$(node -p "require('./package.json').version")"
+                  test "$TAG" = "$PKG" || { echo "::error::tag $TAG does not match package.json $PKG (run npm version first)"; exit 1; }
+                  node tools/stamp-docs-version.mjs --check
+            - uses: actions/setup-python@v6
+              with:
+                  python-version: "3.12"
+            - run: pip install 'pyinstaller==6.*' # majors change onedir layout
+            - name: Make .icns from AppIcon.png
+              run: |
+                  mkdir -p build/icon.iconset
+                  for s in 16 32 128 256 512; do
+                    sips -z $s $s web-editor/assets/AppIcon.png --out "build/icon.iconset/icon_${s}x${s}.png" > /dev/null
+                    sips -z $((s*2)) $((s*2)) web-editor/assets/AppIcon.png --out "build/icon.iconset/icon_${s}x${s}@2x.png" > /dev/null
+                  done
+                  iconutil -c icns build/icon.iconset -o build/AppIcon.icns
+                  echo "MSMPL_ICNS=$PWD/build/AppIcon.icns" >> "$GITHUB_ENV"
+            - name: Build Library bridge (PyInstaller onedir) + assemble the .app
+              run: |
+                  pyinstaller --noconfirm --distpath dist/bundle --workpath build/bundle tools/bundle/library.spec
+                  tools/bundle/make_library_app.sh
+            - name: Build Editor bridge (PyInstaller onedir) + assemble the .app
+              run: |
+                  pyinstaller --noconfirm --distpath dist/bundle --workpath build/bundle tools/bundle/editor.spec
+                  tools/bundle/make_editor_app.sh
+            - name: Smoke test both frozen bridges
+              env:
+                  MSMPL_NO_OPEN: "1" # no browser on a headless runner
+              run: |
+                  "./$APP_LIB/Contents/Resources/bridge/microSAMPLER Library" &
+                  for i in $(seq 1 40); do
+                    curl -sf http://localhost:8766/api/status > /dev/null && break
+                    sleep 0.5
+                  done
+                  curl -sf http://localhost:8766/api/status | grep -q '"library": true'
+                  curl -sf http://localhost:8766/app.html | grep -q microSAMPLER
+                  curl -sf -X POST http://localhost:8766/api/shutdown | grep -q '"ok": true'
+                  # editor daemon: no device on the runner — must still serve, report
+                  # daemon mode, and survive a claim attempt + release
+                  "./$APP_ED/Contents/Resources/bridge/msmpl-bridge" &
+                  ED_PID=$!
+                  for i in $(seq 1 40); do
+                    curl -sf http://localhost:8765/api/status > /dev/null && break
+                    sleep 0.5
+                  done
+                  curl -sf http://localhost:8765/api/status | grep -q '"daemon": true'
+                  curl -sf http://localhost:8765/app.html | grep -q microSAMPLER
+                  curl -sf -X POST http://localhost:8765/api/release | grep -q '"released": true'
+                  kill $ED_PID
+            - name: Dump the Library log on failure
+              if: failure()
+              run: cat "$HOME/Library/Application Support/DehliMusikk/microSAMPLER Library/library.log" || true
 
-      # ── signing + notarization (skipped unless the secrets are configured) ──
-      - name: Import signing certificate
-        if: env.HAVE_SIGNING == 'true'
-        env:
-          CERT_P12: ${{ secrets.MACOS_CERT_P12 }}
-          CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
-        run: |
-          KEYCHAIN=build/signing.keychain-db
-          KEYCHAIN_PW=$(openssl rand -hex 16)
-          echo "$CERT_P12" | base64 -d > build/cert.p12
-          security create-keychain -p "$KEYCHAIN_PW" "$KEYCHAIN"
-          security set-keychain-settings -lut 21600 "$KEYCHAIN"   # 6 h: the DMG
-          #  codesign runs AFTER the apps' notarize wait (can be hours)
-          security unlock-keychain -p "$KEYCHAIN_PW" "$KEYCHAIN"
-          security import build/cert.p12 -k "$KEYCHAIN" -P "$CERT_PASSWORD" \
-            -T /usr/bin/codesign
-          security set-key-partition-list -S apple-tool:,apple: -s \
-            -k "$KEYCHAIN_PW" "$KEYCHAIN" > /dev/null
-          security list-keychains -d user -s "$KEYCHAIN" login.keychain
-          rm build/cert.p12
-      - name: Codesign (hardened runtime)
-        if: env.HAVE_SIGNING == 'true'
-        env:
-          IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
-        run: |
-          # inside-out: 1) loose Mach-O files (dylibs/.so/executables, incl.
-          # the editor's embedded bridge + vendored libusb) — but NOT framework
-          # internals; 2) nested frameworks AS BUNDLES (signing their files
-          # individually leaves the framework unsealed → the app-level sign
-          # dies with "bundle format is ambiguous"); 3) each app bundle last
-          for APP in "$APP_LIB" "$APP_ED"; do
-            find "$APP/Contents" -type f \( -name '*.dylib' -o -name '*.so' -o -perm +111 \) \
-                ! -path '*/*.framework/*' \
-              -exec codesign --force --options runtime --timestamp \
-                --entitlements tools/bundle/entitlements.plist --sign "$IDENTITY" {} +
-            find "$APP/Contents" -type d -name '*.framework' \
-              -exec codesign --force --options runtime --timestamp \
-                --entitlements tools/bundle/entitlements.plist --sign "$IDENTITY" {} +
-            codesign --force --options runtime --timestamp \
-              --entitlements tools/bundle/entitlements.plist --sign "$IDENTITY" "$APP"
-            codesign --verify --deep --strict "$APP"
-          done
-      - name: Notarize + staple the apps
-        if: env.HAVE_SIGNING == 'true'
-        timeout-minutes: 150   # 2 notarize waits + build must fit the 360 min job cap
-        env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
-        run: |
-          # ONE submission for both apps (Apple scans everything in the zip)
-          mkdir build/notarize
-          ditto "$APP_LIB" "build/notarize/$(basename "$APP_LIB")"
-          ditto "$APP_ED" "build/notarize/$(basename "$APP_ED")"
-          ditto -c -k build/notarize build/notarize.zip
-          tools/bundle/notarize.sh build/notarize.zip
-          xcrun stapler staple "$APP_LIB"
-          xcrun stapler staple "$APP_ED"
+            # ── signing + notarization (skipped unless the secrets are configured) ──
+            - name: Import signing certificate
+              if: env.HAVE_SIGNING == 'true'
+              env:
+                  CERT_P12: ${{ secrets.MACOS_CERT_P12 }}
+                  CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
+              run: |
+                  KEYCHAIN=build/signing.keychain-db
+                  KEYCHAIN_PW=$(openssl rand -hex 16)
+                  echo "$CERT_P12" | base64 -d > build/cert.p12
+                  security create-keychain -p "$KEYCHAIN_PW" "$KEYCHAIN"
+                  security set-keychain-settings -lut 21600 "$KEYCHAIN"   # 6 h: the DMG
+                  #  codesign runs AFTER the apps' notarize wait (can be hours)
+                  security unlock-keychain -p "$KEYCHAIN_PW" "$KEYCHAIN"
+                  security import build/cert.p12 -k "$KEYCHAIN" -P "$CERT_PASSWORD" \
+                    -T /usr/bin/codesign
+                  security set-key-partition-list -S apple-tool:,apple: -s \
+                    -k "$KEYCHAIN_PW" "$KEYCHAIN" > /dev/null
+                  security list-keychains -d user -s "$KEYCHAIN" login.keychain
+                  rm build/cert.p12
+            - name: Codesign (hardened runtime)
+              if: env.HAVE_SIGNING == 'true'
+              env:
+                  IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
+              run: |
+                  # inside-out: 1) loose Mach-O files (dylibs/.so/executables, incl.
+                  # the editor's embedded bridge + vendored libusb) — but NOT framework
+                  # internals; 2) nested frameworks AS BUNDLES (signing their files
+                  # individually leaves the framework unsealed → the app-level sign
+                  # dies with "bundle format is ambiguous"); 3) each app bundle last
+                  for APP in "$APP_LIB" "$APP_ED"; do
+                    find "$APP/Contents" -type f \( -name '*.dylib' -o -name '*.so' -o -perm +111 \) \
+                        ! -path '*/*.framework/*' \
+                      -exec codesign --force --options runtime --timestamp \
+                        --entitlements tools/bundle/entitlements.plist --sign "$IDENTITY" {} +
+                    find "$APP/Contents" -type d -name '*.framework' \
+                      -exec codesign --force --options runtime --timestamp \
+                        --entitlements tools/bundle/entitlements.plist --sign "$IDENTITY" {} +
+                    codesign --force --options runtime --timestamp \
+                      --entitlements tools/bundle/entitlements.plist --sign "$IDENTITY" "$APP"
+                    codesign --verify --deep --strict "$APP"
+                  done
+            - name: Notarize + staple the apps
+              if: env.HAVE_SIGNING == 'true'
+              timeout-minutes: 150 # 2 notarize waits + build must fit the 360 min job cap
+              env:
+                  APPLE_ID: ${{ secrets.APPLE_ID }}
+                  APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+                  APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+              run: |
+                  # ONE submission for both apps (Apple scans everything in the zip)
+                  mkdir build/notarize
+                  ditto "$APP_LIB" "build/notarize/$(basename "$APP_LIB")"
+                  ditto "$APP_ED" "build/notarize/$(basename "$APP_ED")"
+                  ditto -c -k build/notarize build/notarize.zip
+                  tools/bundle/notarize.sh build/notarize.zip
+                  xcrun stapler staple "$APP_LIB"
+                  xcrun stapler staple "$APP_ED"
 
-      # DMG, not zips: drag-installing from a mounted DMG is the one install
-      # path macOS never App-Translocates (the zip flow reliably did, blocking
-      # SMAppService until a manual de-quarantine — user-hit twice)
-      - name: Build DMG (both apps + Applications shortcut)
-        run: |
-          VERSION=$(node -p "require('./package.json').version")
-          mkdir -p build/dmg
-          ditto "$APP_LIB" "build/dmg/$(basename "$APP_LIB")"
-          ditto "$APP_ED" "build/dmg/$(basename "$APP_ED")"
-          ln -s /Applications build/dmg/Applications
-          hdiutil create -volname "microSAMPLER apps v$VERSION" \
-            -srcfolder build/dmg -ov -format UDZO \
-            "dist/bundle/microSAMPLER-macos-${{ matrix.arch }}.dmg"
-      - name: Sign + notarize + staple the DMG
-        if: env.HAVE_SIGNING == 'true'
-        timeout-minutes: 150
-        env:
-          IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
-        run: |
-          DMG="dist/bundle/microSAMPLER-macos-${{ matrix.arch }}.dmg"
-          codesign --force --timestamp --sign "$IDENTITY" "$DMG"
-          tools/bundle/notarize.sh "$DMG"
-          xcrun stapler staple "$DMG"
-      - uses: actions/upload-artifact@v7
-        with:
-          name: microSAMPLER-apps-macos-${{ matrix.arch }}
-          path: dist/bundle/microSAMPLER-macos-${{ matrix.arch }}.dmg
-      - name: Attach to the release
-        if: github.event_name == 'release'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          TAG: ${{ github.event.release.tag_name }}
-        run: |
-          gh release upload "$TAG" \
-            "dist/bundle/microSAMPLER-macos-${{ matrix.arch }}.dmg" --clobber
+            # DMG, not zips: drag-installing from a mounted DMG is the one install
+            # path macOS never App-Translocates (the zip flow reliably did, blocking
+            # SMAppService until a manual de-quarantine — user-hit twice)
+            - name: Build DMG (both apps + Applications shortcut)
+              run: |
+                  VERSION=$(node -p "require('./package.json').version")
+                  mkdir -p build/dmg
+                  ditto "$APP_LIB" "build/dmg/$(basename "$APP_LIB")"
+                  ditto "$APP_ED" "build/dmg/$(basename "$APP_ED")"
+                  ln -s /Applications build/dmg/Applications
+                  hdiutil create -volname "microSAMPLER apps v$VERSION" \
+                    -srcfolder build/dmg -ov -format UDZO \
+                    "dist/bundle/microSAMPLER-macos-${{ matrix.arch }}.dmg"
+            - name: Sign + notarize + staple the DMG
+              if: env.HAVE_SIGNING == 'true'
+              timeout-minutes: 150
+              env:
+                  IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
+                  APPLE_ID: ${{ secrets.APPLE_ID }}
+                  APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+                  APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+              run: |
+                  DMG="dist/bundle/microSAMPLER-macos-${{ matrix.arch }}.dmg"
+                  codesign --force --timestamp --sign "$IDENTITY" "$DMG"
+                  tools/bundle/notarize.sh "$DMG"
+                  xcrun stapler staple "$DMG"
+            - uses: actions/upload-artifact@v7
+              with:
+                  name: microSAMPLER-apps-macos-${{ matrix.arch }}
+                  path: dist/bundle/microSAMPLER-macos-${{ matrix.arch }}.dmg
+            - name: Attach to the release
+              if: github.event_name == 'release'
+              env:
+                  GH_TOKEN: ${{ github.token }}
+                  TAG: ${{ github.event.release.tag_name }}
+              run: |
+                  gh release upload "$TAG" \
+                    "dist/bundle/microSAMPLER-macos-${{ matrix.arch }}.dmg" --clobber

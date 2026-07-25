@@ -1,0 +1,14 @@
+# Build output and dependencies
+node_modules/
+dist/
+release/
+
+# npm-managed, not hand-formatted
+package-lock.json
+
+# Generated data modules (rebuilt by tools/re/extract_fx.py)
+web-editor/functions/valueTables.js
+web-editor/functions/fxData.js
+
+# Vendored third-party code
+native-tools/vendor/

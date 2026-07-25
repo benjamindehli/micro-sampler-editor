@@ -1,68 +1,74 @@
 // Waveform screen: lazy WAV load, peak rendering, zoom/pan, start/end marker
 // dragging, device audition + approximate playhead.
-import { tuneCents } from 'components/controls/controls.js';
-import { renderMeter } from 'components/meter/meter.js';
-import { selectSlot } from 'components/pads/pads.js';
-import { loadSampleAudio } from 'components/sample-editor/sampleLoad.js';
-import { renderChips, renderMetaFmt, renderPoints } from 'components/sample-editor/slot.js';
-import { nearestZeroCrossing } from 'functions/audioTools.js';
-import { slotData, state } from 'functions/state.js';
-import { tick } from 'functions/ticker.js';
-import { $, api, jsonBody } from 'functions/util.js';
+import { tuneCents } from "components/controls/controls.js";
+import { renderMeter } from "components/meter/meter.js";
+import { selectSlot } from "components/pads/pads.js";
+import { loadSampleAudio } from "components/sample-editor/sampleLoad.js";
+import { renderChips, renderMetaFmt, renderPoints } from "components/sample-editor/slot.js";
+import { nearestZeroCrossing } from "functions/audioTools.js";
+import { slotData, state } from "functions/state.js";
+import { tick } from "functions/ticker.js";
+import { $, api, jsonBody } from "functions/util.js";
 
 // Zoom window into the decoded buffer, in SAMPLE space [0..n]. vlen === 0 means
 // "fit on next draw". The window is global (not per-slot) and resets to fit
 // whenever a different sample's waveform is (re)loaded.
-const MIN_SAMPLES = 32;                          // tightest zoom (~frame level)
+const MIN_SAMPLES = 32; // tightest zoom (~frame level)
 let view = { v0: 0, vlen: 0 };
 
-const wave = $('#wave');
+const wave = $("#wave");
 const curBuf = () => (state.sel != null ? state.buffers.get(state.sel) : null);
 
 // ── zero-crossing snap (start/end) ───────────────────────────────────────────
 // Cutting a sample mid-cycle clicks; snapping the trim points to the nearest
 // zero crossing avoids it. Points are in DEVICE frames but the decoded buffer may
 // be resampled (decodeAudioData → context rate), so map frame⇄buffer-sample.
-const zeroSnapOn = () => { const t = $('#zero-snap'); return !t || t.checked; };
+const zeroSnapOn = () => {
+    const t = $("#zero-snap");
+    return !t || t.checked;
+};
 
 // snap a device-frame point to the nearest zero crossing in the (maybe-resampled)
 // buffer: map frame→buffer-sample, find the crossing, map back to a device frame
 function snapZeroFrame(frame, s, buf) {
-  const n = buf.length, total = s.frames || n;
-  const win = Math.max(64, Math.round(buf.sampleRate * 0.012));   // ~12 ms search window
-  const chans = Array.from({ length: buf.numberOfChannels }, (_, c) => buf.getChannelData(c));
-  const zc = nearestZeroCrossing(chans, (frame / total) * n, win);
-  return zc < 0 ? frame : Math.round((zc / n) * total);
+    const n = buf.length,
+        total = s.frames || n;
+    const win = Math.max(64, Math.round(buf.sampleRate * 0.012)); // ~12 ms search window
+    const chans = Array.from({ length: buf.numberOfChannels }, (_, c) => buf.getChannelData(c));
+    const zc = nearestZeroCrossing(chans, (frame / total) * n, win);
+    return zc < 0 ? frame : Math.round((zc / n) * total);
 }
 
 export async function loadWave(i) {
-  stopAudition();                  // end any held audition note before switching
-  const s = slotData(i);
-  const canvas = $('#wave');
-  const status = $('#wave-status');
-  const ctx2d = canvas.getContext('2d');
-  ctx2d.clearRect(0, 0, canvas.width, canvas.height);
-  if (s.empty) {
-    status.hidden = false; status.textContent = 'NO DATA';
-    $('#wave-zoom').hidden = true;
-    return;
-  }
+    stopAudition(); // end any held audition note before switching
+    const s = slotData(i);
+    const canvas = $("#wave");
+    const status = $("#wave-status");
+    const ctx2d = canvas.getContext("2d");
+    ctx2d.clearRect(0, 0, canvas.width, canvas.height);
+    if (s.empty) {
+        status.hidden = false;
+        status.textContent = "NO DATA";
+        $("#wave-zoom").hidden = true;
+        return;
+    }
 
-  status.hidden = false; status.textContent = 'READING…';
-  try {
-    const buf = await loadSampleAudio(i);        // fetch+decode+cache+format
-    if (state.sel !== i) return;                 // user moved on meanwhile
-    status.hidden = true;
-    renderChips(s);
-    renderMetaFmt(s);
-    renderPoints(s);                             // frames known now → enable START/END
-    renderMeter();                               // exact size now known
-    view = { v0: 0, vlen: buf.length };          // fresh sample → fit
-    drawWave(buf, s);
-    updateZoomUI();
-  } catch (e) {
-    status.textContent = 'READ ERROR — ' + e.message.toUpperCase();
-  }
+    status.hidden = false;
+    status.textContent = "READING…";
+    try {
+        const buf = await loadSampleAudio(i); // fetch+decode+cache+format
+        if (state.sel !== i) return; // user moved on meanwhile
+        status.hidden = true;
+        renderChips(s);
+        renderMetaFmt(s);
+        renderPoints(s); // frames known now → enable START/END
+        renderMeter(); // exact size now known
+        view = { v0: 0, vlen: buf.length }; // fresh sample → fit
+        drawWave(buf, s);
+        updateZoomUI();
+    } catch (e) {
+        status.textContent = "READ ERROR — " + e.message.toUpperCase();
+    }
 }
 
 // Redraw coalescing: pointermove (drag/pan) and wheel fire faster than the
@@ -75,22 +81,22 @@ let redrawReq = 0;
 // every drag frame. Invalidated on the theme-change event (see bottom).
 let _themeColors = null;
 function themeColors() {
-  if (!_themeColors) {
-    const cs = getComputedStyle(document.documentElement);
-    _themeColors = {
-      rgb: cs.getPropertyValue('--amber-rgb').trim() || '255,138,30',
-      hiRgb: cs.getPropertyValue('--amber-hi-rgb').trim() || '255,192,99',
-    };
-  }
-  return _themeColors;
+    if (!_themeColors) {
+        const cs = getComputedStyle(document.documentElement);
+        _themeColors = {
+            rgb: cs.getPropertyValue("--amber-rgb").trim() || "255,138,30",
+            hiRgb: cs.getPropertyValue("--amber-hi-rgb").trim() || "255,192,99"
+        };
+    }
+    return _themeColors;
 }
 function scheduleRedraw() {
-  if (redrawReq) return;
-  redrawReq = requestAnimationFrame(() => {
-    redrawReq = 0;
-    const buf = curBuf();
-    if (buf && state.sel != null) drawWave(buf, slotData(state.sel));
-  });
+    if (redrawReq) return;
+    redrawReq = requestAnimationFrame(() => {
+        redrawReq = 0;
+        const buf = curBuf();
+        if (buf && state.sel != null) drawWave(buf, slotData(state.sel));
+    });
 }
 
 // The waveform is rendered to an OFFSCREEN canvas once per geometry/theme
@@ -103,318 +109,387 @@ let waveCache = null;
 // per-column lo/hi/mid PER CHANNEL — returns one {los,his,mids} per channel so
 // stereo can be drawn as two lanes (mono = a single-element array).
 function computePeaks(buf, n, v0, vlen, W) {
-  const spp = vlen / W;
-  return Array.from({ length: buf.numberOfChannels }, (_, c) => {
-    const ch = buf.getChannelData(c);
-    const los = new Float32Array(W), his = new Float32Array(W), mids = new Float32Array(W);
-    for (let x = 0; x < W; x++) {
-      const a = v0 + x * spp;
-      let i0 = Math.floor(a), i1 = Math.max(i0 + 1, Math.ceil(a + spp));
-      if (i0 < 0) i0 = 0;
-      if (i1 > n) i1 = n;
-      let lo = 1, hi = -1, acc = 0, cnt = 0;
-      const stride = Math.max(1, Math.floor((i1 - i0) / 24));
-      for (let i = i0; i < i1; i += stride) {
-        const v = ch[i] || 0;
-        if (v < lo) lo = v;
-        if (v > hi) hi = v;
-        acc += v; cnt++;
-      }
-      los[x] = lo; his[x] = hi; mids[x] = cnt ? acc / cnt : 0;
-    }
-    return { los, his, mids };
-  });
+    const spp = vlen / W;
+    return Array.from({ length: buf.numberOfChannels }, (_, c) => {
+        const ch = buf.getChannelData(c);
+        const los = new Float32Array(W),
+            his = new Float32Array(W),
+            mids = new Float32Array(W);
+        for (let x = 0; x < W; x++) {
+            const a = v0 + x * spp;
+            let i0 = Math.floor(a),
+                i1 = Math.max(i0 + 1, Math.ceil(a + spp));
+            if (i0 < 0) i0 = 0;
+            if (i1 > n) i1 = n;
+            let lo = 1,
+                hi = -1,
+                acc = 0,
+                cnt = 0;
+            const stride = Math.max(1, Math.floor((i1 - i0) / 24));
+            for (let i = i0; i < i1; i += stride) {
+                const v = ch[i] || 0;
+                if (v < lo) lo = v;
+                if (v > hi) hi = v;
+                acc += v;
+                cnt++;
+            }
+            los[x] = lo;
+            his[x] = hi;
+            mids[x] = cnt ? acc / cnt : 0;
+        }
+        return { los, his, mids };
+    });
 }
 
 // render the static waveform (grid + bars + trace, uniform brightness, WITH the
 // glow) to an offscreen canvas — done only when geometry/theme changes, so its
 // per-column cost is off the drag hot path
 function buildWaveCache(buf, n, v0, vlen, W, H, rgb, hiRgb, dpr) {
-  const oc = (waveCache && waveCache.canvas.width === W && waveCache.canvas.height === H)
-    ? waveCache.canvas : document.createElement('canvas');
-  oc.width = W; oc.height = H;                    // (also clears)
-  const g = oc.getContext('2d');
-  const A = a => `rgba(${rgb},${a})`;
+    const oc = waveCache && waveCache.canvas.width === W && waveCache.canvas.height === H ? waveCache.canvas : document.createElement("canvas");
+    oc.width = W;
+    oc.height = H; // (also clears)
+    const g = oc.getContext("2d");
+    const A = (a) => `rgba(${rgb},${a})`;
 
-  g.strokeStyle = A(.07); g.lineWidth = 1;        // faint vertical grid (full H)
-  for (let x = 0; x < W; x += W / 16) line(g, x, 0, x, H);
+    g.strokeStyle = A(0.07);
+    g.lineWidth = 1; // faint vertical grid (full H)
+    for (let x = 0; x < W; x += W / 16) line(g, x, 0, x, H);
 
-  // one lane per channel: mono = full height; stereo = two half-height lanes
-  // (L on top, R below) so each channel's content is readable on its own
-  const chanPeaks = computePeaks(buf, n, v0, vlen, W);
-  const nch = chanPeaks.length;
-  const laneH = H / nch;
-  chanPeaks.forEach((pk, c) => {
-    const mid = c * laneH + laneH / 2;            // this lane's baseline
-    const amp = (laneH / 2) * .92;
-    g.strokeStyle = A(.07); g.lineWidth = 1;      // baseline
-    line(g, 0, mid, W, mid);
-    g.save();                                     // min/max bars (with glow)
-    g.shadowColor = A(.8); g.shadowBlur = 6 * dpr;
-    g.fillStyle = `rgb(${rgb})`; g.globalAlpha = .95;
-    for (let x = 0; x < W; x++) {
-      // fill the column from its most-negative to its most-positive sample
-      // (los ≤ his ⇒ y0 ≤ y1); min 1px so near-silent columns still show
-      const y0 = mid + pk.los[x] * amp, y1 = mid + pk.his[x] * amp;
-      g.fillRect(x, y0, 1, Math.max(1, y1 - y0));
+    // one lane per channel: mono = full height; stereo = two half-height lanes
+    // (L on top, R below) so each channel's content is readable on its own
+    const chanPeaks = computePeaks(buf, n, v0, vlen, W);
+    const nch = chanPeaks.length;
+    const laneH = H / nch;
+    chanPeaks.forEach((pk, c) => {
+        const mid = c * laneH + laneH / 2; // this lane's baseline
+        const amp = (laneH / 2) * 0.92;
+        g.strokeStyle = A(0.07);
+        g.lineWidth = 1; // baseline
+        line(g, 0, mid, W, mid);
+        g.save(); // min/max bars (with glow)
+        g.shadowColor = A(0.8);
+        g.shadowBlur = 6 * dpr;
+        g.fillStyle = `rgb(${rgb})`;
+        g.globalAlpha = 0.95;
+        for (let x = 0; x < W; x++) {
+            // fill the column from its most-negative to its most-positive sample
+            // (los ≤ his ⇒ y0 ≤ y1); min 1px so near-silent columns still show
+            const y0 = mid + pk.los[x] * amp,
+                y1 = mid + pk.his[x] * amp;
+            g.fillRect(x, y0, 1, Math.max(1, y1 - y0));
+        }
+        g.restore();
+        g.save(); // connecting trace
+        g.strokeStyle = `rgba(${hiRgb},.85)`;
+        g.lineWidth = dpr;
+        g.shadowColor = A(0.6);
+        g.shadowBlur = 4 * dpr;
+        g.beginPath();
+        for (let x = 0; x < W; x++) {
+            const y = mid + pk.mids[x] * amp;
+            x ? g.lineTo(x, y) : g.moveTo(x, y);
+        }
+        g.stroke();
+        g.restore();
+        if (nch > 1) {
+            // L / R lane label — bottom-left
+            g.fillStyle = `rgba(${hiRgb},.5)`; // of the lane, clear of the top
+            g.font = `${9 * dpr}px "Share Tech Mono", monospace`; // S/E marker flags
+            g.fillText(c === 0 ? "L" : "R", 4 * dpr, (c + 1) * laneH - 5 * dpr);
+        }
+    });
+    if (nch > 1) {
+        // divider between the lanes
+        g.strokeStyle = A(0.16);
+        g.lineWidth = 1;
+        line(g, 0, laneH, W, laneH);
     }
-    g.restore();
-    g.save();                                     // connecting trace
-    g.strokeStyle = `rgba(${hiRgb},.85)`; g.lineWidth = dpr;
-    g.shadowColor = A(.6); g.shadowBlur = 4 * dpr;
-    g.beginPath();
-    for (let x = 0; x < W; x++) {
-      const y = mid + pk.mids[x] * amp;
-      x ? g.lineTo(x, y) : g.moveTo(x, y);
-    }
-    g.stroke(); g.restore();
-    if (nch > 1) {                                // L / R lane label — bottom-left
-      g.fillStyle = `rgba(${hiRgb},.5)`;          // of the lane, clear of the top
-      g.font = `${9 * dpr}px "Share Tech Mono", monospace`;   // S/E marker flags
-      g.fillText(c === 0 ? 'L' : 'R', 4 * dpr, (c + 1) * laneH - 5 * dpr);
-    }
-  });
-  if (nch > 1) {                                  // divider between the lanes
-    g.strokeStyle = A(.16); g.lineWidth = 1;
-    line(g, 0, laneH, W, laneH);
-  }
-  return oc;
+    return oc;
 }
 
 function drawWave(buf, s) {
-  const canvas = $('#wave');
-  const dpr = devicePixelRatio || 1;
-  const W = Math.round(canvas.clientWidth * dpr), H = Math.round(canvas.clientHeight * dpr);
-  const g = canvas.getContext('2d');
-  if (canvas.width !== W || canvas.height !== H) { canvas.width = W; canvas.height = H; }
-  else g.clearRect(0, 0, W, H);
+    const canvas = $("#wave");
+    const dpr = devicePixelRatio || 1;
+    const W = Math.round(canvas.clientWidth * dpr),
+        H = Math.round(canvas.clientHeight * dpr);
+    const g = canvas.getContext("2d");
+    if (canvas.width !== W || canvas.height !== H) {
+        canvas.width = W;
+        canvas.height = H;
+    } else g.clearRect(0, 0, W, H);
 
-  const n = buf.length;
-  // clamp the zoom window to the buffer (also handles the "fit" sentinel)
-  if (!(view.vlen > 0) || view.vlen > n) view = { v0: 0, vlen: n };
-  view.v0 = Math.max(0, Math.min(n - view.vlen, view.v0));
-  const { v0, vlen } = view;
-  const { rgb, hiRgb } = themeColors();
+    const n = buf.length;
+    // clamp the zoom window to the buffer (also handles the "fit" sentinel)
+    if (!(view.vlen > 0) || view.vlen > n) view = { v0: 0, vlen: n };
+    view.v0 = Math.max(0, Math.min(n - view.vlen, view.v0));
+    const { v0, vlen } = view;
+    const { rgb, hiRgb } = themeColors();
 
-  // start/end are DEVICE frames; the decoded buffer may be resampled. Map a
-  // device frame → buffer sample → canvas x through the current zoom window.
-  const total = s.frames || n;
-  const frameToX = f => (((f / total) * n - v0) / vlen) * W;
-  const startX = frameToX(s.start), endX = frameToX(s.end);
+    // start/end are DEVICE frames; the decoded buffer may be resampled. Map a
+    // device frame → buffer sample → canvas x through the current zoom window.
+    const total = s.frames || n;
+    const frameToX = (f) => (((f / total) * n - v0) / vlen) * W;
+    const startX = frameToX(s.start),
+        endX = frameToX(s.end);
 
-  // (re)build the offscreen waveform only when geometry/theme changed — NOT on
-  // a marker drag (only startX/endX below move), so the drag stays cheap
-  const key = `${v0}|${vlen}|${W}|${H}|${n}|${rgb}|${hiRgb}`;
-  if (!waveCache || waveCache.key !== key || waveCache.buf !== buf)
-    waveCache = { key, buf, canvas: buildWaveCache(buf, n, v0, vlen, W, H, rgb, hiRgb, dpr) };
-  g.drawImage(waveCache.canvas, 0, 0);            // one blit — the whole waveform
+    // (re)build the offscreen waveform only when geometry/theme changed — NOT on
+    // a marker drag (only startX/endX below move), so the drag stays cheap
+    const key = `${v0}|${vlen}|${W}|${H}|${n}|${rgb}|${hiRgb}`;
+    if (!waveCache || waveCache.key !== key || waveCache.buf !== buf)
+        waveCache = { key, buf, canvas: buildWaveCache(buf, n, v0, vlen, W, H, rgb, hiRgb, dpr) };
+    g.drawImage(waveCache.canvas, 0, 0); // one blit — the whole waveform
 
-  // in/out-of-range: dim outside [start,end] with a cheap overlay that moves
-  // with the markers (was baked per-bar, forcing a full redraw every frame)
-  const l = Math.max(0, Math.min(W, startX)), r = Math.max(0, Math.min(W, endX));
-  g.fillStyle = 'rgba(0,0,0,.72)';
-  if (l > 0) g.fillRect(0, 0, l, H);
-  if (r < W) g.fillRect(r, 0, W - r, H);
+    // in/out-of-range: dim outside [start,end] with a cheap overlay that moves
+    // with the markers (was baked per-bar, forcing a full redraw every frame)
+    const l = Math.max(0, Math.min(W, startX)),
+        r = Math.max(0, Math.min(W, endX));
+    g.fillStyle = "rgba(0,0,0,.72)";
+    if (l > 0) g.fillRect(0, 0, l, H);
+    if (r < W) g.fillRect(r, 0, W - r, H);
 
-  // start/end marker flags (skip when scrolled off-screen). Each label sits
-  // OUTSIDE the selection — S to the left of its line, E to the right — and
-  // flips to the inside only when it would run off that edge of the canvas
-  // (so START-at-0 and END-at-the-end both stay on-screen).
-  for (const [x, label, dir] of [[startX, 'S', -1], [endX, 'E', 1]]) {
-    if (x < -2 || x > W + 2) continue;
-    g.strokeStyle = `rgb(${hiRgb})`; g.lineWidth = dpr;
-    line(g, x, 0, x, H);
-    g.fillStyle = `rgb(${hiRgb})`;
-    g.font = `${10 * dpr}px "Share Tech Mono", monospace`;
-    const tw = g.measureText(label).width;
-    let lx = dir < 0 ? x - 3 * dpr - tw : x + 3 * dpr;
-    if (lx < 0) lx = x + 3 * dpr;                 // S near the left edge → flip in
-    if (lx + tw > W) lx = x - 3 * dpr - tw;       // E near the right edge → flip in
-    g.fillText(label, lx, 12 * dpr);
-  }
+    // start/end marker flags (skip when scrolled off-screen). Each label sits
+    // OUTSIDE the selection — S to the left of its line, E to the right — and
+    // flips to the inside only when it would run off that edge of the canvas
+    // (so START-at-0 and END-at-the-end both stay on-screen).
+    for (const [x, label, dir] of [
+        [startX, "S", -1],
+        [endX, "E", 1]
+    ]) {
+        if (x < -2 || x > W + 2) continue;
+        g.strokeStyle = `rgb(${hiRgb})`;
+        g.lineWidth = dpr;
+        line(g, x, 0, x, H);
+        g.fillStyle = `rgb(${hiRgb})`;
+        g.font = `${10 * dpr}px "Share Tech Mono", monospace`;
+        const tw = g.measureText(label).width;
+        let lx = dir < 0 ? x - 3 * dpr - tw : x + 3 * dpr;
+        if (lx < 0) lx = x + 3 * dpr; // S near the left edge → flip in
+        if (lx + tw > W) lx = x - 3 * dpr - tw; // E near the right edge → flip in
+        g.fillText(label, lx, 12 * dpr);
+    }
 }
-const line = (g, a, b, c, d) => { g.beginPath(); g.moveTo(a, b); g.lineTo(c, d); g.stroke(); };
+const line = (g, a, b, c, d) => {
+    g.beginPath();
+    g.moveTo(a, b);
+    g.lineTo(c, d);
+    g.stroke();
+};
 
 // ───────────────────────────────────────────────────────────────── zoom ──
 function fitView() {
-  const buf = curBuf();
-  if (buf) view = { v0: 0, vlen: buf.length };
+    const buf = curBuf();
+    if (buf) view = { v0: 0, vlen: buf.length };
 }
 // scale the window by `factor` (>1 zooms out) keeping the sample under `frac`
 // (0..1 across the canvas) anchored in place.
 function zoomAround(frac, factor) {
-  const buf = curBuf();
-  if (!buf) return;
-  const n = buf.length;
-  const anchor = view.v0 + frac * view.vlen;
-  const vlen = Math.max(MIN_SAMPLES, Math.min(n, view.vlen * factor));
-  const v0 = Math.max(0, Math.min(n - vlen, anchor - frac * vlen));
-  view = { v0, vlen };
+    const buf = curBuf();
+    if (!buf) return;
+    const n = buf.length;
+    const anchor = view.v0 + frac * view.vlen;
+    const vlen = Math.max(MIN_SAMPLES, Math.min(n, view.vlen * factor));
+    const v0 = Math.max(0, Math.min(n - vlen, anchor - frac * vlen));
+    view = { v0, vlen };
 }
 function updateZoomUI() {
-  const z = $('#wave-zoom');
-  const buf = curBuf();
-  if (!buf) { z.hidden = true; return; }
-  z.hidden = false;
-  const level = buf.length / (view.vlen || buf.length);
-  $('#wz-level').textContent =
-    (level < 9.95 ? level.toFixed(1) : Math.round(level)) + '×';
-  const atFit = view.vlen >= buf.length - 0.5;
-  $('#wz-out').disabled = atFit;
-  $('#wz-fit').disabled = atFit;
+    const z = $("#wave-zoom");
+    const buf = curBuf();
+    if (!buf) {
+        z.hidden = true;
+        return;
+    }
+    z.hidden = false;
+    const level = buf.length / (view.vlen || buf.length);
+    $("#wz-level").textContent = (level < 9.95 ? level.toFixed(1) : Math.round(level)) + "×";
+    const atFit = view.vlen >= buf.length - 0.5;
+    $("#wz-out").disabled = atFit;
+    $("#wz-fit").disabled = atFit;
 }
 function redrawZoom() {
-  const buf = curBuf();
-  if (!buf) return;
-  scheduleRedraw();          // coalesced — wheel/pan events outpace the display
-  updateZoomUI();
+    const buf = curBuf();
+    if (!buf) return;
+    scheduleRedraw(); // coalesced — wheel/pan events outpace the display
+    updateZoomUI();
 }
 
-$('#wz-in').onclick = () => { zoomAround(0.5, 0.6); redrawZoom(); };
-$('#wz-out').onclick = () => { zoomAround(0.5, 1 / 0.6); redrawZoom(); };
-$('#wz-fit').onclick = () => { fitView(); redrawZoom(); };
+$("#wz-in").onclick = () => {
+    zoomAround(0.5, 0.6);
+    redrawZoom();
+};
+$("#wz-out").onclick = () => {
+    zoomAround(0.5, 1 / 0.6);
+    redrawZoom();
+};
+$("#wz-fit").onclick = () => {
+    fitView();
+    redrawZoom();
+};
 
-wave.addEventListener('wheel', ev => {
-  const buf = curBuf();
-  if (!buf) return;
-  ev.preventDefault();
-  const r = wave.getBoundingClientRect();
-  const frac = Math.max(0, Math.min(1, (ev.clientX - r.left) / r.width));
-  zoomAround(frac, ev.deltaY < 0 ? 0.8 : 1.25);
-  redrawZoom();
-}, { passive: false });
+wave.addEventListener(
+    "wheel",
+    (ev) => {
+        const buf = curBuf();
+        if (!buf) return;
+        ev.preventDefault();
+        const r = wave.getBoundingClientRect();
+        const frac = Math.max(0, Math.min(1, (ev.clientX - r.left) / r.width));
+        zoomAround(frac, ev.deltaY < 0 ? 0.8 : 1.25);
+        redrawZoom();
+    },
+    { passive: false }
+);
 
-wave.addEventListener('dblclick', () => { fitView(); redrawZoom(); });
+wave.addEventListener("dblclick", () => {
+    fitView();
+    redrawZoom();
+});
 
 // ─────────────────────────────── start/end marker dragging · pan dragging ──
 // Points are u32 frame counts (too big for a live 0x41 value): drag updates
 // the display locally, release sends them via the param blob (POST …/points).
 // Dragging the body (not a marker) pans the zoom window instead.
 {
-  let drag = null;                                // {mode:'start'|'end'|'pan', …}
+    let drag = null; // {mode:'start'|'end'|'pan', …}
 
-  const sel = () => {
-    const s = state.sel != null ? slotData(state.sel) : null;
-    return s && !s.empty && state.buffers.get(state.sel) ? s : null;
-  };
-  const frameAt = (ev, s) => {
-    const n = (curBuf() || { length: 1 }).length;
-    const r = wave.getBoundingClientRect();
-    const samp = view.v0 + ((ev.clientX - r.left) / r.width) * view.vlen;
-    const total = s.frames || n;
-    const f = Math.round((samp / n) * total);
-    return Math.max(0, Math.min((s.frames || 2) - 2, f));
-  };
-  const nearMarker = (ev, s) => {
-    const n = (curBuf() || { length: 1 }).length;
-    const total = s.frames || n;
-    const r = wave.getBoundingClientRect();
-    const x = ev.clientX - r.left;
-    const toX = f => (((f / total) * n - view.v0) / view.vlen) * r.width;
-    const ds = Math.abs(x - toX(s.start)), de = Math.abs(x - toX(s.end));
-    if (ds < 9 && ds <= de) return 'start';
-    if (de < 9) return 'end';
-    return null;
-  };
-  const canPan = () => { const b = curBuf(); return b && view.vlen < b.length - 0.5; };
+    const sel = () => {
+        const s = state.sel != null ? slotData(state.sel) : null;
+        return s && !s.empty && state.buffers.get(state.sel) ? s : null;
+    };
+    const frameAt = (ev, s) => {
+        const n = (curBuf() || { length: 1 }).length;
+        const r = wave.getBoundingClientRect();
+        const samp = view.v0 + ((ev.clientX - r.left) / r.width) * view.vlen;
+        const total = s.frames || n;
+        const f = Math.round((samp / n) * total);
+        return Math.max(0, Math.min((s.frames || 2) - 2, f));
+    };
+    const nearMarker = (ev, s) => {
+        const n = (curBuf() || { length: 1 }).length;
+        const total = s.frames || n;
+        const r = wave.getBoundingClientRect();
+        const x = ev.clientX - r.left;
+        const toX = (f) => (((f / total) * n - view.v0) / view.vlen) * r.width;
+        const ds = Math.abs(x - toX(s.start)),
+            de = Math.abs(x - toX(s.end));
+        if (ds < 9 && ds <= de) return "start";
+        if (de < 9) return "end";
+        return null;
+    };
+    const canPan = () => {
+        const b = curBuf();
+        return b && view.vlen < b.length - 0.5;
+    };
 
-  wave.addEventListener('pointerdown', ev => {
-    const s = sel();
-    if (!s) return;
-    const m = nearMarker(ev, s);
-    if (m) drag = { mode: m };
-    else if (canPan()) drag = { mode: 'pan', x: ev.clientX, v0: view.v0 };
-    else return;                                  // at fit, body drag is a no-op
-    wave.setPointerCapture(ev.pointerId);
-    ev.preventDefault();
-  });
-  wave.addEventListener('pointermove', ev => {
-    const s = sel();
-    if (!s) return;
-    if (!drag) {
-      wave.style.cursor = nearMarker(ev, s) ? 'ew-resize' : (canPan() ? 'grab' : '');
-      return;
-    }
-    if (drag.mode === 'pan') {
-      const n = curBuf().length;
-      const r = wave.getBoundingClientRect();
-      const dxFrac = (ev.clientX - drag.x) / r.width;
-      view = { v0: Math.max(0, Math.min(n - view.vlen, drag.v0 - dxFrac * view.vlen)),
-               vlen: view.vlen };
-      wave.style.cursor = 'grabbing';
-      redrawZoom();
-      return;
-    }
-    const f = frameAt(ev, s);
-    if (drag.mode === 'start') s.start = Math.min(f, s.end - 1);
-    else s.end = Math.max(f, s.start + 1);
-    scheduleRedraw();                             // coalesced (see drawWave)
-    renderPoints(s);
-  });
-  const endDrag = async () => {
-    if (!drag) return;
-    const mode = drag.mode;
-    drag = null;
-    wave.style.cursor = '';
-    if (mode === 'pan') { scheduleRedraw(); return; }   // full-quality final frame;
-    //                                                     panning sends nothing
-    const s = slotData(state.sel);
-    const buf = curBuf();
-    // snap the just-dragged marker to the nearest zero crossing (numeric inputs
-    // stay exact — they commit straight through commitPoints)
-    if (buf && zeroSnapOn()) {
-      if (mode === 'start') s.start = snapZeroFrame(s.start, s, buf);
-      else s.end = snapZeroFrame(s.end, s, buf);
-    }
-    await commitPoints(s.start, s.end);
-  };
-  wave.addEventListener('pointerup', endDrag);
-  // pointercancel commits like pointerup — pointermove already mutated
-  // s.start/s.end, so just dropping the drag would leave the readouts and
-  // markers diverged from the device until the next commit or focus resync
-  wave.addEventListener('pointercancel', endDrag);
+    wave.addEventListener("pointerdown", (ev) => {
+        const s = sel();
+        if (!s) return;
+        const m = nearMarker(ev, s);
+        if (m) drag = { mode: m };
+        else if (canPan()) drag = { mode: "pan", x: ev.clientX, v0: view.v0 };
+        else return; // at fit, body drag is a no-op
+        wave.setPointerCapture(ev.pointerId);
+        ev.preventDefault();
+    });
+    wave.addEventListener("pointermove", (ev) => {
+        const s = sel();
+        if (!s) return;
+        if (!drag) {
+            wave.style.cursor = nearMarker(ev, s) ? "ew-resize" : canPan() ? "grab" : "";
+            return;
+        }
+        if (drag.mode === "pan") {
+            const n = curBuf().length;
+            const r = wave.getBoundingClientRect();
+            const dxFrac = (ev.clientX - drag.x) / r.width;
+            view = { v0: Math.max(0, Math.min(n - view.vlen, drag.v0 - dxFrac * view.vlen)), vlen: view.vlen };
+            wave.style.cursor = "grabbing";
+            redrawZoom();
+            return;
+        }
+        const f = frameAt(ev, s);
+        if (drag.mode === "start") s.start = Math.min(f, s.end - 1);
+        else s.end = Math.max(f, s.start + 1);
+        scheduleRedraw(); // coalesced (see drawWave)
+        renderPoints(s);
+    });
+    const endDrag = async () => {
+        if (!drag) return;
+        const mode = drag.mode;
+        drag = null;
+        wave.style.cursor = "";
+        if (mode === "pan") {
+            scheduleRedraw();
+            return;
+        } // full-quality final frame;
+        //                                                     panning sends nothing
+        const s = slotData(state.sel);
+        const buf = curBuf();
+        // snap the just-dragged marker to the nearest zero crossing (numeric inputs
+        // stay exact — they commit straight through commitPoints)
+        if (buf && zeroSnapOn()) {
+            if (mode === "start") s.start = snapZeroFrame(s.start, s, buf);
+            else s.end = snapZeroFrame(s.end, s, buf);
+        }
+        await commitPoints(s.start, s.end);
+    };
+    wave.addEventListener("pointerup", endDrag);
+    // pointercancel commits like pointerup — pointermove already mutated
+    // s.start/s.end, so just dropping the drag would leave the readouts and
+    // markers diverged from the device until the next commit or focus resync
+    wave.addEventListener("pointercancel", endDrag);
 
-  // zero-snap toggle (persisted; default on)
-  const zt = $('#zero-snap');
-  try { zt.checked = localStorage.getItem('msmpl.zerosnap') !== '0'; } catch { /* ignore */ }
-  zt.addEventListener('change', () => {
-    try { localStorage.setItem('msmpl.zerosnap', zt.checked ? '1' : '0'); } catch { /* ignore */ }
-    tick(`zero-crossing snap: ${zt.checked ? 'ON' : 'OFF'}`);
-  });
+    // zero-snap toggle (persisted; default on)
+    const zt = $("#zero-snap");
+    try {
+        zt.checked = localStorage.getItem("msmpl.zerosnap") !== "0";
+    } catch {
+        /* ignore */
+    }
+    zt.addEventListener("change", () => {
+        try {
+            localStorage.setItem("msmpl.zerosnap", zt.checked ? "1" : "0");
+        } catch {
+            /* ignore */
+        }
+        tick(`zero-crossing snap: ${zt.checked ? "ON" : "OFF"}`);
+    });
 }
 
 // Commit START/END points to the device — shared by the marker drag and the
 // numeric inputs under the waveform: clamp, redraw, POST, refresh the readout.
 async function commitPoints(start, end) {
-  if (state.sel == null) return;
-  const i = state.sel, s = slotData(i);
-  if (!s.frames) return;                  // length unknown (WAV not loaded yet) —
-                                          // clamping here would collapse to 1 frame
-  const max = s.frames - 2;               // start < end ≤ max, so start ≤ max-1
-  s.start = Math.max(0, Math.min(max - 1, Math.round(start)));
-  s.end = Math.max(s.start + 1, Math.min(max, Math.round(end)));
-  const buf = curBuf();
-  if (buf) drawWave(buf, s);
-  renderPoints(s);
-  try {
-    await api(`/api/sample/${i}/points`, jsonBody({ start: s.start, end: s.end }));
-    tick(`→ S${i + 1} points ${s.start.toLocaleString()}…${s.end.toLocaleString()}`);
-  } catch (e) { tick(`⚠ points failed: ${e.message}`); }
+    if (state.sel == null) return;
+    const i = state.sel,
+        s = slotData(i);
+    if (!s.frames) return; // length unknown (WAV not loaded yet) —
+    // clamping here would collapse to 1 frame
+    const max = s.frames - 2; // start < end ≤ max, so start ≤ max-1
+    s.start = Math.max(0, Math.min(max - 1, Math.round(start)));
+    s.end = Math.max(s.start + 1, Math.min(max, Math.round(end)));
+    const buf = curBuf();
+    if (buf) drawWave(buf, s);
+    renderPoints(s);
+    try {
+        await api(`/api/sample/${i}/points`, jsonBody({ start: s.start, end: s.end }));
+        tick(`→ S${i + 1} points ${s.start.toLocaleString()}…${s.end.toLocaleString()}`);
+    } catch (e) {
+        tick(`⚠ points failed: ${e.message}`);
+    }
 }
 
 // numeric START/END entry (the editable readouts under the waveform). A blank or
 // non-numeric field falls back to the current value, so editing one point never
 // silently resets the other; edits before the sample length is known are ignored.
-$('#ro-row').addEventListener('change', e => {
-  if (!e.target.closest('.ro-input') || state.sel == null) return;
-  const s = slotData(state.sel);
-  if (!s.frames) return renderPoints(s);  // not ready — restore the shown values
-  const sv = $('#ro-row [data-point="start"]').value;
-  const ev = $('#ro-row [data-point="end"]').value;
-  const start = sv === '' ? s.start : Number(sv);
-  const end = ev === '' ? s.end : Number(ev);
-  if (Number.isFinite(start) && Number.isFinite(end)) commitPoints(start, end);
-  else renderPoints(s);                   // bad input — restore the shown values
+$("#ro-row").addEventListener("change", (e) => {
+    if (!e.target.closest(".ro-input") || state.sel == null) return;
+    const s = slotData(state.sel);
+    if (!s.frames) return renderPoints(s); // not ready — restore the shown values
+    const sv = $('#ro-row [data-point="start"]').value;
+    const ev = $('#ro-row [data-point="end"]').value;
+    const start = sv === "" ? s.start : Number(sv);
+    const end = ev === "" ? s.end : Number(ev);
+    if (Number.isFinite(start) && Number.isFinite(end)) commitPoints(start, end);
+    else renderPoints(s); // bad input — restore the shown values
 });
 
 // Follow the hardware: select the slot the device just triggered (SSE 'note').
@@ -422,8 +497,8 @@ $('#ro-row').addEventListener('change', e => {
 // an instant select with the waveform already cached; an as-yet-unloaded slot
 // (preload still running) just loads on select like a normal click.
 export function followSelect(i) {
-  if (i == null || i < 0 || i > 35 || !state.bank) return;
-  if (i !== state.sel) selectSlot(i);
+    if (i == null || i < 0 || i > 35 || !state.bank) return;
+    if (i !== state.sel) selectSlot(i);
 }
 
 // ───────────────────────────────────────────────────────────── audition ──
@@ -433,18 +508,20 @@ export function followSelect(i) {
 // natural duration ((end−start)/rate), looping if the sample loops, mapped
 // through the zoom window. Needs the slot's WAV loaded (it is — its waveform is
 // shown); skipped otherwise.
-let playRAF = null, playing = false, playingSlot = null;
+let playRAF = null,
+    playing = false,
+    playingSlot = null;
 
 export function stopAudition(sendNoteOff = true) {
-  if (!playing) return;
-  if (playRAF) cancelAnimationFrame(playRAF);
-  playRAF = null;
-  $('#playhead').hidden = true;
-  $('#audition-btn').classList.remove('playing');
-  $('#audition-btn .ai-lbl').textContent = 'PLAY';
-  if (sendNoteOff && playingSlot != null)
-    api('/api/note', jsonBody({ slot: playingSlot, on: false })).catch(() => { });
-  playing = false; playingSlot = null;
+    if (!playing) return;
+    if (playRAF) cancelAnimationFrame(playRAF);
+    playRAF = null;
+    $("#playhead").hidden = true;
+    $("#audition-btn").classList.remove("playing");
+    $("#audition-btn .ai-lbl").textContent = "PLAY";
+    if (sendNoteOff && playingSlot != null) api("/api/note", jsonBody({ slot: playingSlot, on: false })).catch(() => {});
+    playing = false;
+    playingSlot = null;
 }
 
 // playback-speed multiplier the device applies to a pad-played sample, so the
@@ -453,77 +530,91 @@ export function stopAudition(sendNoteOff = true) {
 // bank BPM ÷ the sample's original BPM (orig BPM known only once the WAV has
 // loaded — falls back to 1 until then).
 function playbackSpeed(s) {
-  if ((s.bpm_sync || 0) === 0) {
-    const semis = (s.semitone || 0) + tuneCents(s.tune == null ? 64 : s.tune) / 100;
-    return 2 ** (semis / 12);
-  }
-  return (s.tempo_bpm && state.bank && state.bank.bpm)
-    ? state.bank.bpm / s.tempo_bpm : 1;
+    if ((s.bpm_sync || 0) === 0) {
+        const semis = (s.semitone || 0) + tuneCents(s.tune == null ? 64 : s.tune) / 100;
+        return 2 ** (semis / 12);
+    }
+    return s.tempo_bpm && state.bank && state.bank.bpm ? state.bank.bpm / s.tempo_bpm : 1;
 }
 
 function startPlayhead(s) {
-  const buf = state.buffers.get(playingSlot);
-  if (!buf || !s.rate_hz || s.end <= s.start) return;   // unknown duration → no playhead
-  const ph = $('#playhead');
-  const total = s.frames || buf.length, n = buf.length;
-  const speed = playbackSpeed(s) || 1;                  // faster pitch = shorter sweep
-  const regionMs = ((s.end - s.start) / s.rate_hz / speed) * 1000;
-  const rev = !!s.reverse;                              // REVERSE → sweep END→START
-  // width read ONCE (not per frame — a per-frame clientWidth read right after
-  // moving the line forces a reflow every frame); moved via transform so the
-  // sweep stays compositor-only. Approximate anyway — a mid-play resize is fine.
-  const width = wave.clientWidth;
-  let t0 = null;
-  const frame = (ts) => {
-    if (!playing) return;
-    if (t0 == null) t0 = ts;
-    let elapsed = ts - t0;
-    if (elapsed >= regionMs) {
-      if (s.loop) { t0 = ts; elapsed = 0; }            // looping sample → repeat
-      else return stopAudition();                      // one-shot finished
-    }
-    const frac = regionMs > 0 ? elapsed / regionMs : 0;
-    const pos = rev ? 1 - frac : frac;
-    const devFrame = s.start + pos * (s.end - s.start);
-    const x = (((devFrame / total) * n - view.v0) / view.vlen) * width;
-    if (x < 0 || x > width) ph.hidden = true;             // scrolled off (zoom)
-    else { ph.hidden = false; ph.style.transform = `translateX(${x}px)`; }
+    const buf = state.buffers.get(playingSlot);
+    if (!buf || !s.rate_hz || s.end <= s.start) return; // unknown duration → no playhead
+    const ph = $("#playhead");
+    const total = s.frames || buf.length,
+        n = buf.length;
+    const speed = playbackSpeed(s) || 1; // faster pitch = shorter sweep
+    const regionMs = ((s.end - s.start) / s.rate_hz / speed) * 1000;
+    const rev = !!s.reverse; // REVERSE → sweep END→START
+    // width read ONCE (not per frame — a per-frame clientWidth read right after
+    // moving the line forces a reflow every frame); moved via transform so the
+    // sweep stays compositor-only. Approximate anyway — a mid-play resize is fine.
+    const width = wave.clientWidth;
+    let t0 = null;
+    const frame = (ts) => {
+        if (!playing) return;
+        if (t0 == null) t0 = ts;
+        let elapsed = ts - t0;
+        if (elapsed >= regionMs) {
+            if (s.loop) {
+                t0 = ts;
+                elapsed = 0;
+            } // looping sample → repeat
+            else return stopAudition(); // one-shot finished
+        }
+        const frac = regionMs > 0 ? elapsed / regionMs : 0;
+        const pos = rev ? 1 - frac : frac;
+        const devFrame = s.start + pos * (s.end - s.start);
+        const x = (((devFrame / total) * n - view.v0) / view.vlen) * width;
+        if (x < 0 || x > width)
+            ph.hidden = true; // scrolled off (zoom)
+        else {
+            ph.hidden = false;
+            ph.style.transform = `translateX(${x}px)`;
+        }
+        playRAF = requestAnimationFrame(frame);
+    };
     playRAF = requestAnimationFrame(frame);
-  };
-  playRAF = requestAnimationFrame(frame);
 }
 
-$('#audition-btn').onclick = () => {
-  if (playing) { stopAudition(); return; }
-  if (state.sel == null) return;
-  const s = slotData(state.sel);
-  if (s.empty) return;
-  playing = true; playingSlot = state.sel;
-  $('#audition-btn').classList.add('playing');
-  $('#audition-btn .ai-lbl').textContent = 'STOP';
-  api('/api/note', jsonBody({ slot: playingSlot, on: true, velocity: 100 }))
-    .catch(err => { tick(`⚠ play failed: ${err.message}`); stopAudition(false); });
-  startPlayhead(s);
+$("#audition-btn").onclick = () => {
+    if (playing) {
+        stopAudition();
+        return;
+    }
+    if (state.sel == null) return;
+    const s = slotData(state.sel);
+    if (s.empty) return;
+    playing = true;
+    playingSlot = state.sel;
+    $("#audition-btn").classList.add("playing");
+    $("#audition-btn .ai-lbl").textContent = "STOP";
+    api("/api/note", jsonBody({ slot: playingSlot, on: true, velocity: 100 })).catch((err) => {
+        tick(`⚠ play failed: ${err.message}`);
+        stopAudition(false);
+    });
+    startPlayhead(s);
 };
 
 // redraw the current slot's waveform from its cached buffer (markers included),
 // keeping the zoom view. Used on resize/theme change AND after a bank re-sync
 // so hardware-edited START/END points show up (they aren't live-transmitted).
 export const redrawCurrent = () => {
-  if (state.sel != null && state.buffers.has(state.sel)) {
-    drawWave(state.buffers.get(state.sel), slotData(state.sel));
-    updateZoomUI();
-  }
+    if (state.sel != null && state.buffers.has(state.sel)) {
+        drawWave(state.buffers.get(state.sel), slotData(state.sel));
+        updateZoomUI();
+    }
 };
 // resize streams events while the window is being dragged — coalesce to one
 // draw per frame (scheduleRedraw); the zoom chrome only needs a cheap update
-addEventListener('resize', () => {
-  if (state.sel != null && state.buffers.has(state.sel)) {
-    scheduleRedraw();
-    updateZoomUI();
-  }
+addEventListener("resize", () => {
+    if (state.sel != null && state.buffers.has(state.sel)) {
+        scheduleRedraw();
+        updateZoomUI();
+    }
 });
-addEventListener('msmpl-theme', () => {           // one-shot — sync is fine
-  _themeColors = null;                            // re-read the new accent
-  redrawCurrent();
+addEventListener("msmpl-theme", () => {
+    // one-shot — sync is fine
+    _themeColors = null; // re-read the new accent
+    redrawCurrent();
 });

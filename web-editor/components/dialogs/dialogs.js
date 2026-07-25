@@ -1,321 +1,348 @@
 // Upload + rename dialogs, incl. the upload memory pre-flight, and the
 // editor-panel WAV drop target.
-import { refreshBank } from 'app.js';
-import { fmtMem, loadAllSamples, MEM_SMPL_TOTAL, memBlk, sampleMemUsage, slotDevBytes }
-  from 'components/meter/meter.js';
-import { syncPads } from 'components/pads/pads.js';
-import { forgetSample } from 'components/sample-editor/sampleLoad.js';
-import { openSlice } from 'components/sample-editor/slice.js';
-import { showSlot } from 'components/sample-editor/slot.js';
-import { decodeWavPcm, encodeWav, processBuffer, toolsActive } from 'functions/audioTools.js';
-import { noteName } from 'functions/notes.js';
-import { slotData, state } from 'functions/state.js';
-import { tick } from 'functions/ticker.js';
-import { $, api, apiJson, confirmDialog, jsonBody } from 'functions/util.js';
+import { refreshBank } from "app.js";
+import { fmtMem, loadAllSamples, MEM_SMPL_TOTAL, memBlk, sampleMemUsage, slotDevBytes } from "components/meter/meter.js";
+import { syncPads } from "components/pads/pads.js";
+import { forgetSample } from "components/sample-editor/sampleLoad.js";
+import { openSlice } from "components/sample-editor/slice.js";
+import { showSlot } from "components/sample-editor/slot.js";
+import { decodeWavPcm, encodeWav, processBuffer, toolsActive } from "functions/audioTools.js";
+import { noteName } from "functions/notes.js";
+import { slotData, state } from "functions/state.js";
+import { tick } from "functions/ticker.js";
+import { $, api, apiJson, confirmDialog, jsonBody } from "functions/util.js";
 
 // the selected file decoded to float channels (null if not a PCM WAV we can
 // process) and its raw bytes — both cached so OK doesn't re-read the file.
-let udDecoded = null, udBytes = null;
-const UD_TOOL_IDS = ['ud-channels', 'ud-normalize', 'ud-trim', 'ud-gain', 'ud-fadein', 'ud-fadeout'];
+let udDecoded = null,
+    udBytes = null;
+const UD_TOOL_IDS = ["ud-channels", "ud-normalize", "ud-trim", "ud-gain", "ud-fadein", "ud-fadeout"];
 const readToolOpts = () => ({
-  channels: $('#ud-channels').value,
-  normalize: $('#ud-normalize').checked,
-  trim: $('#ud-trim').checked,
-  gainDb: +$('#ud-gain').value || 0,
-  fadeInMs: +$('#ud-fadein').value || 0,
-  fadeOutMs: +$('#ud-fadeout').value || 0,
+    channels: $("#ud-channels").value,
+    normalize: $("#ud-normalize").checked,
+    trim: $("#ud-trim").checked,
+    gainDb: +$("#ud-gain").value || 0,
+    fadeInMs: +$("#ud-fadein").value || 0,
+    fadeOutMs: +$("#ud-fadeout").value || 0
 });
 // 8-char device name from a filename (drop the extension, ASCII-only, upper)
-const fileToName = f => f.name.replace(/\.\w+$/, '')
-  .replace(/[^\x20-\x7e]/g, '').toUpperCase().slice(0, 8) || 'SAMPLE';
+const fileToName = (f) =>
+    f.name
+        .replace(/\.\w+$/, "")
+        .replace(/[^\x20-\x7e]/g, "")
+        .toUpperCase()
+        .slice(0, 8) || "SAMPLE";
 
 // Bulk-load several WAVs into consecutive slots starting at `startSlot`
 // (dropping >1 file on the grid/editor). Raw upload — no audio-tools panel —
 // using each filename as the sample name; one confirm, sequential transfer.
 export async function uploadBatch(startSlot, files) {
-  files = files.slice(0, 36 - startSlot);          // clamp to the last pad
-  const last = startSlot + files.length - 1;
-  if (!await confirmDialog(`LOAD ${files.length} WAVS`,
-      `Into PADS ${startSlot + 1}–${last + 1}? OVERWRITES those slots in the ` +
-      `device's current bank (RAM).`, 'LOAD')) return;
-  let done = 0;
-  for (let i = 0; i < files.length; i++) {
-    const slot = startSlot + i, f = files[i];
-    try {
-      await api(`/api/sample/${slot}?name=${encodeURIComponent(fileToName(f))}&tempo=120`,
-                { method: 'POST', body: await f.arrayBuffer() });
-      forgetSample(slot);
-      tick(`⇧ ${++done}/${files.length}: "${fileToName(f)}" → S${slot + 1}`);
-    } catch (err) {
-      tick(`⚠ batch stopped at S${slot + 1}: ${err.message}`);
-      break;
+    files = files.slice(0, 36 - startSlot); // clamp to the last pad
+    const last = startSlot + files.length - 1;
+    if (
+        !(await confirmDialog(
+            `LOAD ${files.length} WAVS`,
+            `Into PADS ${startSlot + 1}–${last + 1}? OVERWRITES those slots in the ` + `device's current bank (RAM).`,
+            "LOAD"
+        ))
+    )
+        return;
+    let done = 0;
+    for (let i = 0; i < files.length; i++) {
+        const slot = startSlot + i,
+            f = files[i];
+        try {
+            await api(`/api/sample/${slot}?name=${encodeURIComponent(fileToName(f))}&tempo=120`, { method: "POST", body: await f.arrayBuffer() });
+            forgetSample(slot);
+            tick(`⇧ ${++done}/${files.length}: "${fileToName(f)}" → S${slot + 1}`);
+        } catch (err) {
+            tick(`⚠ batch stopped at S${slot + 1}: ${err.message}`);
+            break;
+        }
     }
-  }
-  await refreshBank();
-  if (done) {
-    state.sel = startSlot; await showSlot(startSlot);
-    loadAllSamples().catch(() => { });             // eager-load the new samples
-  }
+    await refreshBank();
+    if (done) {
+        state.sel = startSlot;
+        await showSlot(startSlot);
+        loadAllSamples().catch(() => {}); // eager-load the new samples
+    }
 }
 
 // ────────────────────────────────────────────────────────────── upload ──
 export function openUpload(file) {
-  if (state.sel == null) return;
-  const dlg = $('#upload-dialog');
-  $('#ud-slot').textContent = `PAD ${state.sel + 1} (${noteName(state.sel)})`;
-  const fileInput = $('#ud-file');
-  if (file) {
-    const dt = new DataTransfer();
-    dt.items.add(file);
-    fileInput.files = dt.files;
-  } else fileInput.value = '';
-  resetTools();
-  syncNameFromFile();
-  $('#ud-progress').hidden = true;
-  dlg.showModal();
+    if (state.sel == null) return;
+    const dlg = $("#upload-dialog");
+    $("#ud-slot").textContent = `PAD ${state.sel + 1} (${noteName(state.sel)})`;
+    const fileInput = $("#ud-file");
+    if (file) {
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        fileInput.files = dt.files;
+    } else fileInput.value = "";
+    resetTools();
+    syncNameFromFile();
+    $("#ud-progress").hidden = true;
+    dlg.showModal();
 }
 function resetTools() {
-  $('#ud-channels').value = 'keep';
-  $('#ud-normalize').checked = false;
-  $('#ud-trim').checked = false;
-  $('#ud-gain').value = '0';
-  $('#ud-fadein').value = '0';
-  $('#ud-fadeout').value = '0';
-  udDecoded = null; udBytes = null;
+    $("#ud-channels").value = "keep";
+    $("#ud-normalize").checked = false;
+    $("#ud-trim").checked = false;
+    $("#ud-gain").value = "0";
+    $("#ud-fadein").value = "0";
+    $("#ud-fadeout").value = "0";
+    udDecoded = null;
+    udBytes = null;
 }
 function setToolsEnabled(on, haveFile) {
-  for (const id of UD_TOOL_IDS) $('#' + id).disabled = !on;
-  $('#ud-slice').disabled = !on;                   // slicing needs a decodable WAV
-  const note = $('#ud-tools-note');
-  note.hidden = on || !haveFile;
-  if (!note.hidden)
-    note.textContent = 'Tools unavailable for this file — it will upload unchanged.';
+    for (const id of UD_TOOL_IDS) $("#" + id).disabled = !on;
+    $("#ud-slice").disabled = !on; // slicing needs a decodable WAV
+    const note = $("#ud-tools-note");
+    note.hidden = on || !haveFile;
+    if (!note.hidden) note.textContent = "Tools unavailable for this file — it will upload unchanged.";
 }
 async function syncNameFromFile() {
-  const f = $('#ud-file').files[0];
-  if (f) $('#ud-name').value = fileToName(f);
-  // decode the WAV up front so the tools + memory pre-flight reflect the result
-  udDecoded = null; udBytes = null;
-  setToolsEnabled(false, !!f);
-  if (f) {
-    try { udBytes = await f.arrayBuffer(); udDecoded = decodeWavPcm(udBytes); }
-    catch { udDecoded = null; }
-  }
-  setToolsEnabled(!!udDecoded, !!f);
-  uploadPreflight();
+    const f = $("#ud-file").files[0];
+    if (f) $("#ud-name").value = fileToName(f);
+    // decode the WAV up front so the tools + memory pre-flight reflect the result
+    udDecoded = null;
+    udBytes = null;
+    setToolsEnabled(false, !!f);
+    if (f) {
+        try {
+            udBytes = await f.arrayBuffer();
+            udDecoded = decodeWavPcm(udBytes);
+        } catch {
+            udDecoded = null;
+        }
+    }
+    setToolsEnabled(!!udDecoded, !!f);
+    uploadPreflight();
 }
-$('#ud-file').onchange = syncNameFromFile;
+$("#ud-file").onchange = syncNameFromFile;
 // debounced: the pre-flight runs processBuffer (full-file DSP — peak scans,
 // trim, fades) just to update the memory estimate; per-keystroke recompute
 // makes the dialog laggy while typing a value on a long sample
 let preflightT = null;
 const preflightSoon = () => {
-  clearTimeout(preflightT);
-  preflightT = setTimeout(uploadPreflight, 150);
+    clearTimeout(preflightT);
+    preflightT = setTimeout(uploadPreflight, 150);
 };
-for (const id of UD_TOOL_IDS) $('#' + id).addEventListener('input', preflightSoon);
+for (const id of UD_TOOL_IDS) $("#" + id).addEventListener("input", preflightSoon);
 
 // minimal RIFF/WAVE chunk walk over the file head (proper fmt/data chunks —
 // 44-byte assumptions break on files with LIST/INFO chunks)
 function riffFormat(dv) {
-  try {
-    if (dv.getUint32(0) !== 0x52494646 || dv.getUint32(8) !== 0x57415645)
-      return null;                               // "RIFF" … "WAVE"
-    let off = 12, ch = 0, rate = 0, bits = 0, dataBytes = 0;
-    while (off + 8 <= dv.byteLength) {
-      const id = dv.getUint32(off), size = dv.getUint32(off + 4, true);
-      if (id === 0x666d7420) {                   // "fmt "
-        ch = dv.getUint16(off + 10, true);
-        rate = dv.getUint32(off + 12, true);
-        bits = dv.getUint16(off + 22, true);
-      }
-      if (id === 0x64617461) { dataBytes = size; break; }   // "data"
-      off += 8 + size + (size & 1);
+    try {
+        if (dv.getUint32(0) !== 0x52494646 || dv.getUint32(8) !== 0x57415645) return null; // "RIFF" … "WAVE"
+        let off = 12,
+            ch = 0,
+            rate = 0,
+            bits = 0,
+            dataBytes = 0;
+        while (off + 8 <= dv.byteLength) {
+            const id = dv.getUint32(off),
+                size = dv.getUint32(off + 4, true);
+            if (id === 0x666d7420) {
+                // "fmt "
+                ch = dv.getUint16(off + 10, true);
+                rate = dv.getUint32(off + 12, true);
+                bits = dv.getUint16(off + 22, true);
+            }
+            if (id === 0x64617461) {
+                dataBytes = size;
+                break;
+            } // "data"
+            off += 8 + size + (size & 1);
+        }
+        if (!ch || !rate || !bits) return null;
+        return { channels: ch, rate, bytesPerFrame: ch * (bits >> 3), dataBytes };
+    } catch {
+        return null;
     }
-    if (!ch || !rate || !bits) return null;
-    return { channels: ch, rate, bytesPerFrame: ch * (bits >> 3), dataBytes };
-  } catch { return null; }
 }
 
 // pre-flight: will this WAV fit the device's sample pool? Mirrors the
 // device accounting (resample to nearest device rate, 16-bit, 32 KB blocks)
 // and what replacing the target slot frees up.
 async function uploadPreflight() {
-  const el = $('#ud-mem');
-  const ok = $('#ud-ok');
-  el.hidden = true;
-  el.classList.remove('over');
-  ok.disabled = false;
-  const f = $('#ud-file').files[0];
-  if (!f || state.sel == null || !state.bank) return;
-  // derive frames/channels/rate from the PROCESSED audio when we can decode it
-  // (so trim + channel conversion are reflected); otherwise fall back to the
-  // RIFF header estimate.
-  let frames, channels, rate;
-  const opts = readToolOpts();
-  if (udDecoded) {
-    const r = (udDecoded && toolsActive(opts)) ? processBuffer(udDecoded, opts) : udDecoded;
-    channels = r.channels.length; frames = r.channels[0].length; rate = r.rate;
-  } else {
-    const dv = new DataView(await f.slice(0, 64 * 1024).arrayBuffer());
-    const fmt = riffFormat(dv);
-    if (!fmt) return;                            // bridge will reject it anyway
-    frames = Math.floor(fmt.dataBytes / fmt.bytesPerFrame);
-    channels = fmt.channels; rate = fmt.rate;
-  }
-  const target = [48000, 24000, 12000, 6000].reduce((a, r) =>
-    Math.abs(r - rate) < Math.abs(a - rate) ? r : a);
-  const need = memBlk(Math.floor(frames * target / rate) * channels * 2);
-  const used = sampleMemUsage();                 // always exact (all preloaded)
-  const freed = slotDevBytes(slotData(state.sel));
-  const free = MEM_SMPL_TOTAL - used + freed;
-  el.hidden = false;
-  if (need > free) {
-    el.classList.add('over');
-    el.textContent = `✕ WON'T FIT — needs ${fmtMem(need)}, only ${fmtMem(Math.max(0, free))} free`;
-    ok.disabled = true;
-  } else {
-    el.textContent = `SMPL MEM after load: ${fmtMem(used - freed + need)}/${fmtMem(MEM_SMPL_TOTAL)}`;
-  }
+    const el = $("#ud-mem");
+    const ok = $("#ud-ok");
+    el.hidden = true;
+    el.classList.remove("over");
+    ok.disabled = false;
+    const f = $("#ud-file").files[0];
+    if (!f || state.sel == null || !state.bank) return;
+    // derive frames/channels/rate from the PROCESSED audio when we can decode it
+    // (so trim + channel conversion are reflected); otherwise fall back to the
+    // RIFF header estimate.
+    let frames, channels, rate;
+    const opts = readToolOpts();
+    if (udDecoded) {
+        const r = udDecoded && toolsActive(opts) ? processBuffer(udDecoded, opts) : udDecoded;
+        channels = r.channels.length;
+        frames = r.channels[0].length;
+        rate = r.rate;
+    } else {
+        const dv = new DataView(await f.slice(0, 64 * 1024).arrayBuffer());
+        const fmt = riffFormat(dv);
+        if (!fmt) return; // bridge will reject it anyway
+        frames = Math.floor(fmt.dataBytes / fmt.bytesPerFrame);
+        channels = fmt.channels;
+        rate = fmt.rate;
+    }
+    const target = [48000, 24000, 12000, 6000].reduce((a, r) => (Math.abs(r - rate) < Math.abs(a - rate) ? r : a));
+    const need = memBlk(Math.floor((frames * target) / rate) * channels * 2);
+    const used = sampleMemUsage(); // always exact (all preloaded)
+    const freed = slotDevBytes(slotData(state.sel));
+    const free = MEM_SMPL_TOTAL - used + freed;
+    el.hidden = false;
+    if (need > free) {
+        el.classList.add("over");
+        el.textContent = `✕ WON'T FIT — needs ${fmtMem(need)}, only ${fmtMem(Math.max(0, free))} free`;
+        ok.disabled = true;
+    } else {
+        el.textContent = `SMPL MEM after load: ${fmtMem(used - freed + need)}/${fmtMem(MEM_SMPL_TOTAL)}`;
+    }
 }
-$('#upload-btn').onclick = () => openUpload(null);
+$("#upload-btn").onclick = () => openUpload(null);
 
 // SLICE… → hand the (tool-processed) decoded buffer to the slice dialog
-$('#ud-slice').onclick = () => {
-  if (!udDecoded || state.sel == null) return;
-  const opts = readToolOpts();
-  const buf = toolsActive(opts) ? processBuffer(udDecoded, opts) : udDecoded;
-  const base = ($('#ud-name').value || 'SLICE').replace(/[^\x20-\x7e]/g, '').toUpperCase();
-  $('#upload-dialog').close();
-  openSlice(buf, base, state.sel);
+$("#ud-slice").onclick = () => {
+    if (!udDecoded || state.sel == null) return;
+    const opts = readToolOpts();
+    const buf = toolsActive(opts) ? processBuffer(udDecoded, opts) : udDecoded;
+    const base = ($("#ud-name").value || "SLICE").replace(/[^\x20-\x7e]/g, "").toUpperCase();
+    $("#upload-dialog").close();
+    openSlice(buf, base, state.sel);
 };
 
-$('#ud-ok').onclick = async e => {
-  e.preventDefault();
-  const f = $('#ud-file').files[0];
-  if (!f) return;
-  const name = encodeURIComponent($('#ud-name').value || 'SAMPLE');
-  const tempo = +$('#ud-tempo').value || 120;
-  // apply the audio tools in-browser when any is active and we could decode the
-  // file; otherwise send the original bytes untouched (byte-identical upload).
-  const opts = readToolOpts();
-  let body;
-  if (udDecoded && toolsActive(opts)) {
-    const pr = processBuffer(udDecoded, opts);
-    body = encodeWav(pr.channels, pr.rate);
-  } else {
-    body = udBytes || await f.arrayBuffer();
-  }
-  $('#ud-progress').hidden = false;
-  $('#ud-ok').setAttribute('aria-busy', 'true');
-  try {
-    await api(`/api/sample/${state.sel}?name=${name}&tempo=${tempo}`,
-      { method: 'POST', body });
-    tick(`⇧ loaded "${$('#ud-name').value}" → S${state.sel + 1}`);
-    forgetSample(state.sel);                     // its content changed
-    $('#upload-dialog').close();
-    await refreshBank();
-    await showSlot(state.sel);
-  } catch (err) {
-    tick(`⚠ upload failed: ${err.message}`);
-    alert('Upload failed: ' + err.message);
-  } finally {
-    $('#ud-progress').hidden = true;
-    $('#ud-ok').removeAttribute('aria-busy');
-  }
+$("#ud-ok").onclick = async (e) => {
+    e.preventDefault();
+    const f = $("#ud-file").files[0];
+    if (!f) return;
+    const name = encodeURIComponent($("#ud-name").value || "SAMPLE");
+    const tempo = +$("#ud-tempo").value || 120;
+    // apply the audio tools in-browser when any is active and we could decode the
+    // file; otherwise send the original bytes untouched (byte-identical upload).
+    const opts = readToolOpts();
+    let body;
+    if (udDecoded && toolsActive(opts)) {
+        const pr = processBuffer(udDecoded, opts);
+        body = encodeWav(pr.channels, pr.rate);
+    } else {
+        body = udBytes || (await f.arrayBuffer());
+    }
+    $("#ud-progress").hidden = false;
+    $("#ud-ok").setAttribute("aria-busy", "true");
+    try {
+        await api(`/api/sample/${state.sel}?name=${name}&tempo=${tempo}`, { method: "POST", body });
+        tick(`⇧ loaded "${$("#ud-name").value}" → S${state.sel + 1}`);
+        forgetSample(state.sel); // its content changed
+        $("#upload-dialog").close();
+        await refreshBank();
+        await showSlot(state.sel);
+    } catch (err) {
+        tick(`⚠ upload failed: ${err.message}`);
+        alert("Upload failed: " + err.message);
+    } finally {
+        $("#ud-progress").hidden = true;
+        $("#ud-ok").removeAttribute("aria-busy");
+    }
 };
 
 // ────────────────────────────────────────────────────────────── rename ──
 // (param-blob write: name bytes 0..7 + long name 0x20..0x3f)
-$('#rename-btn').onclick = () => {
-  if (state.sel == null) return;
-  const s = slotData(state.sel);
-  if (!s || s.empty) return;
-  $('#rn-slot').textContent = `PAD ${state.sel + 1} (${noteName(state.sel)})`;
-  $('#rn-name').value = s.name || '';
-  $('#rn-long').value = s.long_name || '';
-  $('#rename-dialog').showModal();
-};
-$('#rn-ok').onclick = async e => {
-  e.preventDefault();
-  const name = $('#rn-name').value.trim().toUpperCase().slice(0, 8);
-  if (!name) return;
-  const long_name = $('#rn-long').value.trim().slice(0, 32);
-  $('#rn-ok').setAttribute('aria-busy', 'true');
-  try {
-    const res = await apiJson(`/api/sample/${state.sel}/name`, jsonBody({ name, long_name }));
+$("#rename-btn").onclick = () => {
+    if (state.sel == null) return;
     const s = slotData(state.sel);
-    s.name = res.name;
-    s.long_name = res.long_name;
-    tick(`✎ S${state.sel + 1} renamed "${res.name}"`);
-    $('#rename-dialog').close();
-    syncPads();                       // name-only change — in-place
-    $('#sel-name').textContent = res.name.padEnd(8);
-    $('#sel-long').textContent = res.long_name;
-  } catch (err) {
-    tick(`⚠ rename failed: ${err.message}`);
-    alert('Rename failed: ' + err.message);
-  } finally {
-    $('#rn-ok').removeAttribute('aria-busy');
-  }
+    if (!s || s.empty) return;
+    $("#rn-slot").textContent = `PAD ${state.sel + 1} (${noteName(state.sel)})`;
+    $("#rn-name").value = s.name || "";
+    $("#rn-long").value = s.long_name || "";
+    $("#rename-dialog").showModal();
+};
+$("#rn-ok").onclick = async (e) => {
+    e.preventDefault();
+    const name = $("#rn-name").value.trim().toUpperCase().slice(0, 8);
+    if (!name) return;
+    const long_name = $("#rn-long").value.trim().slice(0, 32);
+    $("#rn-ok").setAttribute("aria-busy", "true");
+    try {
+        const res = await apiJson(`/api/sample/${state.sel}/name`, jsonBody({ name, long_name }));
+        const s = slotData(state.sel);
+        s.name = res.name;
+        s.long_name = res.long_name;
+        tick(`✎ S${state.sel + 1} renamed "${res.name}"`);
+        $("#rename-dialog").close();
+        syncPads(); // name-only change — in-place
+        $("#sel-name").textContent = res.name.padEnd(8);
+        $("#sel-long").textContent = res.long_name;
+    } catch (err) {
+        tick(`⚠ rename failed: ${err.message}`);
+        alert("Rename failed: " + err.message);
+    } finally {
+        $("#rn-ok").removeAttribute("aria-busy");
+    }
 };
 
 // ────────────────────────────────────────────── bank name / BPM dialog ──
 // Bank object = 0 (from EditBankParameterAction in the original binary):
 // params 0..7 = the 8 name chars (sent one per message, space-padded),
 // param 16 = BPM × 10. Targets the current bank (RAM), like all live edits.
-$('#bank-lcd').onclick = () => {
-  if (!state.bank) return;
-  $('#bd-name').value = state.bank.name || '';
-  $('#bd-bpm').value = state.bank.bpm.toFixed(1);
-  $('#bank-dialog').showModal();
+$("#bank-lcd").onclick = () => {
+    if (!state.bank) return;
+    $("#bd-name").value = state.bank.name || "";
+    $("#bd-bpm").value = state.bank.bpm.toFixed(1);
+    $("#bank-dialog").showModal();
 };
-$('#bank-lcd').onkeydown = e => {
-  if (e.key === 'Enter' || e.key === ' ') {
-    e.preventDefault();               // Space would scroll the page
-    $('#bank-lcd').click();
-  }
+$("#bank-lcd").onkeydown = (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault(); // Space would scroll the page
+        $("#bank-lcd").click();
+    }
 };
 
-$('#bd-ok').onclick = async e => {
-  e.preventDefault();
-  const name = $('#bd-name').value.trim().toUpperCase().slice(0, 8);
-  const bpm = Math.max(20, Math.min(300, +$('#bd-bpm').value || 120));
-  if (!name) return;
-  $('#bd-ok').setAttribute('aria-busy', 'true');
-  try {
-    // one batched request — the bridge sends all 9 messages (8 name chars +
-    // BPM) in a single device-lock acquisition; per-message /api/param
-    // round-trips were user-visibly sluggish
-    const res = await apiJson('/api/bank/settings', jsonBody({ name, bpm }));
-    state.bank.name = res.name;
-    state.bank.bpm = res.bpm;
-    $('#bank-name').textContent = res.name.padEnd(8);
-    $('#bank-bpm').textContent = res.bpm.toFixed(1);
-    tick(`✎ bank "${res.name}" · ${res.bpm.toFixed(1)} BPM`);
-    $('#bank-dialog').close();
-  } catch (err) {
-    tick(`⚠ bank edit failed: ${err.message}`);
-    alert('Bank edit failed: ' + err.message);
-  } finally {
-    $('#bd-ok').removeAttribute('aria-busy');
-  }
+$("#bd-ok").onclick = async (e) => {
+    e.preventDefault();
+    const name = $("#bd-name").value.trim().toUpperCase().slice(0, 8);
+    const bpm = Math.max(20, Math.min(300, +$("#bd-bpm").value || 120));
+    if (!name) return;
+    $("#bd-ok").setAttribute("aria-busy", "true");
+    try {
+        // one batched request — the bridge sends all 9 messages (8 name chars +
+        // BPM) in a single device-lock acquisition; per-message /api/param
+        // round-trips were user-visibly sluggish
+        const res = await apiJson("/api/bank/settings", jsonBody({ name, bpm }));
+        state.bank.name = res.name;
+        state.bank.bpm = res.bpm;
+        $("#bank-name").textContent = res.name.padEnd(8);
+        $("#bank-bpm").textContent = res.bpm.toFixed(1);
+        tick(`✎ bank "${res.name}" · ${res.bpm.toFixed(1)} BPM`);
+        $("#bank-dialog").close();
+    } catch (err) {
+        tick(`⚠ bank edit failed: ${err.message}`);
+        alert("Bank edit failed: " + err.message);
+    } finally {
+        $("#bd-ok").removeAttribute("aria-busy");
+    }
 };
 
 // ─────────────────────────────────── drag & drop onto the editor panel ──
-const editor = $('.editor');
-editor.addEventListener('dragover', e => {
-  if (state.sel == null) return;
-  e.preventDefault();
-  $('#drop-veil').hidden = false;
+const editor = $(".editor");
+editor.addEventListener("dragover", (e) => {
+    if (state.sel == null) return;
+    e.preventDefault();
+    $("#drop-veil").hidden = false;
 });
-editor.addEventListener('dragleave', () => $('#drop-veil').hidden = true);
-editor.addEventListener('drop', e => {
-  e.preventDefault();
-  $('#drop-veil').hidden = true;
-  if (state.sel == null) return;
-  const wavs = [...e.dataTransfer.files].filter(f => /\.wav$/i.test(f.name));
-  if (!wavs.length) return;
-  if (wavs.length === 1) openUpload(wavs[0]);      // single → full upload dialog
-  else uploadBatch(state.sel, wavs);               // many → bulk-fill from here
+editor.addEventListener("dragleave", () => ($("#drop-veil").hidden = true));
+editor.addEventListener("drop", (e) => {
+    e.preventDefault();
+    $("#drop-veil").hidden = true;
+    if (state.sel == null) return;
+    const wavs = [...e.dataTransfer.files].filter((f) => /\.wav$/i.test(f.name));
+    if (!wavs.length) return;
+    if (wavs.length === 1)
+        openUpload(wavs[0]); // single → full upload dialog
+    else uploadBatch(state.sel, wavs); // many → bulk-fill from here
 });

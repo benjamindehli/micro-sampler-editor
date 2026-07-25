@@ -2,114 +2,213 @@
 
 /* ── pads ─────────────────────────────────────────────────────────────── */
 .pads {
-  background: linear-gradient(178deg, var(--steel-2), var(--steel-1) 44%);
-  border: 1px solid var(--line);
-  border-radius: var(--r);
-  box-shadow: inset 0 1px 0 var(--line-hi), 0 10px 30px rgba(0,0,0,.45);
-  padding: .9rem;
+    background: linear-gradient(178deg, var(--steel-2), var(--steel-1) 44%);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    box-shadow:
+        inset 0 1px 0 var(--line-hi),
+        0 10px 30px rgba(0, 0, 0, 0.45);
+    padding: 0.9rem;
 }
 /* pad filter box (right of the SAMPLE title) */
-.pads .panel-title { display: flex; align-items: center; justify-content: space-between; gap: .6rem; }
-.pad-search {
-  font: inherit; font-size: .6rem; letter-spacing: .06em;
-  color: var(--amber); background: var(--phos-bg);
-  border: 1px solid var(--line); border-radius: 3px;
-  padding: .22rem .45rem; width: 8.5rem; max-width: 45%;
+.pads .panel-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
 }
-.pad-search:focus { outline: none; border-color: var(--amber-dk); }
-.pad-search::placeholder { color: var(--ink-dim); letter-spacing: .12em; }
-.pad.dimmed { opacity: .2; transition: opacity .12s; }
+.pad-search {
+    font: inherit;
+    font-size: 0.6rem;
+    letter-spacing: 0.06em;
+    color: var(--amber);
+    background: var(--phos-bg);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 0.22rem 0.45rem;
+    width: 8.5rem;
+    max-width: 45%;
+}
+.pad-search:focus {
+    outline: none;
+    border-color: var(--amber-dk);
+}
+.pad-search::placeholder {
+    color: var(--ink-dim);
+    letter-spacing: 0.12em;
+}
+.pad.dimmed {
+    opacity: 0.2;
+    transition: opacity 0.12s;
+}
 .pad-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
 }
 .pad {
-  position: relative;
-  appearance: none; cursor: pointer;
-  border: 1px solid var(--line);
-  border-bottom-color: #000;
-  border-radius: 4px;
-  background: linear-gradient(180deg, #1f1f24, #141417);
-  padding: .42rem .5rem .4rem;
-  min-height: 46px;
-  text-align: left;
-  box-shadow: 0 2px 0 #000;
-  transition: transform .05s, border-color .15s, background .15s;
+    position: relative;
+    appearance: none;
+    cursor: pointer;
+    border: 1px solid var(--line);
+    border-bottom-color: #000;
+    border-radius: 4px;
+    background: linear-gradient(180deg, #1f1f24, #141417);
+    padding: 0.42rem 0.5rem 0.4rem;
+    min-height: 46px;
+    text-align: left;
+    box-shadow: 0 2px 0 #000;
+    transition:
+        transform 0.05s,
+        border-color 0.15s,
+        background 0.15s;
 }
-.pad:hover { border-color: var(--line-hi); transform: translateY(-1px); box-shadow: 0 2px 0 #000, 0 5px 10px rgba(0, 0, 0, .4); }
-.pad:active { transform: translateY(1px); box-shadow: 0 1px 0 #000; }
+.pad:hover {
+    border-color: var(--line-hi);
+    transform: translateY(-1px);
+    box-shadow:
+        0 2px 0 #000,
+        0 5px 10px rgba(0, 0, 0, 0.4);
+}
+.pad:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 0 #000;
+}
 /* sharps = a keyboard's black keys: darker face so the layout reads at a glance
    (defined before .pad.sel so a selected sharp still gets the amber tint) */
-.pad.black { background: linear-gradient(180deg, #141418, #0b0b0d); }
-.pad.black:hover { border-color: var(--line-hi); }
+.pad.black {
+    background: linear-gradient(180deg, #141418, #0b0b0d);
+}
+.pad.black:hover {
+    border-color: var(--line-hi);
+}
 .pad-num {
-  font-family: "Share Tech Mono", monospace;
-  font-size: .6rem; color: var(--ink-dim);
+    font-family: "Share Tech Mono", monospace;
+    font-size: 0.6rem;
+    color: var(--ink-dim);
 }
 .pad-name {
-  display: block; margin-top: .15rem;
-  font-family: "Share Tech Mono", monospace;
-  font-size: .78rem; letter-spacing: .05em;
-  color: var(--ink);
-  white-space: nowrap; overflow: hidden;
+    display: block;
+    margin-top: 0.15rem;
+    font-family: "Share Tech Mono", monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    color: var(--ink);
+    white-space: nowrap;
+    overflow: hidden;
 }
-.pad.empty .pad-name { color: #3c3c44; }
+.pad.empty .pad-name {
+    color: #3c3c44;
+}
 .pad .pad-led {
-  position: absolute; top: 7px; right: 7px;
-  width: 5px; height: 5px; border-radius: 50%;
-  background: #2c2c33;
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #2c2c33;
 }
 /* used-but-not-loaded: dim dot; loaded (audio cached): bright glowing dot */
-.pad.used .pad-led { background: var(--amber-dk); }
-.pad.loaded .pad-led { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
-.pad.used .pad-name { color: var(--amber-hi); text-shadow: 0 0 6px rgba(var(--amber-rgb),.3); }
+.pad.used .pad-led {
+    background: var(--amber-dk);
+}
+.pad.loaded .pad-led {
+    background: var(--amber);
+    box-shadow: 0 0 6px var(--amber);
+}
+.pad.used .pad-name {
+    color: var(--amber-hi);
+    text-shadow: 0 0 6px rgba(var(--amber-rgb), 0.3);
+}
 .pad.sel {
-  background: linear-gradient(180deg,
-    color-mix(in srgb, rgb(var(--amber-rgb)) 14%, var(--steel-0)),
-    color-mix(in srgb, rgb(var(--amber-rgb)) 8%, var(--steel-0)));
-  border-color: var(--amber-dk);
-  box-shadow: 0 2px 0 #000, 0 0 0 1px var(--amber-dk), 0 0 18px rgba(var(--amber-rgb),.15);
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, rgb(var(--amber-rgb)) 14%, var(--steel-0)),
+        color-mix(in srgb, rgb(var(--amber-rgb)) 8%, var(--steel-0))
+    );
+    border-color: var(--amber-dk);
+    box-shadow:
+        0 2px 0 #000,
+        0 0 0 1px var(--amber-dk),
+        0 0 18px rgba(var(--amber-rgb), 0.15);
 }
 .pads-hint {
-  margin-top: .8rem; font-size: .58rem; letter-spacing: .16em; color: var(--ink-dim);
-  display: flex; align-items: center; justify-content: space-between; gap: .6rem;
+    margin-top: 0.8rem;
+    font-size: 0.58rem;
+    letter-spacing: 0.16em;
+    color: var(--ink-dim);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
 }
-.pads-hint b { color: var(--amber); font-weight: 600; }
+.pads-hint b {
+    color: var(--amber);
+    font-weight: 600;
+}
 .follow-toggle {
-  display: inline-flex; align-items: center; gap: .35rem; flex: none;
-  cursor: pointer; color: var(--ink-dim); white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex: none;
+    cursor: pointer;
+    color: var(--ink-dim);
+    white-space: nowrap;
 }
-.follow-toggle input { accent-color: var(--amber); cursor: pointer; margin: 0; }
-.follow-toggle:hover { color: var(--ink); }
-
+.follow-toggle input {
+    accent-color: var(--amber);
+    cursor: pointer;
+    margin: 0;
+}
+.follow-toggle:hover {
+    color: var(--ink);
+}
 
 /* pad drop target highlight (drag a WAV onto a pad) */
 .pad.drop-hint {
-  outline: 1px solid var(--amber);
-  box-shadow: 0 0 14px rgba(var(--amber-rgb),.45), inset 0 0 10px rgba(var(--amber-rgb),.12);
+    outline: 1px solid var(--amber);
+    box-shadow:
+        0 0 14px rgba(var(--amber-rgb), 0.45),
+        inset 0 0 10px rgba(var(--amber-rgb), 0.12);
 }
 
 /* pad ▶ play zone (plays the sample on the DEVICE while held) —
    lower-right, clear of the status LED in the upper-right */
 .pad-play {
-  position: absolute; bottom: 2px; right: 2px;
-  font-size: .95rem; line-height: 1;
-  color: var(--ink-dim); padding: .25rem .4rem;
-  border-radius: 3px;
-  opacity: .35; transition: opacity .12s, color .12s, background .12s;
-  cursor: pointer; user-select: none;
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    font-size: 0.95rem;
+    line-height: 1;
+    color: var(--ink-dim);
+    padding: 0.25rem 0.4rem;
+    border-radius: 3px;
+    opacity: 0.35;
+    transition:
+        opacity 0.12s,
+        color 0.12s,
+        background 0.12s;
+    cursor: pointer;
+    user-select: none;
 }
-.pad:hover .pad-play { opacity: 1; }
+.pad:hover .pad-play {
+    opacity: 1;
+}
 .pad-play:hover {
-  color: var(--amber-hi);
-  background: rgba(var(--amber-rgb),.12);
-  text-shadow: 0 0 8px rgba(var(--amber-rgb),.5);
+    color: var(--amber-hi);
+    background: rgba(var(--amber-rgb), 0.12);
+    text-shadow: 0 0 8px rgba(var(--amber-rgb), 0.5);
 }
 .pad.sounding {
-  border-color: var(--amber);
-  box-shadow: 0 0 14px rgba(var(--amber-rgb),.5), 0 2px 0 #000;
+    border-color: var(--amber);
+    box-shadow:
+        0 0 14px rgba(var(--amber-rgb), 0.5),
+        0 2px 0 #000;
 }
-.pad.sounding .pad-play { opacity: 1; color: var(--amber); }
+.pad.sounding .pad-play {
+    opacity: 1;
+    color: var(--amber);
+}
 
 /* upload pre-flight memory line */
