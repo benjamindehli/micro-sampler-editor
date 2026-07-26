@@ -6,7 +6,7 @@ __pycache__/
 # C extensions
 *.so
 # …but the vendored libusb runtime libs DO ship in releases — keep them tracked
-!native-tools/vendor/libusb/**
+!src/native-tools/vendor/libusb/**
 
 # personal Korg backups dropped here to import/extract (your data, often large)
 /original-backup-files/
@@ -235,13 +235,13 @@ __marimo__/
 # ── microSAMPLER project ────────────────────────────────────────────────
 # personal device data — bank backups made by the UTILITY page / bank.py
 # (folders are recreated automatically on the next backup)
-native-tools/backups/
-native-tools/bank_current/
+src/native-tools/backups/
+src/native-tools/bank_current/
 
 # ad-hoc dumps written by the CLI tools (download.py etc.)
-native-tools/*.wav
-native-tools/*.bin
-native-tools/*.mid
+src/native-tools/*.wav
+src/native-tools/*.bin
+src/native-tools/*.mid
 
 # launcher app if rebuilt locally
 

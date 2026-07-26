@@ -48,7 +48,7 @@ from playwright.sync_api import sync_playwright
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ASSETS = os.path.join(ROOT, 'docs', 'assets')
-sys.path.insert(0, os.path.join(ROOT, 'native-tools'))
+sys.path.insert(0, os.path.join(ROOT, 'src', 'native-tools'))
 
 CAP = (1540, 940)        # capture viewport (rail needs ~1519px; DSR=1 keeps PNGs lean)
 SHOT = (1000, 610)       # static screenshots + gif
@@ -180,7 +180,7 @@ def bridge(extra_args, port, banks_dir):
     proc = None
     if not wait_ready(base, 1):
         proc = subprocess.Popen(
-            [sys.executable, os.path.join(ROOT, 'native-tools', 'bridge.py'),
+            [sys.executable, os.path.join(ROOT, 'src', 'native-tools', 'bridge.py'),
              *extra_args, '--port', str(port)],
             env={**os.environ, 'MSMPL_BACKUP_DIR': banks_dir},
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

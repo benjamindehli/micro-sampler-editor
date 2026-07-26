@@ -1,9 +1,9 @@
-// Unit tests for the pure upload-audio DSP (web-editor/functions/audioTools.js).
+// Unit tests for the pure upload-audio DSP (src/web-editor/functions/audioTools.js).
 // Built-in node:test — no deps. Run: node --test test/  (or: npm test)
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { decodeWavPcm, encodeWav, nearestZeroCrossing, processBuffer, sliceBuffer, toolsActive } from "../../web-editor/functions/audioTools.js";
+import { decodeWavPcm, encodeWav, nearestZeroCrossing, processBuffer, sliceBuffer, toolsActive } from "../../src/web-editor/functions/audioTools.js";
 
 const RATE = 48000;
 const NOOP = { channels: "keep", normalize: false, trim: false, gainDb: 0, fadeInMs: 0, fadeOutMs: 0 };

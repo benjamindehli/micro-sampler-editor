@@ -22,7 +22,7 @@ review times.
 
 Use the **Bug report** / **Feature request** templates. For bugs, the most
 useful thing you can do is say **whether it also reproduces in mock mode**
-(`python3 native-tools/bridge.py --mock`). That tells us instantly whether it's
+(`python3 src/native-tools/bridge.py --mock`). That tells us instantly whether it's
 a UI bug or device/protocol-related. Please also paste the **bridge terminal
 output** and **browser console** errors.
 
@@ -34,11 +34,11 @@ to a real device.
 
 ```bash
 # UI / app work — no hardware, no extra deps:
-python3 native-tools/bridge.py --mock        # then open http://localhost:8765
+python3 src/native-tools/bridge.py --mock        # then open http://localhost:8765
 
 # With a real microSAMPLER (sudo claims the USB iface; pyusb + libusb are
-# bundled in native-tools/vendor/ — no pip or brew step):
-sudo python3 native-tools/bridge.py
+# bundled in src/native-tools/vendor/ — no pip or brew step):
+sudo python3 src/native-tools/bridge.py
 ```
 
 `--mock` serves fake data so you can develop and test almost everything without
@@ -52,7 +52,7 @@ Please run the same checks CI runs. All are offline (no hardware, no network):
 
 ```bash
 # Python: offline protocol/flow suite (3.8-compatible, dependency-free)
-cd native-tools && python3 protocol.py && python3 test_download.py \
+cd src/native-tools && python3 protocol.py && python3 test_download.py \
   && python3 test_upload.py && python3 test_bank.py && python3 test_bridge.py && cd ..
 
 # JavaScript unit tests (Node's built-in runner, no deps)
@@ -92,7 +92,7 @@ JS checks, both linters, and the e2e smoke. They must all pass.
 Much of the device protocol can't be exercised offline, and the maintainer
 can't packet-capture. So:
 
-- Anything touching **`native-tools/bridge.py` / `protocol.py` / the transfer
+- Anything touching **`src/native-tools/bridge.py` / `protocol.py` / the transfer
   CLIs** is **hardware-critical and largely unverifiable in CI**. Change it
   conservatively, keep the offline tests green, and **call out in your PR what
   you could and couldn't test on a real device**.
@@ -143,7 +143,7 @@ its license) before adding it.
 ## Don't commit
 
 - Korg's `.pkg` installer or the owner's manual PDF (copyright, gitignored).
-- Personal bank backups / samples (`native-tools/backups/`, `*.wav`, etc. are
+- Personal bank backups / samples (`src/native-tools/backups/`, `*.wav`, etc. are
   gitignored).
 - `node_modules/` or `dist/` (gitignored).
 

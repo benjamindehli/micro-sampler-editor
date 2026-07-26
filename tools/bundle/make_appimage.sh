@@ -18,7 +18,7 @@ TOOL="build/bundle/appimagetool"
 rm -rf "$APPDIR"
 mkdir -p "$APPDIR"
 cp -r "$ONEDIR"/. "$APPDIR/"
-cp web-editor/assets/AppIcon.png "$APPDIR/microsampler-library.png"
+cp src/web-editor/assets/AppIcon.png "$APPDIR/microsampler-library.png"
 
 cat > "$APPDIR/microsampler-library.desktop" <<'EOF'
 [Desktop Entry]

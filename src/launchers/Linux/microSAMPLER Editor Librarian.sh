@@ -33,9 +33,17 @@ pause_exit() {                       # never vanish silently
 }
 
 HERE="$(cd "$(dirname "$0")" && pwd)" || pause_exit "cannot resolve own path"
-ROOT="$(cd "$HERE/.." && pwd)"       # app folder (this launcher lives in Linux/)
+# Locate native-tools relative to this launcher. Works both from the packaged
+# ZIP (launcher in macOS/ etc., native-tools at the ZIP root) and from a source
+# checkout (launcher in src/launchers/<OS>/, native-tools in src/).
+NT=""
+for _c in "$HERE/../native-tools" "$HERE/../../native-tools"; do
+  [ -f "$_c/bridge.py" ] && { NT="$(cd "$_c" && pwd)"; break; }
+done
+[ -n "$NT" ] || pause_exit "native-tools/ not found near the launcher"
+ROOT="$(cd "$NT/.." && pwd)"
 echo "repo:   $ROOT"
-cd "$ROOT/native-tools" || pause_exit "native-tools/ not found next to the app"
+cd "$NT" || pause_exit "cannot enter native-tools/"
 
 PY="$(command -v python3 || true)"
 [ -n "$PY" ] || pause_exit "python3 not found in PATH"

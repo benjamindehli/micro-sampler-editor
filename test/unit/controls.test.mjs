@@ -9,7 +9,7 @@ import test from "node:test";
 
 globalThis.document = { querySelector: () => ({ querySelectorAll: () => [] }) };
 const { tuneCents, tuneDisplay, fmtPan, fmtLevel, dec14, BIPOLAR, PARAM, OBJ_BASE } =
-    await import("../../web-editor/components/controls/controls.js");
+    await import("../../src/web-editor/components/controls/controls.js");
 
 test("tuneCents: 0..127 wire → −99..+99 cents (hardware-measured curve)", () => {
     // edges clamp to ±99

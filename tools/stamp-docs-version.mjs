@@ -1,7 +1,7 @@
 // Sync the version in non-package files to package.json's version:
 //   - docs/index.html: the "Download vX.Y.Z (ZIP)" button, the release-ZIP URL,
 //     and the JSON-LD softwareVersion.
-//   - native-tools/bridge.py: the VERSION constant the bridge reports via
+//   - src/native-tools/bridge.py: the VERSION constant the bridge reports via
 //     /api/status (the app's "update available" check compares against it).
 //   - CITATION.cff: the citation metadata's version field.
 //
@@ -34,7 +34,7 @@ const targets = [
         ]
     },
     {
-        file: "native-tools/bridge.py",
+        file: "src/native-tools/bridge.py",
         patterns: [
             // VERSION = '...'  (value the bridge reports via /api/status)
             [new RegExp(`VERSION = '${V}'`), `VERSION = '${version}'`]

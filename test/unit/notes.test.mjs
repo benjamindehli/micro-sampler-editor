@@ -1,9 +1,9 @@
-// Unit tests for the pure note/keyboard theory (web-editor/functions/notes.js).
+// Unit tests for the pure note/keyboard theory (src/web-editor/functions/notes.js).
 // Built-in node:test — no deps. Run: node --test test/*.test.mjs  (or: npm test)
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { noteName, QWERTY_KEYMAP, QWERTY_OCTAVES, qwertySlot } from "../../web-editor/functions/notes.js";
+import { noteName, QWERTY_KEYMAP, QWERTY_OCTAVES, qwertySlot } from "../../src/web-editor/functions/notes.js";
 
 test("noteName covers the 36 pads C3..B5", () => {
     assert.equal(noteName(0), "C3"); // first pad

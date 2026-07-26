@@ -64,7 +64,7 @@ def make_msmpl(path):
     bnkp = chunk(b'BnkP', b'SMOKEBNK' + struct.pack('<H', 1200) + b'\xff' * 54)
     smps = chunk(b'SmpS', chunk(b'SmpD', bytes(param) + hdr + pcm))
     # one recorded pattern so the library's pattern (MIDI) export shows up too
-    sys.path.insert(0, os.path.join(ROOT, 'native-tools'))
+    sys.path.insert(0, os.path.join(ROOT, 'src', 'native-tools'))
     from test_msmpl import recorded_pattern_blob
     seqs = chunk(b'SeqS', chunk(b'SeqD', recorded_pattern_blob(name='SMOKE')))
     with open(path, 'wb') as f:

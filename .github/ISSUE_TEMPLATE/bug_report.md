@@ -23,7 +23,7 @@ Which view (SAMPLES / EFFECT / PATTERNS / UTILITY) and the steps:
 What you expected to happen instead.
 
 **Does it also happen in mock mode?**
-Run the bridge without hardware — `python3 native-tools/bridge.py --mock` — and try
+Run the bridge without hardware — `python3 src/native-tools/bridge.py --mock` — and try
 the same thing. This tells us whether it's a UI bug or device/protocol-related.
 
 - [ ] Reproduces in `--mock`
@@ -54,7 +54,7 @@ If it's visual, a screenshot of the editor helps.
 - OS + version: <!-- e.g. macOS 14.5 / Ubuntu 24.04 / Windows 11 -->
 - Python version (`python3 --version`): <!-- 3.8+ required -->
 - Browser + version: <!-- e.g. Chrome 126 -->
-- How you launched it: <!-- double-click .command / `sudo python3 native-tools/bridge.py` / `--mock` -->
+- How you launched it: <!-- double-click .command / `sudo python3 src/native-tools/bridge.py` / `--mock` -->
 - microSAMPLER connected over USB: <!-- yes / no -->
 
 **Additional context**

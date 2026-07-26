@@ -64,7 +64,7 @@ def resource_root():
     if getattr(sys, 'frozen', False):
         return sys._MEIPASS
     return os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                         '..', '..'))
+                                         '..', '..', 'src'))
 
 
 def user_data_dir():

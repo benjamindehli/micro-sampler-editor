@@ -31,22 +31,22 @@ jobs:
             # lazily and only needed when real hardware is opened
             - name: protocol self-test
               run: python protocol.py
-              working-directory: native-tools
+              working-directory: src/native-tools
             - name: download flow (mock device)
               run: python test_download.py
-              working-directory: native-tools
+              working-directory: src/native-tools
             - name: upload flow (mock device)
               run: python test_upload.py
-              working-directory: native-tools
+              working-directory: src/native-tools
             - name: bank backup/restore (mock device)
               run: python test_bank.py
-              working-directory: native-tools
+              working-directory: src/native-tools
             - name: bridge HTTP/SSE round-trips (mock device)
               run: python test_bridge.py
-              working-directory: native-tools
+              working-directory: src/native-tools
             - name: original .msmpl_bank reader
               run: python test_msmpl.py
-              working-directory: native-tools
+              working-directory: src/native-tools
 
     frontend:
         name: frontend syntax
@@ -59,15 +59,15 @@ jobs:
                   cache: npm
             - name: JS syntax check
               run: |
-                  find web-editor -name '*.js' -print0 | while IFS= read -r -d '' f; do
+                  find src/web-editor -name '*.js' -print0 | while IFS= read -r -d '' f; do
                     echo "checking $f"
                     node --check "$f"
                   done
             - name: ES module imports resolve
               run: node --input-type=module -e "
-                  import('./web-editor/functions/valueTables.js').then(m =>
+                  import('./src/web-editor/functions/valueTables.js').then(m =>
                   console.log('valueTables:', Object.keys(m.VALUE_TABLES).length, 'tables'));
-                  import('./web-editor/functions/fxData.js').then(m =>
+                  import('./src/web-editor/functions/fxData.js').then(m =>
                   console.log('fxData:', m.FX_TYPES.length, 'fx types'));"
             - name: unit tests (pure modules)
               run: |

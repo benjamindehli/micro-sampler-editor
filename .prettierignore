@@ -7,8 +7,8 @@ release/
 package-lock.json
 
 # Generated data modules (rebuilt by tools/re/extract_fx.py)
-web-editor/functions/valueTables.js
-web-editor/functions/fxData.js
+src/web-editor/functions/valueTables.js
+src/web-editor/functions/fxData.js
 
 # Vendored third-party code
-native-tools/vendor/
+src/native-tools/vendor/

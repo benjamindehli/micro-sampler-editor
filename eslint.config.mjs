@@ -5,19 +5,19 @@
 // code, duplicate keys. NOT a style enforcer — Prettier owns formatting, so
 // ESLint omits stylistic rules to avoid fighting it (see .prettierrc).
 //
-//   npx eslint web-editor/js        # or: npm run lint:js
+//   npx eslint src/web-editor/js        # or: npm run lint:js
 import js from "@eslint/js";
 import globals from "globals";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
 
 export default [
     // generated data modules — not hand-written, don't lint
-    { ignores: ["web-editor/functions/valueTables.js", "web-editor/functions/fxData.js"] },
+    { ignores: ["src/web-editor/functions/valueTables.js", "src/web-editor/functions/fxData.js"] },
 
     js.configs.recommended,
 
     {
-        files: ["web-editor/**/*.js"],
+        files: ["src/web-editor/**/*.js"],
         plugins: { "simple-import-sort": simpleImportSort },
         languageOptions: {
             ecmaVersion: 2022,

@@ -13,12 +13,14 @@ title microSAMPLER Editor / Librarian
 echo == microSAMPLER Editor / Librarian ==
 echo.
 
-cd /d "%~dp0..\native-tools"
-if not exist bridge.py (
-  echo ERROR: native-tools\bridge.py was not found next to the app.
+set "NT=%~dp0..\native-tools"
+if not exist "%NT%\bridge.py" set "NT=%~dp0..\..\native-tools"
+if not exist "%NT%\bridge.py" (
+  echo ERROR: native-tools\bridge.py was not found.
   pause
   exit /b 1
 )
+cd /d "%NT%"
 
 REM find Python (the "py" launcher first, then "python")
 set "PY="
