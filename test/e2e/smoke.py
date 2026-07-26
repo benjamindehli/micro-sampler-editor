@@ -8,7 +8,7 @@ Dev/CI only — needs Playwright:
     pip install playwright && playwright install chromium
 
 Run from anywhere:
-    python3 e2e/smoke.py            # (override port with SMOKE_PORT)
+    python3 test/e2e/smoke.py       # (override port with SMOKE_PORT)
 """
 import json
 import math
@@ -24,7 +24,7 @@ import wave
 
 from playwright.sync_api import sync_playwright
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 PORT = int(os.environ.get('SMOKE_PORT', '8799'))
 BASE = 'http://127.0.0.1:%d' % PORT
 

@@ -123,4 +123,4 @@ jobs:
             # smoke.py boots the mock bridge itself, drives the app headless, and
             # fails on any page/console error or broken core interaction
             - name: Browser smoke (mock device)
-              run: python e2e/smoke.py
+              run: python test/e2e/smoke.py

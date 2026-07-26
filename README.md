@@ -227,7 +227,7 @@ JavaScript unit tests for the pure modules (audio DSP + value encoders), via
 Node's built-in test runner (no deps):
 
 ```bash
-npm test        # node --test test/*.test.mjs
+npm test        # node --test test/unit/*.test.mjs
 ```
 
 The app needs **no build step** to develop or run. It's plain ES modules and per-component CSS served straight from `web-editor/`.
@@ -237,7 +237,7 @@ on any page/console error or broken interaction):
 
 ```bash
 pip install playwright && playwright install chromium
-python3 e2e/smoke.py        # reuses a bridge already on the port, else starts a mock one
+python3 test/e2e/smoke.py        # reuses a bridge already on the port, else starts a mock one
 ```
 
 ### Linting

@@ -12,7 +12,7 @@
         "lint:js": "eslint web-editor",
         "format": "prettier --write .",
         "format:check": "prettier --check .",
-        "test": "node --import ./test/alias-register.mjs --test test/*.test.mjs",
+        "test": "node --import ./test/unit/alias-register.mjs --test test/unit/*.test.mjs",
         "stamp-version": "node tools/stamp-docs-version.mjs",
         "version": "node tools/stamp-docs-version.mjs && git add docs/index.html native-tools/bridge.py CITATION.cff"
     },

@@ -65,7 +65,7 @@ ruff check         # pip install ruff
 
 # End-to-end browser smoke (boots the mock bridge, drives it headless)
 pip install playwright && playwright install chromium
-python3 e2e/smoke.py
+python3 test/e2e/smoke.py
 ```
 
 CI (`.github/workflows/ci.yml`) runs the offline suite (Python 3.8 + 3.12), the
@@ -82,7 +82,7 @@ JS checks, both linters, and the e2e smoke. They must all pass.
   suite stays dependency-free, and it should stay that way.
 - **JavaScript** is browser ES modules (no transpile). Pure, testable logic
   (e.g. value encoders, the audio DSP) lives in modules that unit-test under
-  `node:test` in `test/`. Add coverage there when you touch them.
+  `node:test` in `test/unit/`. Add coverage there when you touch them.
 - **CSS** is split per component and themed via CSS custom properties
   (`--amber-rgb` etc. + `color-mix`) so the accent theming keeps working. Avoid
   hard-coding accent colours.

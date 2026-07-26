@@ -173,5 +173,5 @@ Standard MIDI Files.
 
 See [CONTRIBUTING](CONTRIBUTING.md). In short: a Python offline suite
 (`native-tools/test_*.py`, mock device), JS unit tests for the pure modules
-(`test/`, `node --test`), a Playwright browser smoke (`e2e/smoke.py`), and two
+(`test/unit/`, `node --test`), a Playwright browser smoke (`test/e2e/smoke.py`), and two
 linters (Ruff + ESLint), all run in `.github/workflows/ci.yml`.
