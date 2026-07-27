@@ -213,9 +213,8 @@
         #0c0c0f;
 }
 
-/* read-only info row */
+/* START/END inputs — sit in the .screen-meta row directly under the waveform */
 .ro-row {
-    margin-top: 0.8rem;
     display: flex;
     gap: 0.45rem;
     flex-wrap: wrap;

@@ -50,7 +50,6 @@ export function renderPoints(s) {
     const ro = $("#ro-row");
     if (s.empty) {
         ro.innerHTML = "";
-        $("#meta-points").textContent = "";
         return;
     }
     // editable START/END (device frames) — committed by waveform.js. Build the
@@ -71,7 +70,6 @@ export function renderPoints(s) {
     si.disabled = ei.disabled = !s.frames;
     if (document.activeElement !== si) si.value = s.start;
     if (document.activeElement !== ei) ei.value = s.end;
-    $("#meta-points").textContent = `START ${s.start.toLocaleString()} · END ${s.end.toLocaleString()}`;
 }
 
 export function renderChips(s) {

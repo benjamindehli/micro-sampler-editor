@@ -408,7 +408,9 @@
                             </div>
                         </div>
                         <div class="screen-meta">
-                            <span id="meta-points">START 0 · END 0</span>
+                            <!-- editable START/END (device frames), populated by slot.js;
+               sits directly under the waveform it edits -->
+                            <div class="ro-row" id="ro-row"></div>
                             <label class="zsnap-toggle" title="Snap dragged START/END markers to the nearest zero crossing (avoids clicks)">
                                 <input type="checkbox" id="zero-snap" checked /> ZERO-SNAP
                             </label>
@@ -497,9 +499,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- start/end (edited on the waveform; shown read-only for now) -->
-                        <div class="ro-row" id="ro-row"></div>
                     </div>
 
                     <!-- drop veil -->
