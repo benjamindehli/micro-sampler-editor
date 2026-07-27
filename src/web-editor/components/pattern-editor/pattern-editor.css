@@ -89,7 +89,7 @@
     align-items: center;
     justify-content: flex-end;
     padding-right: 5px;
-    font-size: 0.5rem;
+    font-size: 0.62rem;
     color: var(--ink-dim);
     border-bottom: 1px solid rgba(255, 255, 255, 0.03);
     box-sizing: border-box;
