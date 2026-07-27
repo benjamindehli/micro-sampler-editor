@@ -70,34 +70,32 @@
     width: 46px;
     height: 20px;
     border-radius: 10px;
-    background: #0d0d10;
-    border: 1px solid #000;
-    box-shadow:
-        inset 0 2px 5px rgba(0, 0, 0, 0.9),
-        0 1px 0 var(--line-hi);
+    background: var(--steel-0);
+    border: 1px solid var(--line-hi);
     position: relative;
-    transition: background 0.15s;
+    transition:
+        background 0.15s,
+        border-color 0.15s;
 }
 .switch-knob {
     position: absolute;
-    top: 1px;
-    left: 1px;
-    width: 16px;
-    height: 16px;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
-    background: linear-gradient(180deg, #4a4a52, #28282e);
-    box-shadow: 0 1px 2px #000;
+    background: var(--ink-dim);
     transition:
         left 0.12s cubic-bezier(0.3, 1.4, 0.6, 1),
         background 0.15s;
 }
 .switch[aria-checked="true"] .switch-track {
     background: color-mix(in srgb, rgb(var(--amber-rgb)) 16%, #000);
+    border-color: var(--amber-dk);
 }
 .switch[aria-checked="true"] .switch-knob {
-    left: 27px;
-    background: linear-gradient(180deg, var(--amber-hi), var(--amber));
-    box-shadow: 0 0 0 1px var(--amber-dk);
+    left: 28px;
+    background: var(--amber);
 }
 .switch-val {
     font-family: "Share Tech Mono", monospace;
@@ -230,9 +228,10 @@
     letter-spacing: 0.06em;
     padding: 0.32rem 0;
 }
-/* editable START/END (device frames) — styling from the global field rule */
+/* editable START/END (device frames) — styling from the global field rule.
+   Wide enough for a 7-digit frame count plus the number spinner arrows */
 .ro-input {
-    width: 5.5em;
+    width: 8em;
 }
 
 /* drop veil */

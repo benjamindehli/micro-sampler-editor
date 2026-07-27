@@ -30,16 +30,23 @@
 }
 .fx-type-select {
     min-width: 14rem;
-    color: var(--amber-hi);
 }
 .fx-params {
     display: grid;
     gap: 0.8rem 0.9rem;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
 }
+/* fixed three-zone layout (label / control / value) so the control always sits
+   in the same middle band — a select or switch with no value readout lines up
+   with the sliders' faders instead of dropping to the box floor. The value row
+   is reserved even when empty to keep that middle band identical across params. */
 .fx-param {
+    display: grid;
+    grid-template-rows: auto 1fr 1.2rem;
+    justify-items: center;
+    align-items: center;
+    gap: 0.4rem;
     min-height: 5.2rem;
-    justify-content: space-between;
     position: relative;
 }
 .fx-param .fader {
