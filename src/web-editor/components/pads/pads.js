@@ -61,7 +61,15 @@ export function renderPads() {
                    <span class="pad-name">${s.empty ? "· · · ·" : esc(s.name)}</span>
                    <span class="pad-led"></span>` +
             (s.empty ? "" : '<span class="pad-play" aria-hidden="true" title="Play on the device (hold)">▶</span>');
-        b.onclick = () => selectSlot(s.slot);
+        b.onclick = () => selectSlot(s.slot); // keyboard (Enter/Space) activation
+        // Also select on pointerdown: a used pad is draggable (copy/swap), so a
+        // press with the slightest movement becomes a native drag that suppresses
+        // the click, leaving the pad unselected. Selecting on pointerdown makes it
+        // reliable; the ▶ corner still plays without selecting.
+        b.addEventListener("pointerdown", (e) => {
+            if (e.button !== 0 || e.target.closest(".pad-play")) return;
+            selectSlot(s.slot);
+        });
         if (!s.empty) {
             // used pads drag → copy/swap
             b.draggable = true;
