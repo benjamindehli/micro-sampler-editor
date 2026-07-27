@@ -15,11 +15,12 @@
     justify-content: space-between;
     gap: 0.6rem;
 }
-/* footprint only; phosphor look + size come from the global field rule */
+/* grows to fill the row beside the SAMPLE label; phosphor look + size come from
+   the global field rule */
 .pad-search {
     letter-spacing: 0.06em;
-    width: 8.5rem;
-    max-width: 45%;
+    flex: 1;
+    min-width: 0;
 }
 .pad-search::placeholder {
     color: var(--ink-dim);
