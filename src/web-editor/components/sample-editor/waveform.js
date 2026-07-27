@@ -141,9 +141,9 @@ function computePeaks(buf, n, v0, vlen, W) {
     });
 }
 
-// render the static waveform (grid + bars + trace, uniform brightness, WITH the
-// glow) to an offscreen canvas — done only when geometry/theme changes, so its
-// per-column cost is off the drag hot path
+// render the static waveform (grid + bars + trace, flat — no glow) to an
+// offscreen canvas — done only when geometry/theme changes, so its per-column
+// cost is off the drag hot path (a drag just re-blits this bitmap)
 function buildWaveCache(buf, n, v0, vlen, W, H, rgb, hiRgb, dpr) {
     const oc = waveCache && waveCache.canvas.width === W && waveCache.canvas.height === H ? waveCache.canvas : document.createElement("canvas");
     oc.width = W;
@@ -166,31 +166,37 @@ function buildWaveCache(buf, n, v0, vlen, W, H, rgb, hiRgb, dpr) {
         g.strokeStyle = A(0.07);
         g.lineWidth = 1; // baseline
         line(g, 0, mid, W, mid);
-        g.save(); // min/max bars (with glow)
-        g.shadowColor = A(0.8);
-        g.shadowBlur = 6 * dpr;
-        g.fillStyle = `rgb(${rgb})`;
-        g.globalAlpha = 0.95;
+        // min/max bars, filled as ONE path (flat — the per-column shadowBlur glow
+        // was rasterised at blit time and was the bulk of a zoom rebuild)
+        const bars = new Path2D();
         for (let x = 0; x < W; x++) {
             // fill the column from its most-negative to its most-positive sample
             // (los ≤ his ⇒ y0 ≤ y1); min 1px so near-silent columns still show
             const y0 = mid + pk.los[x] * amp,
                 y1 = mid + pk.his[x] * amp;
-            g.fillRect(x, y0, 1, Math.max(1, y1 - y0));
+            bars.rect(x, y0, 1, Math.max(1, y1 - y0));
         }
+        g.save();
+        g.fillStyle = `rgb(${rgb})`;
+        g.globalAlpha = 0.95;
+        g.fill(bars);
         g.restore();
-        g.save(); // connecting trace
-        g.strokeStyle = `rgba(${hiRgb},.85)`;
-        g.lineWidth = dpr;
-        g.shadowColor = A(0.6);
-        g.shadowBlur = 4 * dpr;
-        g.beginPath();
-        for (let x = 0; x < W; x++) {
-            const y = mid + pk.mids[x] * amp;
-            x ? g.lineTo(x, y) : g.moveTo(x, y);
+        // connecting trace (avg) — only when zoomed in enough to be meaningful.
+        // Zoomed out it's a full-height aliased zigzag: visually noisy AND the
+        // dominant rasterisation cost of a rebuild (a tall anti-aliased polyline
+        // across every column), which is why zooming out felt laggy.
+        if (vlen / W <= 12) {
+            g.save();
+            g.strokeStyle = `rgba(${hiRgb},.85)`;
+            g.lineWidth = dpr;
+            g.beginPath();
+            for (let x = 0; x < W; x++) {
+                const y = mid + pk.mids[x] * amp;
+                x ? g.lineTo(x, y) : g.moveTo(x, y);
+            }
+            g.stroke();
+            g.restore();
         }
-        g.stroke();
-        g.restore();
         if (nch > 1) {
             // L / R lane label — bottom-left
             g.fillStyle = `rgba(${hiRgb},.5)`; // of the lane, clear of the top
