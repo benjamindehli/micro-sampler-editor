@@ -103,7 +103,6 @@
     color: var(--amber-hi);
 }
 .pad.sel {
-    background: color-mix(in srgb, rgb(var(--amber-rgb)) 12%, var(--steel-0));
     border-color: var(--amber);
 }
 .pads-hint {
