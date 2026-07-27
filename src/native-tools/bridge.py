@@ -932,22 +932,36 @@ class MockDevice(Device):
     def __init__(self):
         super().__init__()
         self.inquiry = {'family': 0x7f, 'member': 0x0100, 'channel': 0, 'cable': 1}
+        # Synthesise voices with a real-ish shape: a short phrase of decaying
+        # "plucks" (fast attack, exponential decay) over a few harmonics, so the
+        # waveform shows dynamics instead of a flat block (nice in the docs shots).
+        def env(k, seg):
+            return math.exp(-4.5 * k / seg) * min(1.0, k / 120.0)  # attack + decay
+
+        def voice(n, base, plucks):
+            seg = n // plucks
+            out = bytearray()
+            for j in range(n):
+                s = (math.sin(base * j) + 0.4 * math.sin(2 * base * j)
+                     + 0.15 * math.sin(3 * base * j)) / 1.55
+                out += struct.pack('<h', int(11000 * env(j % seg, seg) * s))
+            return bytes(out)
+
         self._slots = {}
-        for i, name in enumerate(['OCTSTRAT', 'OCARINA', 'TOYPIANO']):
+        for i, (name, plucks) in enumerate([('OCTSTRAT', 3), ('OCARINA', 4), ('TOYPIANO', 5)]):
             n = 24000 * (i + 1)
-            pcm = b''.join(struct.pack('<h', int(12000 *
-                           math.sin(j * (0.05 + 0.02 * i))))
-                           for j in range(n))
             self._slots[i] = {'name': name, 'rate': 48000, 'stereo': False,
-                              'pcm': pcm, 'tempo': 120.0}
+                              'pcm': voice(n, 0.05 + 0.02 * i, plucks), 'tempo': 120.0}
         # one stereo slot so the two-lane waveform is exercised in UI dev:
-        # L = slow, full sine; R = faster, quieter sine (interleaved LE)
-        spcm = b''.join(struct.pack('<hh',
-                        int(12000 * math.sin(j * 0.03)),
-                        int(5000 * math.sin(j * 0.13)))
-                        for j in range(24000))
+        # L = slow, full voice; R = faster, quieter — each with its own envelope
+        n, seg = 24000, 24000 // 3
+        spcm = bytearray()
+        for j in range(n):
+            e = env(j % seg, seg)
+            spcm += struct.pack('<hh', int(11000 * e * math.sin(0.03 * j)),
+                                int(6500 * e * math.sin(0.05 * j)))
         self._slots[3] = {'name': 'STEREOPD', 'rate': 48000, 'stereo': True,
-                          'pcm': spcm, 'tempo': 120.0}
+                          'pcm': bytes(spcm), 'tempo': 120.0}
         # stateful effect for UI dev: Filter w/ a few non-default bytes
         self._effect = {'type': 2, 'knobs': [2, 3],
                         'params': [100, 2, 63, 20, 64, 0, 30, 1, 20, 2,
