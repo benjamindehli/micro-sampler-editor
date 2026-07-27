@@ -129,9 +129,6 @@
         400 0.62rem/1.45 "Share Tech Mono",
         monospace;
     letter-spacing: 0.02em;
-    box-shadow:
-        0 8px 22px rgba(0, 0, 0, 0.55),
-        0 0 0 1px rgba(var(--amber-rgb), 0.1);
     opacity: 0;
     transform: translateY(4px);
     pointer-events: none;

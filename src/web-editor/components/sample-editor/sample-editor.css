@@ -12,37 +12,6 @@
     padding: 1.2rem 1.3rem 1.1rem;
     min-height: 540px;
 }
-.screw {
-    position: absolute;
-    width: 11px;
-    height: 11px;
-    border-radius: 50%;
-    background:
-        linear-gradient(135deg, transparent 44%, #555 46%, #555 54%, transparent 56%), radial-gradient(circle at 35% 30%, #4e4e56, #1c1c20 70%);
-    box-shadow:
-        inset 0 1px 2px rgba(0, 0, 0, 0.9),
-        0 1px 0 rgba(255, 255, 255, 0.06);
-}
-.screw.tl {
-    top: 8px;
-    left: 8px;
-}
-.screw.tr {
-    top: 8px;
-    right: 8px;
-    transform: rotate(40deg);
-}
-.screw.bl {
-    bottom: 8px;
-    left: 8px;
-    transform: rotate(70deg);
-}
-.screw.br {
-    bottom: 8px;
-    right: 8px;
-    transform: rotate(15deg);
-}
-
 .editor-empty {
     display: grid;
     place-items: center;
@@ -90,27 +59,26 @@
     align-items: center;
     flex-wrap: wrap;
 }
+/* plain inline readouts (RATE / CH / LEN / BPM), not little boxes */
 .chip {
     font-family: "Share Tech Mono", monospace;
     font-size: 0.66rem;
-    color: var(--ink);
-    background: var(--steel-3);
-    border: 1px solid var(--line);
-    border-radius: 3px;
-    padding: 0.3rem 0.45rem;
+    color: var(--ink-dim);
+    padding: 0.3rem 0.15rem;
     letter-spacing: 0.05em;
 }
 .chip b {
     color: var(--amber);
     font-weight: 400;
 }
-/* editable ORIG BPM chip — a button that opens the tempo dialog (same box as the
-   read-only chips, so it lines up exactly) */
-/* editable, so it carries a faint accent border at rest (vs the static chips) */
+/* editable ORIG BPM chip — the one interactive chip, so it keeps a faint hairline
+   to read as a control (the static chips are plain text) */
 .chip-btn {
     appearance: none;
     cursor: pointer;
-    border-color: var(--amber-dk);
+    background: none;
+    border: 1px solid var(--line-hi);
+    border-radius: 3px;
     transition:
         border-color 0.12s,
         color 0.12s;

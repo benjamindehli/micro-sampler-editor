@@ -143,6 +143,9 @@ body {
     text-decoration: none;
     display: inline-block;
 }
+/* flat, legible button: solid face + hairline border, no bevel/press/gradient.
+   Every button looks the same; the accent is reserved for the SELECTED option in
+   a group (nav tabs, segmented switches), not for "primary" actions. */
 .hw-btn-cap {
     display: inline-block;
     font:
@@ -150,53 +153,27 @@ body {
         sans-serif;
     letter-spacing: 0.14em;
     color: var(--ink);
-    background: linear-gradient(180deg, var(--steel-3), #141417);
-    border: 1px solid var(--line);
-    border-top-color: var(--line-hi);
+    background: var(--steel-3);
+    border: 1px solid var(--line-hi);
     border-radius: 4px;
     padding: 0.55rem 0.85rem;
-    box-shadow:
-        0 2px 0 #000,
-        inset 0 1px 0 rgba(255, 255, 255, 0.05);
     transition:
-        transform 0.06s,
-        box-shadow 0.06s,
-        color 0.15s;
+        background 0.12s,
+        border-color 0.12s,
+        color 0.12s;
     white-space: nowrap; /* a button label never stacks icon over text */
 }
 .hw-btn:not(:disabled):hover .hw-btn-cap {
-    color: var(--amber-hi);
+    background: color-mix(in srgb, var(--steel-3) 82%, #fff);
 }
 .hw-btn:not(:disabled):active .hw-btn-cap {
-    transform: translateY(2px);
-    box-shadow: 0 0 0 #000;
+    background: color-mix(in srgb, var(--steel-3) 84%, #000);
 }
 .hw-btn:disabled {
     cursor: not-allowed;
 }
 .hw-btn:disabled .hw-btn-cap {
     opacity: 0.4;
-}
-.hw-btn.accent .hw-btn-cap {
-    color: #1a0d00;
-    background: linear-gradient(180deg, var(--amber-hi), var(--amber) 60%, color-mix(in srgb, rgb(var(--amber-rgb)) 82%, #000));
-    border-color: var(--amber-dk);
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.25);
-}
-/* accent caps stay dark-on-amber; the generic hover recolours the cap to light
-   amber, which vanishes on the amber fill — keep it dark and signal hover with a
-   brighter fill (no glow: the button is a control, not a light source) */
-.hw-btn.accent:not(:disabled):hover .hw-btn-cap {
-    color: #1a0d00;
-    background: linear-gradient(
-        180deg,
-        color-mix(in srgb, #fff 26%, var(--amber-hi)),
-        var(--amber) 60%,
-        color-mix(in srgb, rgb(var(--amber-rgb)) 82%, #000)
-    );
-    box-shadow:
-        0 2px 0 #000,
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 .hw-btn[aria-busy="true"] .hw-btn-cap {
     opacity: 0.5;
