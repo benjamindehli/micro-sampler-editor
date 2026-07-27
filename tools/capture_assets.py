@@ -5,8 +5,7 @@ described in prose).
 
 It drives the mock bridge headless via Playwright at 1540x940 DSR=1, then
 downscales LANCZOS to the published sizes. Full-colour PNGs (no 256-quantize — that
-posterises the dark gradients); the demo gif uses a shared MAXCOVERAGE palette; the
-mp4/webm are a 12 fps, 2 s-per-view slideshow.
+posterises the dark gradients); the demo mp4/webm are a 12 fps, 2 s-per-view slideshow.
 
 The author/copyright/location metadata (XMP + IPTC on PNGs; Exif+GPS + XMP + IPTC on
 the JPG) is carried forward — it reads the identical stamp from the already-tagged
@@ -20,7 +19,7 @@ Usage (from anywhere):
     python3 tools/capture_assets.py                  # regenerate everything
     python3 tools/capture_assets.py --only samples   # just the SAMPLES screenshot
     python3 tools/capture_assets.py --only screenshots  # all 5 device screenshots
-    python3 tools/capture_assets.py --only demo      # the gif/mp4/webm + poster
+    python3 tools/capture_assets.py --only demo      # the mp4/webm + poster
     python3 tools/capture_assets.py --only library   # just the Library screenshot
     python3 tools/capture_assets.py --out /tmp/check # write elsewhere (e.g. to verify)
 
@@ -291,17 +290,8 @@ def capture_device(base, wav_path, tmp):
 
 
 def build_demo(frames, out):
-    """poster (samples master) + gif (shared palette) + mp4/webm (12 fps slideshow)."""
+    """poster (samples master) + mp4/webm (12 fps, 2 s-per-view slideshow)."""
     save_jpg(lanczos(frames['samples'], VID), os.path.join(out, 'demo-poster.jpg'), 88)
-
-    gif = [lanczos(frames[v], SHOT) for v in DEMO_VIEWS]
-    montage = Image.new('RGB', (SHOT[0], SHOT[1] * len(gif)))
-    for i, im in enumerate(gif):
-        montage.paste(im, (0, SHOT[1] * i))
-    pal = montage.quantize(colors=256, method=Image.MAXCOVERAGE, dither=Image.NONE)
-    gp = [im.quantize(palette=pal, dither=Image.NONE) for im in gif]
-    gp[0].save(os.path.join(out, 'demo.gif'), save_all=True, append_images=gp[1:],
-               duration=2000, loop=0, optimize=False, disposal=2)
 
     seq = tempfile.mkdtemp(prefix='seq-')
     n = 0
@@ -429,7 +419,7 @@ def main():
                 written.append('screenshots/%s.png' % name)
         if 'demo' in want:
             build_demo(frames, args.out)
-            written += ['demo-poster.jpg', 'demo.gif', 'demo.mp4', 'demo.webm']
+            written += ['demo-poster.jpg', 'demo.mp4', 'demo.webm']
         shutil.rmtree(banks, ignore_errors=True)
         shutil.rmtree(tmp, ignore_errors=True)
     if 'library' in want:
