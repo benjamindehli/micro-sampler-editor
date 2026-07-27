@@ -265,50 +265,10 @@
 /* ── view nav ─────────────────────────────────────────────────────────── */
 /* backlit channel-select buttons (was browser-style tabs): the active one is
    lit amber like the panel's segmented switches, not underlined like a web tab */
+/* nav tabs are a segmented control (styled in controls.css); only the layout
+   position lives here */
 .views {
-    display: flex;
-    gap: 5px;
     margin-left: 1.6rem;
-}
-.view-btn {
-    appearance: none;
-    cursor: pointer;
-    font:
-        600 0.66rem/1 "Chakra Petch",
-        sans-serif;
-    letter-spacing: 0.18em;
-    color: var(--ink-dim);
-    background: linear-gradient(180deg, var(--steel-3), #141417);
-    border: 1px solid var(--line);
-    border-top-color: var(--line-hi);
-    border-radius: 5px;
-    padding: 0.52rem 0.95rem;
-    box-shadow:
-        0 2px 0 #000,
-        inset 0 1px 0 rgba(255, 255, 255, 0.04);
-    text-shadow: 0 1px 0 #000; /* engraved silkscreen */
-    transition:
-        color 0.15s,
-        box-shadow 0.2s,
-        background 0.2s,
-        text-shadow 0.2s;
-}
-.view-btn:hover:not(.on) {
-    color: var(--ink);
-}
-.view-btn:active {
-    transform: translateY(1px);
-}
-.view-btn.on {
-    /* illuminated */
-    color: var(--amber);
-    background: linear-gradient(
-        180deg,
-        color-mix(in srgb, rgb(var(--amber-rgb)) 15%, var(--steel-3)),
-        color-mix(in srgb, rgb(var(--amber-rgb)) 6%, #141417)
-    );
-    border-color: var(--amber-dk);
-    box-shadow: 0 2px 0 #000;
 }
 
 /* bank LCD is clickable (bank name/BPM dialog) */

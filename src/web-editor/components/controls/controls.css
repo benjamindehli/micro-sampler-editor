@@ -108,43 +108,64 @@
     color: var(--amber);
 }
 
-/* segmented switch */
-.seg {
-    display: flex;
+/* ── segmented control ────────────────────────────────────────────────────
+   ONE style for every mutually-exclusive button group: BPM SYNC, INPUT source,
+   the SAMPLE/KEYBOARD play toggle, the nav tabs, and the pattern-editor tool +
+   track pickers. A bordered bar of segments; the selected one carries the
+   accent. Restyled in place (markup/JS keep their own class hooks). */
+.seg,
+.views,
+.keybed-mode,
+.pe-track {
+    display: inline-flex;
     border: 1px solid var(--line);
     border-radius: 4px;
     overflow: hidden;
     max-width: 100%;
 }
-.seg button {
+.seg > button,
+.views > .view-btn,
+.keybed-mode > .kb-mode,
+.pe-track > button {
     appearance: none;
     border: 0;
+    border-right: 1px solid var(--line);
     cursor: pointer;
-    font: 600 0.58rem/1 "Chakra Petch";
-    letter-spacing: 0.06em;
+    font:
+        600 0.62rem/1 "Chakra Petch",
+        sans-serif;
+    letter-spacing: 0.1em;
     color: var(--ink-dim);
-    background: #101013;
-    padding: 0.5rem 0.45rem;
+    background: var(--steel-3);
+    padding: 0.5rem 0.7rem;
     flex: 0 1 auto;
     min-width: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: clip;
-    border-right: 1px solid var(--line);
     transition:
         color 0.15s,
         background 0.15s;
 }
-.seg button:last-child {
+.seg > button:last-child,
+.views > .view-btn:last-child,
+.keybed-mode > .kb-mode:last-child,
+.pe-track > button:last-child {
     border-right: 0;
 }
-.seg button:hover {
+.seg > button:hover:not(.on),
+.views > .view-btn:hover:not(.on),
+.keybed-mode > .kb-mode:hover:not(.on),
+.pe-track > button:hover:not(.on) {
     color: var(--ink);
+    background: color-mix(in srgb, var(--steel-3) 82%, #fff);
 }
-.seg button.on {
+.seg > button.on,
+.views > .view-btn.on,
+.keybed-mode > .kb-mode.on,
+.pe-track > button.on {
     color: #1a0d00;
-    background: linear-gradient(180deg, var(--amber-hi), var(--amber));
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.25);
+    background: var(--amber);
 }
 
 /* fader */
