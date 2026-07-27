@@ -32,7 +32,7 @@
     height: 100%;
     width: 0;
     background: var(--amber);
-    box-shadow: 0 0 8px rgba(var(--amber-rgb), 0.5);
+    box-shadow: 0 0 3px rgba(var(--amber-rgb), 0.25);
     transition: width 0.35s ease;
 }
 .mem-fill.warn {
@@ -40,7 +40,6 @@
 }
 .mem-fill.crit {
     background: #ff5436;
-    box-shadow: 0 0 8px rgba(255, 84, 54, 0.6);
 }
 .mem-val {
     font-family: "Share Tech Mono", monospace;

@@ -31,24 +31,17 @@
     gap: 0.7rem;
 }
 .pattern-card {
-    background: linear-gradient(180deg, var(--steel-2), #131316);
+    background: var(--steel-1);
     border: 1px solid var(--line);
-    border-top-color: var(--line-hi);
     border-radius: 5px;
     padding: 0.7rem 0.8rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    transition:
-        transform 0.12s,
-        border-color 0.12s,
-        box-shadow 0.12s;
+    transition: border-color 0.12s;
 }
 .pattern-card:hover {
-    /* subtle lift on hover (tactile, signals interactivity) */
-    transform: translateY(-1px);
-    border-color: var(--line-hi);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+    border-color: var(--amber-dk);
 }
 /* empty / unreadable patterns recede so the recorded ones stand out (still
    fully usable — hover brings them back to full strength) */
@@ -71,7 +64,6 @@
     font-family: "Share Tech Mono", monospace;
     font-size: 1.05rem;
     color: var(--amber);
-    text-shadow: 0 0 7px rgba(var(--amber-rgb), 0.4);
 }
 .pattern-card .p-name {
     font-family: "Share Tech Mono", monospace;
@@ -94,10 +86,9 @@
     display: block;
     width: 100%;
     height: 88px;
-    border-radius: 3px;
+    border-radius: var(--ctl-r);
     background: var(--phos-bg);
-    border: 1px solid #000;
-    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.85);
+    border: 1px solid var(--line-hi);
 }
 /* approximate sweep while the pattern plays on the device (loops with it) */
 .p-playhead {
@@ -137,11 +128,9 @@
 }
 .p-meta .dot.smp {
     background: var(--amber);
-    box-shadow: 0 0 5px rgba(var(--amber-rgb), 0.6);
 }
 .p-meta .dot.kbd {
     background: #ffe9c9;
-    box-shadow: 0 0 5px rgba(255, 233, 201, 0.5);
 }
 
 /* pattern receive progress */
@@ -171,6 +160,5 @@
     height: 100%;
     width: 0;
     background: var(--amber);
-    box-shadow: 0 0 8px rgba(var(--amber-rgb), 0.5);
     transition: width 0.2s ease;
 }

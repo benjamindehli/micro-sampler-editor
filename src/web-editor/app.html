@@ -144,11 +144,6 @@
         <!-- ── effect view ─────────────────────────────────────────────────────── -->
         <main class="deck utility-deck" id="view-effect" hidden>
             <section class="editor">
-                <div class="screw tl"></div>
-                <div class="screw tr"></div>
-                <div class="screw bl"></div>
-                <div class="screw br"></div>
-
                 <div class="fx-head">
                     <div>
                         <div class="panel-title">BANK EFFECT</div>
@@ -196,11 +191,6 @@
         <!-- ── patterns view ───────────────────────────────────────────────────── -->
         <main class="deck utility-deck" id="view-patterns" hidden>
             <section class="editor">
-                <div class="screw tl"></div>
-                <div class="screw tr"></div>
-                <div class="screw bl"></div>
-                <div class="screw br"></div>
-
                 <div class="patterns-head">
                     <div>
                         <div class="panel-title">PATTERNS <em>01–16</em></div>
@@ -233,11 +223,6 @@
         <!-- ── utility view ────────────────────────────────────────────────────── -->
         <main class="deck utility-deck" id="view-utility" hidden>
             <section class="editor">
-                <div class="screw tl"></div>
-                <div class="screw tr"></div>
-                <div class="screw bl"></div>
-                <div class="screw br"></div>
-
                 <div class="util-cols">
                     <div class="util-col">
                         <div class="panel-title">BACKUP <em>DEVICE → COMPUTER</em></div>
@@ -371,11 +356,6 @@
             <div class="editor-col">
                 <!-- sample editor -->
                 <section class="editor reveal" style="--d: 0.16s">
-                    <div class="screw tl"></div>
-                    <div class="screw tr"></div>
-                    <div class="screw bl"></div>
-                    <div class="screw br"></div>
-
                     <div class="editor-empty" id="editor-empty">
                         <div class="editor-empty-inner">
                             <div class="ghost-wave"></div>
@@ -428,7 +408,9 @@
                             </div>
                         </div>
                         <div class="screen-meta">
-                            <span id="meta-points">START 0 · END 0</span>
+                            <!-- editable START/END (device frames), populated by slot.js;
+               sits directly under the waveform it edits -->
+                            <div class="ro-row" id="ro-row"></div>
                             <label class="zsnap-toggle" title="Snap dragged START/END markers to the nearest zero crossing (avoids clicks)">
                                 <input type="checkbox" id="zero-snap" checked /> ZERO-SNAP
                             </label>
@@ -517,9 +499,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- start/end (edited on the waveform; shown read-only for now) -->
-                        <div class="ro-row" id="ro-row"></div>
                     </div>
 
                     <!-- drop veil -->

@@ -2,12 +2,10 @@
 
 /* ── pads ─────────────────────────────────────────────────────────────── */
 .pads {
-    background: linear-gradient(178deg, var(--steel-2), var(--steel-1) 44%);
+    background: var(--steel-1);
     border: 1px solid var(--line);
     border-radius: var(--r);
-    box-shadow:
-        inset 0 1px 0 var(--line-hi),
-        0 10px 30px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
     padding: 0.9rem;
 }
 /* pad filter box (right of the SAMPLE title) */
@@ -17,21 +15,11 @@
     justify-content: space-between;
     gap: 0.6rem;
 }
+/* footprint only; phosphor look + size come from the global field rule */
 .pad-search {
-    font: inherit;
-    font-size: 0.6rem;
     letter-spacing: 0.06em;
-    color: var(--amber);
-    background: var(--phos-bg);
-    border: 1px solid var(--line);
-    border-radius: 3px;
-    padding: 0.22rem 0.45rem;
     width: 8.5rem;
     max-width: 45%;
-}
-.pad-search:focus {
-    outline: none;
-    border-color: var(--amber-dk);
 }
 .pad-search::placeholder {
     color: var(--ink-dim);
@@ -51,36 +39,30 @@
     appearance: none;
     cursor: pointer;
     border: 1px solid var(--line);
-    border-bottom-color: #000;
-    border-radius: 4px;
-    background: linear-gradient(180deg, #1f1f24, #141417);
+    border-radius: var(--ctl-r);
+    background: var(--steel-3);
     padding: 0.42rem 0.5rem 0.4rem;
     min-height: 46px;
     text-align: left;
-    box-shadow: 0 2px 0 #000;
     transition:
-        transform 0.05s,
         border-color 0.15s,
         background 0.15s;
 }
 .pad:hover {
     border-color: var(--line-hi);
-    transform: translateY(-1px);
-    box-shadow:
-        0 2px 0 #000,
-        0 5px 10px rgba(0, 0, 0, 0.4);
+    background: color-mix(in srgb, var(--steel-3) 94%, #fff);
 }
 .pad:active {
-    transform: translateY(1px);
-    box-shadow: 0 1px 0 #000;
+    background: color-mix(in srgb, var(--steel-3) 86%, #000);
 }
 /* sharps = a keyboard's black keys: darker face so the layout reads at a glance
    (defined before .pad.sel so a selected sharp still gets the amber tint) */
 .pad.black {
-    background: linear-gradient(180deg, #141418, #0b0b0d);
+    background: var(--steel-0);
 }
 .pad.black:hover {
     border-color: var(--line-hi);
+    background: color-mix(in srgb, var(--steel-0) 94%, #fff);
 }
 .pad-num {
     font-family: "Share Tech Mono", monospace;
@@ -119,19 +101,9 @@
 }
 .pad.used .pad-name {
     color: var(--amber-hi);
-    text-shadow: 0 0 6px rgba(var(--amber-rgb), 0.3);
 }
 .pad.sel {
-    background: linear-gradient(
-        180deg,
-        color-mix(in srgb, rgb(var(--amber-rgb)) 14%, var(--steel-0)),
-        color-mix(in srgb, rgb(var(--amber-rgb)) 8%, var(--steel-0))
-    );
-    border-color: var(--amber-dk);
-    box-shadow:
-        0 2px 0 #000,
-        0 0 0 1px var(--amber-dk),
-        0 0 18px rgba(var(--amber-rgb), 0.15);
+    border-color: var(--amber);
 }
 .pads-hint {
     margin-top: 0.8rem;
@@ -168,9 +140,10 @@
 /* pad drop target highlight (drag a WAV onto a pad) */
 .pad.drop-hint {
     outline: 1px solid var(--amber);
+    border-color: var(--amber-dk);
     box-shadow:
-        0 0 14px rgba(var(--amber-rgb), 0.45),
-        inset 0 0 10px rgba(var(--amber-rgb), 0.12);
+        0 0 0 1px var(--amber-dk),
+        0 2px 0 #000;
 }
 
 /* pad ▶ play zone (plays the sample on the DEVICE while held) —
@@ -198,12 +171,11 @@
 .pad-play:hover {
     color: var(--amber-hi);
     background: rgba(var(--amber-rgb), 0.12);
-    text-shadow: 0 0 8px rgba(var(--amber-rgb), 0.5);
 }
 .pad.sounding {
     border-color: var(--amber);
     box-shadow:
-        0 0 14px rgba(var(--amber-rgb), 0.5),
+        0 0 0 1px var(--amber),
         0 2px 0 #000;
 }
 .pad.sounding .pad-play {

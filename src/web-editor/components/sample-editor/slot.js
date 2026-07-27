@@ -50,7 +50,6 @@ export function renderPoints(s) {
     const ro = $("#ro-row");
     if (s.empty) {
         ro.innerHTML = "";
-        $("#meta-points").textContent = "";
         return;
     }
     // editable START/END (device frames) — committed by waveform.js. Build the
@@ -71,7 +70,6 @@ export function renderPoints(s) {
     si.disabled = ei.disabled = !s.frames;
     if (document.activeElement !== si) si.value = s.start;
     if (document.activeElement !== ei) ei.value = s.end;
-    $("#meta-points").textContent = `START ${s.start.toLocaleString()} · END ${s.end.toLocaleString()}`;
 }
 
 export function renderChips(s) {
@@ -89,12 +87,13 @@ export function renderChips(s) {
         pairs.push(["RATE", "—"], ["LEN", "—"]);
     }
     for (const [k, v] of pairs) chips.insertAdjacentHTML("beforeend", `<span class="chip">${k} <b>${v}</b></span>`);
-    // ORIG BPM is editable — a clickable chip opens the dialog (it re-uploads)
+    // ORIG BPM is editable — a normal button (styled like the others) opens the
+    // dialog (it re-uploads); the static RATE/CH/LEN chips are plain readouts
     if (s.tempo_bpm)
         chips.insertAdjacentHTML(
             "beforeend",
-            `<button class="chip chip-btn" id="chip-bpm"
-         title="Original BPM (sample tempo) — click to edit">BPM <b>${s.tempo_bpm.toFixed(1)}</b></button>`
+            `<button class="hw-btn chip-bpm" id="chip-bpm" type="button"
+         title="Original BPM (sample tempo) — click to edit"><span class="hw-btn-cap">BPM <b>${s.tempo_bpm.toFixed(1)}</b></span></button>`
         );
 }
 

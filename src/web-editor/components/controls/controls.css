@@ -8,10 +8,15 @@
     flex-wrap: wrap;
     gap: 0.6rem;
 }
+/* each group is framed so related controls (playback · sync · pitch · envelope ·
+   dynamics) read as one cluster rather than relying on whitespace alone */
 .ctl-group {
     display: flex;
     gap: 0.6rem;
     min-width: 0;
+    padding: 0.35rem 0.5rem;
+    border: 1px solid var(--line);
+    border-radius: 5px;
 }
 .ctl-group .ctl {
     flex: 1 1 0;
@@ -24,11 +29,10 @@
     flex: 3 1 380px;
 }
 .ctl {
-    background: linear-gradient(180deg, var(--steel-2), #131316);
-    border: 1px solid var(--line);
-    border-top-color: var(--line-hi);
+    /* flat: controls sit directly on the panel, grouped by whitespace rather than
+       each boxed in its own card (avoids the "boxes-in-boxes" density) */
     border-radius: 5px;
-    padding: 0.65rem 0.7rem 0.7rem;
+    padding: 0.55rem 0.7rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -36,9 +40,7 @@
     transition: box-shadow 0.4s;
 }
 .ctl.flash {
-    box-shadow:
-        0 0 0 1px var(--amber),
-        0 0 22px rgba(var(--amber-rgb), 0.35);
+    box-shadow: 0 0 0 1px var(--amber-dk);
     transition: none;
 }
 .ctl.locked {
@@ -55,7 +57,6 @@
     font-family: "Share Tech Mono", monospace;
     font-size: 0.85rem;
     color: var(--amber);
-    text-shadow: 0 0 6px rgba(var(--amber-rgb), 0.4);
 }
 
 /* toggle switch (hardware slide) */
@@ -74,34 +75,32 @@
     width: 46px;
     height: 20px;
     border-radius: 10px;
-    background: #0d0d10;
-    border: 1px solid #000;
-    box-shadow:
-        inset 0 2px 5px rgba(0, 0, 0, 0.9),
-        0 1px 0 var(--line-hi);
+    background: var(--steel-0);
+    border: 1px solid var(--line-hi);
     position: relative;
-    transition: background 0.15s;
+    transition:
+        background 0.15s,
+        border-color 0.15s;
 }
 .switch-knob {
     position: absolute;
-    top: 1px;
-    left: 1px;
-    width: 16px;
-    height: 16px;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
-    background: linear-gradient(180deg, #4a4a52, #28282e);
-    box-shadow: 0 1px 2px #000;
+    background: var(--ink-dim);
     transition:
         left 0.12s cubic-bezier(0.3, 1.4, 0.6, 1),
         background 0.15s;
 }
 .switch[aria-checked="true"] .switch-track {
-    background: color-mix(in srgb, rgb(var(--amber-rgb)) 16%, #000);
+    background: color-mix(in srgb, rgb(var(--amber-rgb)) 12%, #000);
+    border-color: var(--amber-dk);
 }
 .switch[aria-checked="true"] .switch-knob {
-    left: 27px;
-    background: linear-gradient(180deg, var(--amber-hi), var(--amber));
-    box-shadow: 0 0 10px rgba(var(--amber-rgb), 0.7);
+    left: 28px;
+    background: var(--amber);
 }
 .switch-val {
     font-family: "Share Tech Mono", monospace;
@@ -110,46 +109,66 @@
 }
 .switch[aria-checked="true"] .switch-val {
     color: var(--amber);
-    text-shadow: 0 0 6px rgba(var(--amber-rgb), 0.4);
 }
 
-/* segmented switch */
-.seg {
-    display: flex;
+/* ── segmented control ────────────────────────────────────────────────────
+   ONE style for every mutually-exclusive button group: BPM SYNC, INPUT source,
+   the SAMPLE/KEYBOARD play toggle, the nav tabs, and the pattern-editor tool +
+   track pickers. A bordered bar of segments; the selected one carries the
+   accent. Restyled in place (markup/JS keep their own class hooks). */
+.seg,
+.views,
+.keybed-mode,
+.pe-track {
+    display: inline-flex;
     border: 1px solid var(--line);
-    border-radius: 4px;
+    border-radius: var(--ctl-r);
     overflow: hidden;
     max-width: 100%;
 }
-.seg button {
+.seg > button,
+.views > .view-btn,
+.keybed-mode > .kb-mode,
+.pe-track > button {
     appearance: none;
     border: 0;
+    border-right: 1px solid var(--line);
     cursor: pointer;
-    font: 600 0.58rem/1 "Chakra Petch";
-    letter-spacing: 0.06em;
+    font:
+        600 var(--btn-font)/1 "Chakra Petch",
+        sans-serif;
+    letter-spacing: 0.1em;
     color: var(--ink-dim);
-    background: #101013;
-    padding: 0.5rem 0.45rem;
+    background: var(--steel-3);
+    padding: 0.6rem 0.85rem;
     flex: 0 1 auto;
     min-width: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: clip;
-    border-right: 1px solid var(--line);
     transition:
         color 0.15s,
         background 0.15s;
 }
-.seg button:last-child {
+.seg > button:last-child,
+.views > .view-btn:last-child,
+.keybed-mode > .kb-mode:last-child,
+.pe-track > button:last-child {
     border-right: 0;
 }
-.seg button:hover {
+.seg > button:hover:not(.on),
+.views > .view-btn:hover:not(.on),
+.keybed-mode > .kb-mode:hover:not(.on),
+.pe-track > button:hover:not(.on) {
     color: var(--ink);
+    background: color-mix(in srgb, var(--steel-3) 94%, #fff);
 }
-.seg button.on {
+.seg > button.on,
+.views > .view-btn.on,
+.keybed-mode > .kb-mode.on,
+.pe-track > button.on {
     color: #1a0d00;
-    background: linear-gradient(180deg, var(--amber-hi), var(--amber));
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.25);
+    background: var(--amber);
 }
 
 /* fader */
@@ -197,13 +216,13 @@
         #0c0c0f;
 }
 
-/* read-only info row */
+/* START/END inputs — sit in the .screen-meta row directly under the waveform */
 .ro-row {
-    margin-top: 0.8rem;
     display: flex;
     gap: 0.45rem;
     flex-wrap: wrap;
 }
+/* plain label + input, no dashed box */
 .ro {
     display: inline-flex;
     align-items: center;
@@ -212,26 +231,12 @@
     font-size: 0.64rem;
     color: var(--ink-dim);
     letter-spacing: 0.06em;
-    border: 1px dashed var(--line);
-    border-radius: 3px;
-    padding: 0.32rem 0.5rem;
+    padding: 0.32rem 0;
 }
-/* editable START/END (device frames) */
+/* editable START/END (device frames) — styling from the global field rule.
+   Wide enough for a 7-digit frame count plus the number spinner arrows */
 .ro-input {
-    width: 5.5em;
-    font: inherit;
-    color: var(--amber);
-    background: var(--phos-bg);
-    border: 1px solid #000;
-    border-radius: 2px;
-    padding: 0.12rem 0.3rem;
-}
-.ro-input:focus {
-    outline: 1px solid var(--amber-dk);
-}
-.ro-input:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
+    width: 8em;
 }
 
 /* drop veil */

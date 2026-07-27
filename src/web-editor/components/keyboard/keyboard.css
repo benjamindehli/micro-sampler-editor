@@ -8,9 +8,7 @@
     background: var(--steel-1);
     border: 1px solid var(--line);
     border-radius: var(--r);
-    box-shadow:
-        inset 0 1px 0 var(--line-hi),
-        0 8px 24px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     padding: 0.8rem 1rem 1rem;
 }
 
@@ -29,35 +27,7 @@
 }
 
 /* SAMPLE / KEYBOARD play-mode toggle (segmented, like the pattern editor's) */
-.keybed-mode {
-    display: inline-flex;
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    overflow: hidden;
-}
-.kb-mode {
-    background: var(--steel-2);
-    border: 0;
-    color: var(--ink-dim);
-    cursor: pointer;
-    font: inherit;
-    font-size: 0.55rem;
-    letter-spacing: 0.12em;
-    padding: 0.3rem 0.55rem;
-    transition:
-        background 0.12s,
-        color 0.12s;
-}
-.kb-mode + .kb-mode {
-    border-left: 1px solid var(--line);
-}
-.kb-mode:hover {
-    color: var(--amber);
-}
-.kb-mode.on {
-    background: rgba(var(--amber-rgb), 0.22);
-    color: var(--amber);
-}
+/* .keybed-mode / .kb-mode are styled by the shared segmented control (controls.css) */
 
 .keybed-oct {
     display: inline-flex;
@@ -192,7 +162,7 @@
 }
 .pkey.used.loaded::before {
     background: var(--amber);
-    box-shadow: 0 0 5px rgba(var(--amber-rgb), 0.7);
+    box-shadow: 0 0 0 1px var(--amber-dk);
 }
 
 .pk-note {
