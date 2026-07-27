@@ -6,5 +6,11 @@
     "useTabs": false,
     "endOfLine": "lf",
     "printWidth": 150,
-    "singleAttributePerLine": false
+    "singleAttributePerLine": false,
+    "overrides": [
+        {
+            "files": "*.md",
+            "options": { "tabWidth": 2 }
+        }
+    ]
 }
