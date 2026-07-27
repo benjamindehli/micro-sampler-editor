@@ -24,7 +24,7 @@
     --amber: rgb(var(--amber-rgb));
     --amber-hi: rgb(var(--amber-hi-rgb));
     --amber-dk: rgb(var(--amber-dk-rgb));
-    --phos-bg: color-mix(in srgb, rgb(var(--amber-rgb)) 9%, #000); /* LCD glass */
+    --phos-bg: color-mix(in srgb, rgb(var(--amber-rgb)) 6%, #000); /* LCD glass */
     --ok: #79e06b;
     --err: #ff4f3d;
     --r: 6px;
