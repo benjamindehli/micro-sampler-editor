@@ -95,7 +95,7 @@
         background 0.15s;
 }
 .switch[aria-checked="true"] .switch-track {
-    background: color-mix(in srgb, rgb(var(--amber-rgb)) 16%, #000);
+    background: color-mix(in srgb, rgb(var(--amber-rgb)) 12%, #000);
     border-color: var(--amber-dk);
 }
 .switch[aria-checked="true"] .switch-knob {
