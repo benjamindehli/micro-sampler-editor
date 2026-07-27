@@ -1,7 +1,7 @@
 # Security Policy
 
 **microSAMPLER Editor / Librarian** is a locally-run, open-source desktop tool:
-a Python bridge (`native-tools/bridge.py`) that serves a browser UI on
+a Python bridge (`src/native-tools/bridge.py`) that serves a browser UI on
 `http://localhost:8765` and talks to a Korg microSAMPLER over USB. It is not a
 hosted service, and it runs entirely on the user's own machine.
 But it does open a

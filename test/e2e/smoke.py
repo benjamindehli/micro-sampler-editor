@@ -8,7 +8,7 @@ Dev/CI only — needs Playwright:
     pip install playwright && playwright install chromium
 
 Run from anywhere:
-    python3 e2e/smoke.py            # (override port with SMOKE_PORT)
+    python3 test/e2e/smoke.py       # (override port with SMOKE_PORT)
 """
 import json
 import math
@@ -24,7 +24,7 @@ import wave
 
 from playwright.sync_api import sync_playwright
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 PORT = int(os.environ.get('SMOKE_PORT', '8799'))
 BASE = 'http://127.0.0.1:%d' % PORT
 
@@ -64,7 +64,7 @@ def make_msmpl(path):
     bnkp = chunk(b'BnkP', b'SMOKEBNK' + struct.pack('<H', 1200) + b'\xff' * 54)
     smps = chunk(b'SmpS', chunk(b'SmpD', bytes(param) + hdr + pcm))
     # one recorded pattern so the library's pattern (MIDI) export shows up too
-    sys.path.insert(0, os.path.join(ROOT, 'native-tools'))
+    sys.path.insert(0, os.path.join(ROOT, 'src', 'native-tools'))
     from test_msmpl import recorded_pattern_blob
     seqs = chunk(b'SeqS', chunk(b'SeqD', recorded_pattern_blob(name='SMOKE')))
     with open(path, 'wb') as f:
@@ -301,7 +301,7 @@ def main():
     bridge = None
     if not wait_ready(timeout=1):
         bridge = subprocess.Popen(
-            [sys.executable, os.path.join(ROOT, 'native-tools', 'bridge.py'),
+            [sys.executable, os.path.join(ROOT, 'src', 'native-tools', 'bridge.py'),
              '--mock', '--port', str(PORT)],
             env={**os.environ, 'MSMPL_BACKUP_DIR': os.path.join(tmp, 'backups')},
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

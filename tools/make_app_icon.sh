@@ -2,7 +2,7 @@
 # One-shot (run ON the Mac): give the macOS launchers (macOS/*.command) the
 # Dehli Musikk icon.
 #
-# Applies web-editor/assets/AppIcon.png (1024x1024, transparent background,
+# Applies src/web-editor/assets/AppIcon.png (1024x1024, transparent background,
 # pre-rendered from AppIcon.svg) with NSWorkspace — a Finder "custom icon",
 # stored in local extended attributes / resource fork. NOTE: git does not
 # preserve those, so the icon is per-machine; just re-run after cloning.
@@ -12,14 +12,17 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-PNG="$PWD/web-editor/assets/AppIcon.png"
+# repo checkout keeps sources under src/; the packaged ZIP is flat — support both
+if [ -d src/web-editor ]; then WEB="src/web-editor"; L="src/launchers"; else WEB="web-editor"; L="."; fi
+
+PNG="$PWD/$WEB/assets/AppIcon.png"
 if [ "${1:-}" = "--png" ]; then
   PNG="$(cd "$(dirname "$2")" && pwd)/$(basename "$2")"
 fi
 [ -f "$PNG" ] || { echo "not found: $PNG"; exit 1; }
 
-for TARGET in "$PWD/macOS/microSAMPLER Editor Librarian.command" \
-              "$PWD/macOS/microSAMPLER Library.command"; do
+for TARGET in "$PWD/$L/macOS/microSAMPLER Editor Librarian.command" \
+              "$PWD/$L/macOS/microSAMPLER Library.command"; do
   [ -f "$TARGET" ] || { echo "not found: $TARGET"; exit 1; }
   /usr/bin/osascript - "$PNG" "$TARGET" <<'EOF'
 use framework "AppKit"

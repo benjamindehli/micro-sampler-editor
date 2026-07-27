@@ -11,7 +11,7 @@
 #                                       macOS app lifecycle: no reopen handling,
 #                                       no ⌘Q, ghost "not open anymore" states.
 #
-# Bundles the RAW web-editor/ (no build step — served as-is like in dev) and
+# Bundles the RAW src/web-editor/ (no build step — served as-is like in dev) and
 # the native-tools python modules. vendor/ (pyusb + libusb) is deliberately
 # EXCLUDED: library mode never opens USB, and msusb only reaches for pyusb
 # lazily when real hardware is opened.
@@ -19,7 +19,7 @@ import json
 import os
 
 ROOT = os.path.normpath(os.path.join(SPECPATH, '..', '..'))      # repo root
-NATIVE = os.path.join(ROOT, 'native-tools')
+NATIVE = os.path.join(ROOT, 'src', 'native-tools')
 APP_NAME = 'microSAMPLER Library'
 with open(os.path.join(ROOT, 'package.json')) as f:
     VERSION = json.load(f)['version']
@@ -30,7 +30,7 @@ ICON = os.environ.get('MSMPL_ICNS') or None
 a = Analysis(
     [os.path.join(SPECPATH, 'library_app.py')],
     pathex=[NATIVE],                     # so `import bridge` resolves
-    datas=[(os.path.join(ROOT, 'web-editor'), 'web-editor')],
+    datas=[(os.path.join(ROOT, 'src', 'web-editor'), 'web-editor')],
     hiddenimports=['bridge', 'protocol', 'msusb', 'download', 'upload',
                    'bank', 'msmpl_bank'],
     excludes=['usb'],                    # pyusb (vendored, lazy) — never needed here

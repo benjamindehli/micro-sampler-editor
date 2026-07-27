@@ -42,21 +42,21 @@ Everything rides the device's two bulk endpoints (OUT `0x01` / IN `0x82`,
   (headers via SysEx, PCM as raw bytes).
 
 The protocol was reverse-engineered from the original 32-bit editor. The codec
-and message builders live in **`native-tools/protocol.py`** (pure, with an
-offline self-test). The USB transport is **`native-tools/msusb.py`**.
+and message builders live in **`src/native-tools/protocol.py`** (pure, with an
+offline self-test). The USB transport is **`src/native-tools/msusb.py`**.
 
 ## Components
 
-| Path                                     | Role                                                                                                                                                                                           |
-| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `native-tools/bridge.py`                 | HTTP/SSE server + device manager. Owns the USB session.                                                                                                                                        |
-| `native-tools/protocol.py`               | Korg SysEx/bulk codec + builders (pure).                                                                                                                                                       |
-| `native-tools/msusb.py`                  | libusb transport (USB-MIDI packetisation, inquiry).                                                                                                                                            |
-| `native-tools/{download,upload,bank}.py` | Single-sample + full-bank transfer flows (also CLIs).                                                                                                                                          |
-| `native-tools/msmpl_bank.py`             | Reader for original Korg `.msmpl_bank` backups (library mode + CLI).                                                                                                                           |
-| `web-editor/`                            | The browser app, using ES modules with no build step: `app.js` entry, pure leaves in `functions/`, one folder per feature in `components/<name>/` (JS + CSS), globals in `styles/`.            |
-| `tools/bundle/`                          | The packaged desktop apps: PyInstaller specs + entry scripts, the Swift menu-bar shell for the macOS Editor app, AppImage/DMG/notarization scripts (built by `.github/workflows/package.yml`). |
-| `tools/re/`                              | Reverse-engineering toolkit (needs Korg's `.pkg`, not distributed).                                                                                                                            |
+| Path                                         | Role                                                                                                                                                                                           |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/native-tools/bridge.py`                 | HTTP/SSE server + device manager. Owns the USB session.                                                                                                                                        |
+| `src/native-tools/protocol.py`               | Korg SysEx/bulk codec + builders (pure).                                                                                                                                                       |
+| `src/native-tools/msusb.py`                  | libusb transport (USB-MIDI packetisation, inquiry).                                                                                                                                            |
+| `src/native-tools/{download,upload,bank}.py` | Single-sample + full-bank transfer flows (also CLIs).                                                                                                                                          |
+| `src/native-tools/msmpl_bank.py`             | Reader for original Korg `.msmpl_bank` backups (library mode + CLI).                                                                                                                           |
+| `src/web-editor/`                            | The browser app, using ES modules with no build step: `app.js` entry, pure leaves in `functions/`, one folder per feature in `components/<name>/` (JS + CSS), globals in `styles/`.            |
+| `tools/bundle/`                              | The packaged desktop apps: PyInstaller specs + entry scripts, the Swift menu-bar shell for the macOS Editor app, AppImage/DMG/notarization scripts (built by `.github/workflows/package.yml`). |
+| `tools/re/`                                  | Reverse-engineering toolkit (needs Korg's `.pkg`, not distributed).                                                                                                                            |
 
 ### Bridge internals (`bridge.py`)
 
@@ -81,7 +81,7 @@ offline self-test). The USB transport is **`native-tools/msusb.py`**.
   the always-on daemon doesn't hog the microSAMPLER from DAWs. `POST
 /api/release` releases it on demand (the menu bar's _Release Device_).
 
-### Frontend (`web-editor/`)
+### Frontend (`src/web-editor/`)
 
 Plain ES modules, loaded by `app.html`, with **no bundler in dev**. Modules import
 through bare aliases (`functions/…`, `components/…`, `app.js`), resolved by an
@@ -172,6 +172,6 @@ Standard MIDI Files.
 ## Tests & CI
 
 See [CONTRIBUTING](CONTRIBUTING.md). In short: a Python offline suite
-(`native-tools/test_*.py`, mock device), JS unit tests for the pure modules
-(`test/`, `node --test`), a Playwright browser smoke (`e2e/smoke.py`), and two
+(`src/native-tools/test_*.py`, mock device), JS unit tests for the pure modules
+(`test/unit/`, `node --test`), a Playwright browser smoke (`test/e2e/smoke.py`), and two
 linters (Ruff + ESLint), all run in `.github/workflows/ci.yml`.

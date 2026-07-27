@@ -10,7 +10,7 @@
 # intentionally left off to avoid churning the existing, deliberate style.
 target-version = "py38"
 # vendored third-party code (pyusb) — don't lint someone else's library
-extend-exclude = ["native-tools/vendor"]
+extend-exclude = ["src/native-tools/vendor"]
 
 [lint]
 select = ["F", "E9", "B"]

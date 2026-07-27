@@ -107,7 +107,7 @@ requirements below apply to the classic ZIP + launchers:
 - **Python 3.8+** is the only thing you install.
   [pyusb](https://github.com/pyusb/pyusb) (BSD) and
   [libusb](https://libusb.info/) (LGPL) are bundled in
-  [`native-tools/vendor/`](native-tools/vendor/), so there's no `pip` or
+  [`src/native-tools/vendor/`](src/native-tools/vendor/), so there's no `pip` or
   Homebrew step. (A system pyusb/libusb, if you have one installed, is used in
   preference, and the bundled copies are just a fallback. A newer system libusb,
   e.g. `brew install libusb`, can be more robust across reconnects.)
@@ -142,8 +142,8 @@ interface from the OS MIDI driver.
 ### Manual
 
 ```bash
-sudo python3 native-tools/bridge.py   # macOS/Linux (root for USB)
-py -3 native-tools\bridge.py          # Windows
+sudo python3 src/native-tools/bridge.py   # macOS/Linux (root for USB)
+py -3 src/native-tools\bridge.py          # Windows
 ```
 
 Then open http://localhost:8765
@@ -151,7 +151,7 @@ Then open http://localhost:8765
 ### UI development without hardware
 
 ```bash
-python3 native-tools/bridge.py --mock
+python3 src/native-tools/bridge.py --mock
 ```
 
 ### Library mode (no hardware)
@@ -161,7 +161,7 @@ To browse and extract samples from bank backups with no microSAMPLER connected
 original editor), run the bridge in library mode:
 
 ```bash
-python3 native-tools/bridge.py --library
+python3 src/native-tools/bridge.py --library
 ```
 
 Library mode serves on **http://localhost:8766**, a separate port from the
@@ -180,35 +180,43 @@ each as a MIDI file, or all of them as a `.mid` ZIP.
 To extract straight to WAVs from the command line, without the app:
 
 ```bash
-python3 native-tools/msmpl_bank.py info    "my bank.msmpl_bank"   # list samples
-python3 native-tools/msmpl_bank.py extract "my bank.msmpl_bank"   # -> WAVs + manifest
+python3 src/native-tools/msmpl_bank.py info    "my bank.msmpl_bank"   # list samples
+python3 src/native-tools/msmpl_bank.py extract "my bank.msmpl_bank"   # -> WAVs + manifest
 ```
 
-Bank backups land in `native-tools/backups/` (gitignored, they're your data).
+Bank backups land in `src/native-tools/backups/` (gitignored, they're your data).
 Note that sample/parameter transfers target the device's **current bank (RAM)**. Save on the device or restore to a user bank to persist.
 
 ## Repository layout
 
 ```text
-macOS/ Linux/ Windows/        double-clickable launchers per OS — each has
-                              "microSAMPLER Editor Librarian" (device) and
-                              "microSAMPLER Library" (no-hardware librarian)
-web-editor/                   the browser app (served by the bridge)
-native-tools/                 Python bridge + CLI tools (libusb USB-MIDI):
-  bridge.py                     HTTP/SSE server the app talks to
-  download.py / upload.py       single-sample transfer CLIs
-  bank.py                       full-bank backup/restore CLI
-  msusb.py                      transport + diagnostics (inquiry/monitor/…)
-  protocol.py                   Korg SysEx/bulk protocol (offline self-test)
-  test_*.py                     offline regression suite (mock device)
-tools/re/                     reverse-engineering toolkit (needs the original
-                              Korg installer, not included) — regenerates
-                              web-editor/functions/fxData.js etc.
-tools/bundle/                 the desktop apps: PyInstaller specs + entries,
-                              the Swift menu-bar shell, DMG/AppImage/notarize
-                              scripts (built by workflows/package.yml)
-tools/make_app_icon.sh        give the launcher its icon (run once, macOS)
+src/                          application source (everything that ships)
+  web-editor/                 the browser app (served by the bridge)
+  native-tools/               Python bridge + CLI tools (libusb USB-MIDI):
+    bridge.py                   HTTP/SSE server the app talks to
+    download.py / upload.py     single-sample transfer CLIs
+    bank.py                     full-bank backup/restore CLI
+    msusb.py                    transport + diagnostics (inquiry/monitor/…)
+    protocol.py                 Korg SysEx/bulk protocol (offline self-test)
+    test_*.py                   offline regression suite (mock device)
+  launchers/                  double-clickable launchers per OS (macOS/, Linux/,
+                              Windows/), each with a device "Editor Librarian"
+                              and a no-hardware "Library"
+tools/                        dev + build + packaging (not shipped as the app):
+  build.mjs / pack.mjs          minified dist/ + release ZIP
+  re/                           reverse-engineering toolkit (needs the original
+                                Korg installer, not included) — regenerates
+                                src/web-editor/functions/fxData.js etc.
+  bundle/                       the desktop apps: PyInstaller specs + entries,
+                                the Swift menu-bar shell, DMG/AppImage/notarize
+                                scripts (built by workflows/package.yml)
+  make_app_icon.sh              give the launcher its icon (run once, macOS)
+test/                         unit/ (node --test) + e2e/ (Playwright smoke)
+docs/                         the documentation site (published to GitHub Pages)
 ```
+
+The packaged ZIP is flattened for convenience: `web-editor/`, `native-tools/`,
+and the per-OS launcher folders sit at its top level, not under `src/`.
 
 ## Development
 
@@ -218,7 +226,7 @@ device fit together, and [CONTRIBUTING.md](CONTRIBUTING.md) to get started.
 Run the offline test suite (no hardware needed):
 
 ```bash
-cd native-tools
+cd src/native-tools
 python3 protocol.py && python3 test_download.py && python3 test_upload.py \
   && python3 test_bank.py && python3 test_bridge.py
 ```
@@ -227,17 +235,17 @@ JavaScript unit tests for the pure modules (audio DSP + value encoders), via
 Node's built-in test runner (no deps):
 
 ```bash
-npm test        # node --test test/*.test.mjs
+npm test        # node --test test/unit/*.test.mjs
 ```
 
-The app needs **no build step** to develop or run. It's plain ES modules and per-component CSS served straight from `web-editor/`.
+The app needs **no build step** to develop or run. It's plain ES modules and per-component CSS served straight from `src/web-editor/`.
 
 End-to-end browser smoke (boots the mock bridge, drives the app headless, fails
 on any page/console error or broken interaction):
 
 ```bash
 pip install playwright && playwright install chromium
-python3 e2e/smoke.py        # reuses a bridge already on the port, else starts a mock one
+python3 test/e2e/smoke.py        # reuses a bridge already on the port, else starts a mock one
 ```
 
 ### Linting
@@ -246,10 +254,10 @@ Bug-focused linters (dev-only, not runtime dependencies) keep the no-build code
 honest. They catch undefined names, unused imports, etc. CI runs both.
 
 ```bash
-# Python (native-tools/ + tools/) — needs ruff (pip install ruff)
+# Python (src/native-tools/ + tools/) — needs ruff (pip install ruff)
 ruff check
 
-# JavaScript (web-editor/) — needs the dev deps (npm install)
+# JavaScript (src/web-editor/) — needs the dev deps (npm install)
 npm run lint:js
 ```
 
@@ -307,7 +315,7 @@ It writes to the device's memory, so **back up your bank** (UTILITY → BACKUP) 
 
 ---
 
-<img src="web-editor/assets/svg/DehliMusikkLogoInverse.svg" alt="Dehli Musikk" width="160">
+<img src="src/web-editor/assets/svg/DehliMusikkLogoInverse.svg" alt="Dehli Musikk" width="160">
 
 Made by Benjamin Dehli / Dehli Musikk (not affiliated with Korg).
 

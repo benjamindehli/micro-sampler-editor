@@ -20,16 +20,16 @@ Closes #
 - [ ] EFFECT
 - [ ] PATTERNS
 - [ ] UTILITY (backup / restore)
-- [ ] Bridge / device protocol (`native-tools/`)
+- [ ] Bridge / device protocol (`src/native-tools/`)
 - [ ] Other
 
 ## Checks (CI runs these — please run them locally too)
 
-- [ ] Python offline suite passes (`protocol.py` + `test_*.py` in `native-tools/`)
+- [ ] Python offline suite passes (`protocol.py` + `test_*.py` in `src/native-tools/`)
 - [ ] JS unit tests pass (`npm test`)
 - [ ] Linters clean (`npm run lint:js` and `ruff check`)
 - [ ] E2E smoke passes (`python3 e2e/smoke.py`)
-- [ ] Tried it in mock mode (`python3 native-tools/bridge.py --mock`)
+- [ ] Tried it in mock mode (`python3 src/native-tools/bridge.py --mock`)
 
 ## Hardware testing
 

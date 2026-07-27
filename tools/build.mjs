@@ -1,5 +1,5 @@
 // Build a lean, minified distribution into dist/ — for publishing a release.
-// The repo itself stays no-build (clone & run from web-editor/); this only
+// The repo itself stays no-build (clone & run from src/web-editor/); this only
 // produces an optional artifact.
 //
 //   node tools/build.mjs           (or: npm run build)
@@ -19,7 +19,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const WEB = join(ROOT, "web-editor");
+const WEB = join(ROOT, "src/web-editor");
 const DIST = join(ROOT, "dist");
 const r = (...p) => join(ROOT, ...p);
 const d = (...p) => join(DIST, ...p);
@@ -85,12 +85,13 @@ cpSync(join(WEB, "assets"), d("web-editor/assets"), { recursive: true });
 
 // ── Python runtime (no tests), launcher, icon tooling, docs ──────────────
 for (const f of ["msusb.py", "protocol.py", "download.py", "upload.py", "bank.py", "msmpl_bank.py", "bridge.py"])
-    cpSync(r("native-tools", f), d("native-tools", f));
+    cpSync(r("src/native-tools", f), d("native-tools", f));
 // vendored deps (pyusb + per-platform libusb binaries) — so the release runs
 // on just Python 3, no pip/brew
-cpSync(r("native-tools/vendor"), d("native-tools/vendor"), { recursive: true });
+cpSync(r("src/native-tools/vendor"), d("native-tools/vendor"), { recursive: true });
 cpSync(r("tools/make_app_icon.sh"), d("tools/make_app_icon.sh"));
-// launchers, grouped by OS folder (each: device Editor + no-hardware Library)
+// launchers, grouped by OS folder (each: device Editor + no-hardware Library).
+// Source lives in src/launchers/<OS>/ but ships flat at the ZIP root (<OS>/).
 for (const osdir of ["macOS", "Linux", "Windows"]) mkdirSync(d(osdir), { recursive: true });
 for (const launcher of [
     "macOS/microSAMPLER Editor Librarian.command",
@@ -100,7 +101,7 @@ for (const launcher of [
     "Windows/microSAMPLER Editor Librarian.bat",
     "Windows/microSAMPLER Library.bat"
 ])
-    cpSync(r(launcher), d(launcher));
+    cpSync(r("src/launchers", launcher), d(launcher));
 for (const f of ["README.md", "LICENSE"]) cpSync(r(f), d(f));
 
 // ── report ───────────────────────────────────────────────────────────────
