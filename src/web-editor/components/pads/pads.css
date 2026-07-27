@@ -15,21 +15,11 @@
     justify-content: space-between;
     gap: 0.6rem;
 }
+/* footprint only; phosphor look + size come from the global field rule */
 .pad-search {
-    font: inherit;
-    font-size: 0.6rem;
     letter-spacing: 0.06em;
-    color: var(--amber);
-    background: var(--phos-bg);
-    border: 1px solid var(--line);
-    border-radius: 3px;
-    padding: 0.22rem 0.45rem;
     width: 8.5rem;
     max-width: 45%;
-}
-.pad-search:focus {
-    outline: none;
-    border-color: var(--amber-dk);
 }
 .pad-search::placeholder {
     color: var(--ink-dim);
