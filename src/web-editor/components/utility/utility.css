@@ -144,8 +144,7 @@
     border-color: var(--line-hi);
 }
 .lib-bank.sel {
-    border-color: var(--amber-dk);
-    box-shadow: 0 0 0 1px var(--amber-dk);
+    border-color: var(--amber);
 }
 .lib-bank-name {
     display: block;

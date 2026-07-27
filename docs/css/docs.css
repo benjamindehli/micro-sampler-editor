@@ -48,7 +48,7 @@
     --amber: rgb(var(--amber-rgb));
     --amber-hi: #ffc063;
     --amber-dk: #8a4500;
-    --phos-bg: color-mix(in srgb, rgb(var(--amber-rgb)) 9%, #000);
+    --phos-bg: color-mix(in srgb, rgb(var(--amber-rgb)) 6%, #000);
     --err: #ff4f3d;
     --maxw: 880px;
     font-size: 16px;
@@ -70,7 +70,7 @@ body {
         "Segoe UI",
         sans-serif;
     line-height: 1.65;
-    background: radial-gradient(1100px 460px at 70% -160px, #1a1a20 0%, transparent 60%), var(--steel-0);
+    background: var(--steel-0);
 }
 a {
     color: var(--amber-hi);
@@ -214,14 +214,10 @@ img {
 /* ── hero (home) ──────────────────────────────────────────────────────── */
 .hero {
     border: 1px solid var(--line);
-    border-top-color: var(--line-hi);
     border-radius: 10px;
-    background: linear-gradient(180deg, var(--steel-1), #0e0e10);
+    background: var(--steel-1);
     padding: 2rem 2rem 1.6rem;
     margin-bottom: 2.2rem;
-    box-shadow:
-        inset 0 1px 0 var(--line-hi),
-        0 18px 50px rgba(0, 0, 0, 0.5);
 }
 .hero h1 {
     margin: 0 0 0.3rem;
@@ -243,7 +239,6 @@ img {
     height: auto;
     border-radius: 6px;
     border: 1px solid #000;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
     display: block;
 }
 .hero-cta {
@@ -260,7 +255,7 @@ img {
         sans-serif;
     letter-spacing: 0.1em;
     color: #1a0d00;
-    background: linear-gradient(180deg, var(--amber-hi), var(--amber) 60%, var(--amber-dk));
+    background: var(--amber);
     border: 1px solid var(--amber-dk);
     border-radius: 5px;
     padding: 0.7rem 1.1rem;
@@ -285,22 +280,18 @@ img {
 .card {
     display: block;
     border: 1px solid var(--line);
-    border-top-color: var(--line-hi);
     border-radius: 9px;
     background: var(--steel-1);
     padding: 1.1rem 1.2rem;
-    transition:
-        transform 0.12s,
-        border-color 0.12s,
-        box-shadow 0.12s;
+    transition: border-color 0.12s;
 }
 a.card:hover {
     text-decoration: none;
-    transform: translateY(-2px);
     border-color: var(--amber-dk);
-    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.4);
 }
-.card h3 {
+/* .content h3 (defined later) would otherwise win and add a 1.8rem top margin,
+   leaving dead space above each card heading — scope this higher to override it */
+.cards .card h3 {
     margin: 0 0 0.35rem;
     font:
         600 1rem/1.2 "Chakra Petch",
@@ -434,7 +425,6 @@ figure {
 figure img {
     border-radius: 6px;
     border: 1px solid var(--line);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 figcaption {
     color: var(--ink-dim);
