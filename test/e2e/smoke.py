@@ -301,7 +301,7 @@ def main():
     bridge = None
     if not wait_ready(timeout=1):
         bridge = subprocess.Popen(
-            [sys.executable, os.path.join(ROOT, 'native-tools', 'bridge.py'),
+            [sys.executable, os.path.join(ROOT, 'src', 'native-tools', 'bridge.py'),
              '--mock', '--port', str(PORT)],
             env={**os.environ, 'MSMPL_BACKUP_DIR': os.path.join(tmp, 'backups')},
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
