@@ -8,10 +8,15 @@
     flex-wrap: wrap;
     gap: 0.6rem;
 }
+/* each group is framed so related controls (playback · sync · pitch · envelope ·
+   dynamics) read as one cluster rather than relying on whitespace alone */
 .ctl-group {
     display: flex;
     gap: 0.6rem;
     min-width: 0;
+    padding: 0.35rem 0.5rem;
+    border: 1px solid var(--line);
+    border-radius: 5px;
 }
 .ctl-group .ctl {
     flex: 1 1 0;
