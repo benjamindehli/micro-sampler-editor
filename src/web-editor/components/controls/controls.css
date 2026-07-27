@@ -36,9 +36,7 @@
     transition: box-shadow 0.4s;
 }
 .ctl.flash {
-    box-shadow:
-        0 0 0 1px var(--amber),
-        0 0 22px rgba(var(--amber-rgb), 0.35);
+    box-shadow: 0 0 0 1px var(--amber-dk);
     transition: none;
 }
 .ctl.locked {
@@ -55,7 +53,6 @@
     font-family: "Share Tech Mono", monospace;
     font-size: 0.85rem;
     color: var(--amber);
-    text-shadow: 0 0 6px rgba(var(--amber-rgb), 0.4);
 }
 
 /* toggle switch (hardware slide) */
@@ -101,7 +98,7 @@
 .switch[aria-checked="true"] .switch-knob {
     left: 27px;
     background: linear-gradient(180deg, var(--amber-hi), var(--amber));
-    box-shadow: 0 0 10px rgba(var(--amber-rgb), 0.7);
+    box-shadow: 0 0 0 1px var(--amber-dk);
 }
 .switch-val {
     font-family: "Share Tech Mono", monospace;
@@ -110,7 +107,6 @@
 }
 .switch[aria-checked="true"] .switch-val {
     color: var(--amber);
-    text-shadow: 0 0 6px rgba(var(--amber-rgb), 0.4);
 }
 
 /* segmented switch */

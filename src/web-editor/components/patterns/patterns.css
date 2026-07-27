@@ -71,7 +71,6 @@
     font-family: "Share Tech Mono", monospace;
     font-size: 1.05rem;
     color: var(--amber);
-    text-shadow: 0 0 7px rgba(var(--amber-rgb), 0.4);
 }
 .pattern-card .p-name {
     font-family: "Share Tech Mono", monospace;
@@ -137,11 +136,9 @@
 }
 .p-meta .dot.smp {
     background: var(--amber);
-    box-shadow: 0 0 5px rgba(var(--amber-rgb), 0.6);
 }
 .p-meta .dot.kbd {
     background: #ffe9c9;
-    box-shadow: 0 0 5px rgba(255, 233, 201, 0.5);
 }
 
 /* pattern receive progress */
@@ -171,6 +168,5 @@
     height: 100%;
     width: 0;
     background: var(--amber);
-    box-shadow: 0 0 8px rgba(var(--amber-rgb), 0.5);
     transition: width 0.2s ease;
 }

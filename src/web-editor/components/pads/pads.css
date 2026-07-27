@@ -2,12 +2,10 @@
 
 /* ── pads ─────────────────────────────────────────────────────────────── */
 .pads {
-    background: linear-gradient(178deg, var(--steel-2), var(--steel-1) 44%);
+    background: var(--steel-1);
     border: 1px solid var(--line);
     border-radius: var(--r);
-    box-shadow:
-        inset 0 1px 0 var(--line-hi),
-        0 10px 30px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
     padding: 0.9rem;
 }
 /* pad filter box (right of the SAMPLE title) */
@@ -119,7 +117,6 @@
 }
 .pad.used .pad-name {
     color: var(--amber-hi);
-    text-shadow: 0 0 6px rgba(var(--amber-rgb), 0.3);
 }
 .pad.sel {
     background: linear-gradient(
@@ -130,8 +127,7 @@
     border-color: var(--amber-dk);
     box-shadow:
         0 2px 0 #000,
-        0 0 0 1px var(--amber-dk),
-        0 0 18px rgba(var(--amber-rgb), 0.15);
+        0 0 0 1px var(--amber-dk);
 }
 .pads-hint {
     margin-top: 0.8rem;
@@ -168,9 +164,10 @@
 /* pad drop target highlight (drag a WAV onto a pad) */
 .pad.drop-hint {
     outline: 1px solid var(--amber);
+    border-color: var(--amber-dk);
     box-shadow:
-        0 0 14px rgba(var(--amber-rgb), 0.45),
-        inset 0 0 10px rgba(var(--amber-rgb), 0.12);
+        0 0 0 1px var(--amber-dk),
+        0 2px 0 #000;
 }
 
 /* pad ▶ play zone (plays the sample on the DEVICE while held) —
@@ -198,12 +195,11 @@
 .pad-play:hover {
     color: var(--amber-hi);
     background: rgba(var(--amber-rgb), 0.12);
-    text-shadow: 0 0 8px rgba(var(--amber-rgb), 0.5);
 }
 .pad.sounding {
     border-color: var(--amber);
     box-shadow:
-        0 0 14px rgba(var(--amber-rgb), 0.5),
+        0 0 0 1px var(--amber),
         0 2px 0 #000;
 }
 .pad.sounding .pad-play {

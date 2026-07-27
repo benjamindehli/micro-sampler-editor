@@ -185,7 +185,7 @@ body {
 }
 /* accent caps stay dark-on-amber; the generic hover recolours the cap to light
    amber, which vanishes on the amber fill — keep it dark and signal hover with a
-   brighter fill + glow instead */
+   brighter fill (no glow: the button is a control, not a light source) */
 .hw-btn.accent:not(:disabled):hover .hw-btn-cap {
     color: #1a0d00;
     background: linear-gradient(
@@ -196,8 +196,7 @@ body {
     );
     box-shadow:
         0 2px 0 #000,
-        inset 0 1px 0 rgba(255, 255, 255, 0.1),
-        0 0 12px rgba(var(--amber-rgb), 0.4);
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 .hw-btn[aria-busy="true"] .hw-btn-cap {
     opacity: 0.5;
