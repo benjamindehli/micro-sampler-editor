@@ -59,35 +59,22 @@
     align-items: center;
     flex-wrap: wrap;
 }
-/* RATE / CH / LEN / BPM readouts — sized to match the action buttons beside them
-   so the name row reads as one tidy strip of same-height controls */
+/* RATE / CH / LEN — plain inline readouts, not boxes */
 .chip {
-    display: inline-block;
     font-family: "Share Tech Mono", monospace;
     font-size: 0.66rem;
     color: var(--ink-dim);
     letter-spacing: 0.05em;
-    background: var(--steel-3);
-    border: 1px solid var(--line-hi);
-    border-radius: var(--ctl-r);
-    padding: 0.5rem 0.7rem;
     white-space: nowrap;
 }
 .chip b {
     color: var(--amber);
     font-weight: 400;
 }
-/* the ORIG BPM chip is the one interactive readout — a click opens its editor */
-.chip-btn {
-    appearance: none;
-    cursor: pointer;
-    transition:
-        border-color 0.12s,
-        color 0.12s;
-}
-.chip-btn:hover {
-    border-color: var(--amber);
-    color: var(--amber-hi);
+/* ORIG BPM is a normal button (see .hw-btn); its value shows in the accent */
+#chip-bpm .hw-btn-cap b {
+    color: var(--amber);
+    font-weight: 400;
 }
 .name-actions {
     display: flex;

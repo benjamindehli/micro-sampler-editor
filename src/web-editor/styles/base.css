@@ -198,18 +198,20 @@ textarea {
     font-size: var(--ctl-font);
     line-height: 1.25;
     color: var(--amber);
-    background: var(--phos-bg);
+    background: var(--steel-0);
     border: 1px solid var(--line-hi);
     border-radius: var(--ctl-r);
     padding: var(--ctl-pad-y) var(--ctl-pad-x);
 }
+/* focus recolours the existing border rather than drawing a second ring outside */
 input[type="text"]:focus,
 input[type="number"]:focus,
 input[type="search"]:focus,
 input[type="password"]:focus,
 select:focus,
 textarea:focus {
-    outline: 1px solid var(--amber-dk);
+    outline: none;
+    border-color: var(--amber);
 }
 input:disabled,
 select:disabled,
