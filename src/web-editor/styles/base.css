@@ -168,7 +168,7 @@ body {
     white-space: nowrap; /* a button label never stacks icon over text */
 }
 .hw-btn:not(:disabled):hover .hw-btn-cap {
-    background: color-mix(in srgb, var(--steel-3) 82%, #fff);
+    background: color-mix(in srgb, var(--steel-3) 94%, #fff);
 }
 .hw-btn:not(:disabled):active .hw-btn-cap {
     background: color-mix(in srgb, var(--steel-3) 84%, #000);

@@ -161,7 +161,7 @@
 .keybed-mode > .kb-mode:hover:not(.on),
 .pe-track > button:hover:not(.on) {
     color: var(--ink);
-    background: color-mix(in srgb, var(--steel-3) 82%, #fff);
+    background: color-mix(in srgb, var(--steel-3) 94%, #fff);
 }
 .seg > button.on,
 .views > .view-btn.on,

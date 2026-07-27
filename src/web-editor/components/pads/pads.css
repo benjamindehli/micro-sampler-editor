@@ -50,7 +50,7 @@
 }
 .pad:hover {
     border-color: var(--line-hi);
-    background: color-mix(in srgb, var(--steel-3) 84%, #fff);
+    background: color-mix(in srgb, var(--steel-3) 94%, #fff);
 }
 .pad:active {
     background: color-mix(in srgb, var(--steel-3) 86%, #000);
@@ -62,7 +62,7 @@
 }
 .pad.black:hover {
     border-color: var(--line-hi);
-    background: color-mix(in srgb, var(--steel-0) 82%, #fff);
+    background: color-mix(in srgb, var(--steel-0) 94%, #fff);
 }
 .pad-num {
     font-family: "Share Tech Mono", monospace;
