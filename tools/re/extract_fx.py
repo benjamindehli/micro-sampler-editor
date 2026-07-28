@@ -22,6 +22,7 @@ Value semantics (EditEffectParameterAction::perform + set/getParameterDirect):
 Usage:  /tmp/revenv/bin/python tools/re/extract_fx.py   (needs capstone venv +
         extracted pkg; see disasm.py header)
 """
+import html
 import json
 import os
 import re
@@ -161,7 +162,10 @@ def xml_tables():
     for tbl in ['FxDelay_0_30', 'FxDelay_0_50', 'FxDelay_0_350',
                 'FxDelay_0_500', 'FxDelay_0_1400', 'FxFreq_0_12000']:
         m = re.search(r'<%s>(.*?)</%s>' % (tbl, tbl), raw, re.S)
-        out[tbl] = re.findall(r'Text="([^"]*)"', m.group(1)) if m else []
+        # XML-unescape the attribute text: a raw regex grab leaves entities
+        # literal, which is how "S&amp;H" (Sample & Hold) once shipped as the
+        # display string "S&AMP;H". html.unescape handles &amp;/&AMP;/numeric.
+        out[tbl] = [html.unescape(t) for t in re.findall(r'Text="([^"]*)"', m.group(1))] if m else []
     return out
 
 

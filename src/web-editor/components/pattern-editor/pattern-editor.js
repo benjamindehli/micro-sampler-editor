@@ -9,7 +9,7 @@ import { isBlackKey, noteName } from "functions/notes.js";
 import { notesToSmf } from "functions/smfWrite.js";
 import { state } from "functions/state.js";
 import { tick } from "functions/ticker.js";
-import { $, api, apiJson, clampBpm, jsonBody, setSegActive, sweepPlayhead } from "functions/util.js";
+import { $, api, apiJson, clampBpm, esc, jsonBody, setSegActive, sweepPlayhead } from "functions/util.js";
 
 const TPB = 384; // ticks per 4/4 bar (96/quarter)
 const LO = 36,
@@ -546,7 +546,7 @@ function fillSampleSelect() {
     const slots = (state.bank && state.bank.slots) || [];
     for (let i = 0; i < 36; i++) {
         const s = slots[i];
-        const label = s && !s.empty ? s.name : "· · · ·";
+        const label = s && !s.empty ? esc(s.name) : "· · · ·"; // device name → innerHTML: escape (cf. the S&H bug)
         opts.push(`<option value="${i}">${String(i + 1).padStart(2, "0")} · ${midiLabel(48 + i)} · ${label}</option>`);
     }
     sel.innerHTML = opts.join("");

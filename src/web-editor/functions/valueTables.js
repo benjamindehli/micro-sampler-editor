@@ -214,7 +214,7 @@ export const VALUE_TABLES = {
     "Square",
     "Triangle",
     "Sine",
-    "S&AMP;H"
+    "S&H"
   ],
   "FxLfoKeySync": [
     "Off",
