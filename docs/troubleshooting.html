@@ -217,6 +217,16 @@
                         right after an update, quit and reopen it.
                     </td>
                 </tr>
+                <tr>
+                    <td>Editor app opens the browser to "This site can't be reached"</td>
+                    <td>
+                        The macOS Editor app serves the editor from a background service that needs a one-time approval — usually right after a fresh
+                        install or an update, and until it's approved the browser opens to a dead page. Enable it in
+                        <strong>System Settings → General → Login Items &amp; Extensions</strong> ("microSAMPLER Editor Librarian"), then reopen the
+                        app. On <strong>v1.17.2 or later</strong> the app waits for the service and points you straight to that setting instead of
+                        showing an unreachable page.
+                    </td>
+                </tr>
             </table>
 
             <h2 id="faq">FAQ</h2>
