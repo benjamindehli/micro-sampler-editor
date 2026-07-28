@@ -8,7 +8,7 @@ import { renderChips, renderMetaFmt, renderPoints } from "components/sample-edit
 import { nearestZeroCrossing } from "functions/audioTools.js";
 import { slotData, state } from "functions/state.js";
 import { tick } from "functions/ticker.js";
-import { $, api, jsonBody } from "functions/util.js";
+import { $, api, jsonBody, lsGet, lsSet } from "functions/util.js";
 
 // Zoom window into the decoded buffer, in SAMPLE space [0..n]. vlen === 0 means
 // "fit on next draw". The window is global (not per-slot) and resets to fit
@@ -446,17 +446,9 @@ wave.addEventListener("dblclick", () => {
 
     // zero-snap toggle (persisted; default on)
     const zt = $("#zero-snap");
-    try {
-        zt.checked = localStorage.getItem("msmpl.zerosnap") !== "0";
-    } catch {
-        /* ignore */
-    }
+    zt.checked = lsGet("msmpl.zerosnap") !== "0";
     zt.addEventListener("change", () => {
-        try {
-            localStorage.setItem("msmpl.zerosnap", zt.checked ? "1" : "0");
-        } catch {
-            /* ignore */
-        }
+        lsSet("msmpl.zerosnap", zt.checked ? "1" : "0");
         tick(`zero-crossing snap: ${zt.checked ? "ON" : "OFF"}`);
     });
 }

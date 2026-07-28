@@ -8,7 +8,7 @@
 import { noteName, QWERTY_KEYMAP, QWERTY_OCTAVES, qwertySlot } from "functions/notes.js";
 import { state } from "functions/state.js";
 import { tick } from "functions/ticker.js";
-import { $, api, jsonBody } from "functions/util.js";
+import { $, api, jsonBody, lsGet, lsSet } from "functions/util.js";
 
 // the on-screen caption letter for each mapped computer key (see QWERTY_KEYMAP)
 const KEYLABEL = {
@@ -138,11 +138,7 @@ function setOctave(next) {
     next = Math.max(0, Math.min(QWERTY_OCTAVES.length - 1, next));
     if (next === octave) return;
     octave = next;
-    try {
-        localStorage.setItem("msmpl.qwerty.oct", String(octave));
-    } catch {
-        /* ignore */
-    }
+    lsSet("msmpl.qwerty.oct", String(octave));
     tick(`octave: ${QWERTY_OCTAVES[octave]}`);
     syncKeybed();
 }
@@ -161,11 +157,7 @@ function setMode(next) {
         b.classList.toggle("on", mode === m);
         b.setAttribute("aria-pressed", String(mode === m));
     }
-    try {
-        localStorage.setItem("msmpl.qwerty.mode", mode);
-    } catch {
-        /* ignore */
-    }
+    lsSet("msmpl.qwerty.mode", mode);
     syncKeybed();
     tick(mode === "kbd" ? "keyboard: KEYBOARD mode (selected sample, pitched)" : "keyboard: SAMPLE mode (one sample per key)");
 }
@@ -174,11 +166,7 @@ function setEnabled(on) {
     enabled = on;
     if (!on) releaseKeys();
     syncKeybed();
-    try {
-        localStorage.setItem("msmpl.qwerty", on ? "1" : "0");
-    } catch {
-        /* ignore */
-    }
+    lsSet("msmpl.qwerty", on ? "1" : "0");
     tick(`type to play: ${on ? `ON (${QWERTY_OCTAVES[octave]})` : "OFF"}`);
 }
 
@@ -379,11 +367,7 @@ async function setMidi(on) {
         tick("MIDI input: OFF");
     }
     $("#keybed").classList.toggle("midi-on", on);
-    try {
-        localStorage.setItem("msmpl.midi", on ? "1" : "0");
-    } catch {
-        /* ignore */
-    }
+    lsSet("msmpl.midi", on ? "1" : "0");
 }
 
 // ── mouse/touch on the on-screen piano (works even when not armed) ────────────
@@ -413,20 +397,10 @@ $("#kb-oct-up").onclick = () => setOctave(octave + 1);
 $("#kb-mode-sample").onclick = () => setMode("sample");
 $("#kb-mode-kbd").onclick = () => setMode("kbd");
 {
-    const raw = (() => {
-        try {
-            return localStorage.getItem("msmpl.qwerty.oct");
-        } catch {
-            return null;
-        }
-    })();
+    const raw = lsGet("msmpl.qwerty.oct");
     const n = raw == null ? 1 : +raw;
     octave = Number.isInteger(n) && n >= 0 && n <= 2 ? n : 1;
-    try {
-        if (localStorage.getItem("msmpl.qwerty.mode") === "kbd") mode = "kbd";
-    } catch {
-        /* ignore */
-    }
+    if (lsGet("msmpl.qwerty.mode") === "kbd") mode = "kbd";
     for (const [id, m] of [
         ["#kb-mode-sample", "sample"],
         ["#kb-mode-kbd", "kbd"]
@@ -436,11 +410,7 @@ $("#kb-mode-kbd").onclick = () => setMode("kbd");
         b.setAttribute("aria-pressed", String(mode === m));
     }
     const t = $("#qwerty-play");
-    try {
-        t.checked = localStorage.getItem("msmpl.qwerty") === "1";
-    } catch {
-        /* ignore */
-    }
+    t.checked = lsGet("msmpl.qwerty") === "1";
     enabled = t.checked;
     t.addEventListener("change", () => setEnabled(t.checked));
 
@@ -450,13 +420,7 @@ $("#kb-mode-kbd").onclick = () => setMode("kbd");
         const mi = $("#midi-in");
         mi.addEventListener("change", () => setMidi(mi.checked));
         // re-enable only if it was on before — avoids a surprise permission prompt on every load
-        let want = false;
-        try {
-            want = localStorage.getItem("msmpl.midi") === "1";
-        } catch {
-            /* ignore */
-        }
-        if (want) {
+        if (lsGet("msmpl.midi") === "1") {
             mi.checked = true;
             setMidi(true);
         }

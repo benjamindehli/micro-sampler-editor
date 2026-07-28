@@ -20,6 +20,26 @@ export async function api(path, opts) {
 }
 export const apiJson = async (path, opts) => (await api(path, opts)).json();
 
+// localStorage wrappers — persistence is best-effort: private-mode, a disabled
+// store, or a quota error must never throw into the caller. lsGet returns the
+// fallback when the key is missing OR storage is unavailable; lsSet is a no-op
+// on failure.
+export function lsGet(key, fallback = null) {
+    try {
+        const v = localStorage.getItem(key);
+        return v === null ? fallback : v;
+    } catch {
+        return fallback;
+    }
+}
+export function lsSet(key, value) {
+    try {
+        localStorage.setItem(key, value);
+    } catch {
+        /* ignore */
+    }
+}
+
 // opts for a JSON POST — pass to api() (raw response) or apiJson() (parsed),
 // whichever the caller needs. Centralises the method + Content-Type + stringify.
 export const jsonBody = (data) => ({

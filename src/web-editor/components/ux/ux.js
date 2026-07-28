@@ -7,7 +7,7 @@ import { stopTransport } from "components/patterns/patterns.js";
 import { stopAudition } from "components/sample-editor/waveform.js";
 import { slotData, state } from "functions/state.js";
 import { tick } from "functions/ticker.js";
-import { $, api, jsonBody } from "functions/util.js";
+import { $, api, jsonBody, lsGet, lsSet } from "functions/util.js";
 
 // ── accent theming (CSS custom props on :root, persisted) ────────────────
 // Only the three RGB triplets are overridden — every accent surface (glows,
@@ -55,11 +55,7 @@ function applyTheme(i) {
     r.setProperty("--amber-rgb", t.rgb);
     r.setProperty("--amber-hi-rgb", t.hi);
     r.setProperty("--amber-dk-rgb", t.dk);
-    try {
-        localStorage.setItem("msmpl.theme", t.name);
-    } catch {
-        /* ignore */
-    } // by name, so reordering can't shift it
+    lsSet("msmpl.theme", t.name); // by name, so reordering can't shift it
     themeName.textContent = t.name;
     themeOpts.forEach((li, j) => li.setAttribute("aria-selected", String(j === i)));
     dispatchEvent(new Event("msmpl-theme")); // recolour the canvas waveform
@@ -119,12 +115,7 @@ document.addEventListener("click", (e) => {
 });
 
 let themeIdx = (() => {
-    let saved = null;
-    try {
-        saved = localStorage.getItem("msmpl.theme");
-    } catch {
-        /* ignore */
-    }
+    const saved = lsGet("msmpl.theme");
     const i = THEMES.findIndex((t) => t.name === saved);
     return i >= 0 ? i : DEFAULT_THEME; // unknown / legacy numeric value → AMBER
 })();

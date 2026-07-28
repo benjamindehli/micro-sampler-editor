@@ -6,7 +6,7 @@ import { openSlotOp } from "components/sample-editor/slotops.js";
 import { noteName } from "functions/notes.js";
 import { state } from "functions/state.js";
 import { tick } from "functions/ticker.js";
-import { $, api, esc, jsonBody } from "functions/util.js";
+import { $, api, esc, jsonBody, lsGet, lsSet } from "functions/util.js";
 
 export function selectSlot(i) {
     state.sel = i;
@@ -177,19 +177,11 @@ $("#pad-search").addEventListener("input", applyPadFilter);
 // apart from manual play, so this toggle is the only on/off control.
 {
     const fb = $("#follow-hw");
-    try {
-        fb.checked = localStorage.getItem("msmpl.follow") !== "0";
-    } catch {
-        /* ignore */
-    }
+    fb.checked = lsGet("msmpl.follow") !== "0";
     state.follow = fb.checked;
     fb.addEventListener("change", () => {
         state.follow = fb.checked;
-        try {
-            localStorage.setItem("msmpl.follow", fb.checked ? "1" : "0");
-        } catch {
-            /* ignore */
-        }
+        lsSet("msmpl.follow", fb.checked ? "1" : "0");
         tick(`follow: ${fb.checked ? "ON" : "OFF"}`);
     });
 }

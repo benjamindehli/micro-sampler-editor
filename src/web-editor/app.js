@@ -19,7 +19,7 @@ import { loadBackups } from "components/utility/utility.js";
 import { subscribeEvents } from "functions/events.js";
 import { state } from "functions/state.js";
 import { tick } from "functions/ticker.js";
-import { $, apiJson, confirmDialog } from "functions/util.js";
+import { $, apiJson, confirmDialog, lsGet, lsSet } from "functions/util.js";
 
 let subscribed = false;
 
@@ -184,11 +184,7 @@ function showView(name) {
     if (name === "utility") loadBackups().catch(() => {});
     if (name === "library") renderLibrary();
     if (name === "effect") renderFx();
-    try {
-        localStorage.setItem("msmpl.view", name);
-    } catch {
-        /* ignore */
-    }
+    lsSet("msmpl.view", name);
 }
 document.querySelectorAll(".view-btn").forEach((b) => (b.onclick = () => showView(b.dataset.view)));
 
@@ -196,12 +192,8 @@ document.querySelectorAll(".view-btn").forEach((b) => (b.onclick = () => showVie
 // boot() rather than module load so a saved EFFECT/UTILITY view doesn't render
 // or fetch (loadBackups) against empty state before the bridge is connected.
 function restoreView() {
-    try {
-        const v = localStorage.getItem("msmpl.view");
-        if (v && v !== "samples" && $(`.view-btn[data-view="${v}"]`)) showView(v);
-    } catch {
-        /* ignore */
-    }
+    const v = lsGet("msmpl.view");
+    if (v && v !== "samples" && $(`.view-btn[data-view="${v}"]`)) showView(v);
 }
 
 $("#refresh-btn").onclick = () => refreshBank().catch((e) => tick("⚠ " + e.message));
