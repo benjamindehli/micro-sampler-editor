@@ -2,7 +2,7 @@
 import { openPatternEditor } from "components/pattern-editor/pattern-editor.js";
 import { state } from "functions/state.js";
 import { tick } from "functions/ticker.js";
-import { $, apiJson, confirmDialog, esc, jsonBody } from "functions/util.js";
+import { $, apiJson, clampBpm, confirmDialog, esc, jsonBody, sweepPlayhead } from "functions/util.js";
 
 let loadingPatterns = false;
 let lastPatterns = null; // for recolouring the rolls on theme change
@@ -51,10 +51,13 @@ function renderPatterns(patterns) {
     stopTransport(); // cards are about to be rebuilt
     const grid = $("#pattern-grid");
     grid.innerHTML = "";
+    // read the accent ONCE per render — getComputedStyle forces a sync style
+    // recalc, so reading it per card was 16 forced reflows a render
+    const rgb = getComputedStyle(document.documentElement).getPropertyValue("--amber-rgb").trim() || "255,138,30";
     for (const p of patterns) {
         const card = buildCard(p);
         grid.append(card);
-        if (p.valid) drawRoll(card.querySelector(".pattern-roll"), p);
+        if (p.valid) drawRoll(card.querySelector(".pattern-roll"), p, rgb);
     }
 }
 
@@ -145,7 +148,7 @@ function applyPattern(p) {
     const old = grid.children[p.pattern];
     if (old) grid.replaceChild(card, old);
     else grid.append(card);
-    if (p.valid) drawRoll(card.querySelector(".pattern-roll"), p);
+    if (p.valid) drawRoll(card.querySelector(".pattern-roll"), p, getComputedStyle(document.documentElement).getPropertyValue("--amber-rgb").trim() || "255,138,30");
 }
 
 function sampleLabel(idx) {
@@ -154,7 +157,7 @@ function sampleLabel(idx) {
     return s && !s.empty ? s.name : `#${idx + 1}`;
 }
 
-function drawRoll(canvas, p) {
+function drawRoll(canvas, p, rgb) {
     const dpr = devicePixelRatio || 1;
     const W = canvas.clientWidth * dpr || 300,
         H = canvas.clientHeight * dpr || 60;
@@ -162,9 +165,9 @@ function drawRoll(canvas, p) {
     canvas.height = H;
     const g = canvas.getContext("2d");
     const total = Math.max(p.ticks, 1);
-    // sample-mode track follows the theme accent; keyboard-mode track keeps its
-    // distinct pale-cream so the two tracks stay tellable apart on any theme.
-    const rgb = getComputedStyle(document.documentElement).getPropertyValue("--amber-rgb").trim() || "255,138,30";
+    // sample-mode track follows the theme accent (passed in — read once per
+    // render); keyboard-mode track keeps its distinct pale-cream so the two
+    // tracks stay tellable apart on any theme.
     // bar grid
     g.strokeStyle = `rgba(${rgb},.14)`;
     g.lineWidth = 1;
@@ -205,11 +208,11 @@ let playing = null; // { pattern, btn } currently transport-playing, or null
 // APPROXIMATE play sweep on the card's mini-roll (the app can't read the device's
 // true position): a rAF line over the pattern's duration (bars × 4 beats at the
 // bank BPM, ticks == bars×384 so it maps linearly), looping like the device does.
-let pRAF = null,
+let pStop = null,
     pPlayhead = null;
 function stopPlayhead() {
-    if (pRAF) cancelAnimationFrame(pRAF);
-    pRAF = null;
+    if (pStop) pStop();
+    pStop = null;
     if (pPlayhead) {
         pPlayhead.remove();
         pPlayhead = null;
@@ -223,16 +226,8 @@ function startPlayhead(p, btn, bpm) {
     ph.className = "p-playhead";
     wrap.append(ph);
     pPlayhead = ph;
-    const durMs = p.bars * 4 * (60000 / Math.max(20, Math.min(300, bpm || 120)));
-    const width = wrap.clientWidth; // once — a per-frame read after
-    let t0 = null; // moving the line reflows per frame
-    const frame = (ts) => {
-        if (pPlayhead !== ph) return; // stopped or superseded by another card
-        if (t0 == null) t0 = ts;
-        ph.style.transform = `translateX(${(((ts - t0) % durMs) / durMs) * width}px)`;
-        pRAF = requestAnimationFrame(frame);
-    };
-    pRAF = requestAnimationFrame(frame);
+    const durMs = p.bars * 4 * (60000 / clampBpm(bpm)); // 4/4 at the bank BPM
+    pStop = sweepPlayhead(ph, durMs, wrap.clientWidth, () => pPlayhead === ph); // superseded by another card → stop
 }
 
 export function stopTransport() {
@@ -298,7 +293,6 @@ function importPatternSmf(q) {
             applyPattern(r); // single-card update (no full re-receive)
         } catch (e) {
             tick(`⚠ pattern import failed: ${e.message}`);
-            alert("Pattern import failed: " + e.message);
         }
     };
     input.click();

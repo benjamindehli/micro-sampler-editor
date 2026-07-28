@@ -42,7 +42,6 @@ async function runOp(kind, from, to) {
         await refreshBank();
     } catch (e) {
         tick(`⚠ ${kind} failed: ${e.message}`);
-        alert(`${kind} failed: ${e.message}`);
     }
 }
 
@@ -64,6 +63,5 @@ $("#clear-btn").onclick = async () => {
         if (state.sel === sel) await showSlot(sel);
     } catch (e) {
         tick(`⚠ clear failed: ${e.message}`);
-        alert("Clear failed: " + e.message);
     }
 };

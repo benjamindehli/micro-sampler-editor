@@ -219,7 +219,6 @@ $("#ud-ok").onclick = async (e) => {
         await showSlot(state.sel);
     } catch (err) {
         tick(`⚠ upload failed: ${err.message}`);
-        alert("Upload failed: " + err.message);
     } finally {
         $("#ud-progress").hidden = true;
         $("#ud-ok").removeAttribute("aria-busy");
@@ -255,7 +254,6 @@ $("#rn-ok").onclick = async (e) => {
         $("#sel-long").textContent = res.long_name;
     } catch (err) {
         tick(`⚠ rename failed: ${err.message}`);
-        alert("Rename failed: " + err.message);
     } finally {
         $("#rn-ok").removeAttribute("aria-busy");
     }
@@ -297,7 +295,6 @@ $("#bd-ok").onclick = async (e) => {
         $("#bank-dialog").close();
     } catch (err) {
         tick(`⚠ bank edit failed: ${err.message}`);
-        alert("Bank edit failed: " + err.message);
     } finally {
         $("#bd-ok").removeAttribute("aria-busy");
     }

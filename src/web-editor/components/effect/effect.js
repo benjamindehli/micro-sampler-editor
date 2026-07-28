@@ -305,7 +305,6 @@ $("#fx-file").onchange = async (ev) => {
         tick(`⇧ loaded preset "${FX_TYPES[p.type].name}"`);
     } catch (e) {
         tick(`⚠ preset load failed: ${e.message}`);
-        alert("Preset load failed: " + e.message);
     }
 };
 

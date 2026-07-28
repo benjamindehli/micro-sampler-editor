@@ -8,7 +8,7 @@
 import { noteName, QWERTY_KEYMAP, QWERTY_OCTAVES, qwertySlot } from "functions/notes.js";
 import { state } from "functions/state.js";
 import { tick } from "functions/ticker.js";
-import { $, api, jsonBody, lsGet, lsSet } from "functions/util.js";
+import { $, api, jsonBody, lsGet, lsSet, setSegActive } from "functions/util.js";
 
 // the on-screen caption letter for each mapped computer key (see QWERTY_KEYMAP)
 const KEYLABEL = {
@@ -149,14 +149,10 @@ function setMode(next) {
     clickRelease();
     releaseMidi(); // release held notes on the OLD channel first
     mode = next;
-    for (const [id, m] of [
-        ["#kb-mode-sample", "sample"],
-        ["#kb-mode-kbd", "kbd"]
-    ]) {
-        const b = $(id);
-        b.classList.toggle("on", mode === m);
-        b.setAttribute("aria-pressed", String(mode === m));
-    }
+    setSegActive([
+        [$("#kb-mode-sample"), mode === "sample"],
+        [$("#kb-mode-kbd"), mode === "kbd"]
+    ]);
     lsSet("msmpl.qwerty.mode", mode);
     syncKeybed();
     tick(mode === "kbd" ? "keyboard: KEYBOARD mode (selected sample, pitched)" : "keyboard: SAMPLE mode (one sample per key)");
@@ -401,14 +397,10 @@ $("#kb-mode-kbd").onclick = () => setMode("kbd");
     const n = raw == null ? 1 : +raw;
     octave = Number.isInteger(n) && n >= 0 && n <= 2 ? n : 1;
     if (lsGet("msmpl.qwerty.mode") === "kbd") mode = "kbd";
-    for (const [id, m] of [
-        ["#kb-mode-sample", "sample"],
-        ["#kb-mode-kbd", "kbd"]
-    ]) {
-        const b = $(id);
-        b.classList.toggle("on", mode === m);
-        b.setAttribute("aria-pressed", String(mode === m));
-    }
+    setSegActive([
+        [$("#kb-mode-sample"), mode === "sample"],
+        [$("#kb-mode-kbd"), mode === "kbd"]
+    ]);
     const t = $("#qwerty-play");
     t.checked = lsGet("msmpl.qwerty") === "1";
     enabled = t.checked;

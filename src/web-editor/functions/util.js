@@ -69,3 +69,37 @@ export function wavFormat(arrayBuf) {
     const h = readWavHeader(new DataView(arrayBuf));
     return h ? { channels: h.channels, rate: h.rate } : null;
 }
+
+// clamp a BPM into the device's supported range (also the pattern-playhead
+// sweep range) — used wherever a bank/pattern BPM drives timing.
+export const clampBpm = (bpm) => Math.max(20, Math.min(300, bpm || 120));
+
+// Approximate looping playhead: sweep `el` left→right across `width` px over
+// `durMs`, looping, via a compositor-only transform. `alive()` gates each frame
+// (stopped / superseded). Returns a stop() that cancels the rAF. Shared by the
+// pattern card mini-rolls and the pattern-editor preview (the waveform audition
+// playhead is bespoke — reverse / one-shot / zoom-clipping).
+export function sweepPlayhead(el, durMs, width, alive) {
+    let t0 = null,
+        raf = null;
+    const frame = (ts) => {
+        if (!alive()) return;
+        if (t0 == null) t0 = ts;
+        el.style.transform = `translateX(${(((ts - t0) % durMs) / durMs) * width}px)`;
+        raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+    return () => {
+        if (raf) cancelAnimationFrame(raf);
+    };
+}
+
+// toggle `.on` + aria-pressed across a segmented button group. `pairs` is
+// [[element, isActive], …] — the single spelling of the pattern that was
+// hand-rolled in the keyboard mode switch, pattern-editor tool/track, etc.
+export function setSegActive(pairs) {
+    for (const [el, on] of pairs) {
+        el.classList.toggle("on", on);
+        el.setAttribute("aria-pressed", String(on));
+    }
+}

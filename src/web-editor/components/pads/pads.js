@@ -3,7 +3,7 @@ import { openUpload, uploadBatch } from "components/dialogs/dialogs.js";
 import { syncKeybed } from "components/keyboard/keyboard.js";
 import { showSlot } from "components/sample-editor/slot.js";
 import { openSlotOp } from "components/sample-editor/slotops.js";
-import { noteName } from "functions/notes.js";
+import { isBlackKey, noteName } from "functions/notes.js";
 import { state } from "functions/state.js";
 import { tick } from "functions/ticker.js";
 import { $, api, esc, jsonBody, lsGet, lsSet } from "functions/util.js";
@@ -53,7 +53,7 @@ export function renderPads() {
         // "loaded" = decoded audio cached → instant audition/waveform, exact meter
         const loaded = !s.empty && state.buffers.has(s.slot);
         // sharps (C#/D#/F#/G#/A#) are a keyboard's black keys — tint them darker
-        const black = [1, 3, 6, 8, 10].includes((48 + s.slot) % 12);
+        const black = isBlackKey(48 + s.slot);
         b.className =
             "pad " + (s.empty ? "empty" : "used") + (black ? " black" : "") + (state.sel === s.slot ? " sel" : "") + (loaded ? " loaded" : "");
         b.innerHTML =

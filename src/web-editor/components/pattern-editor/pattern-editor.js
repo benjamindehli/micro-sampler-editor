@@ -5,11 +5,11 @@
 // POST /api/pattern/N → smf_to_pattern → pattern_write path. No SEQP is built in
 // the browser. Supports multi-select, copy/paste (clipboard persists across
 // sessions, so it doubles as duplicate-to-another-slot) and undo/redo.
-import { noteName } from "functions/notes.js";
+import { isBlackKey, noteName } from "functions/notes.js";
 import { notesToSmf } from "functions/smfWrite.js";
 import { state } from "functions/state.js";
 import { tick } from "functions/ticker.js";
-import { $, api, apiJson, jsonBody } from "functions/util.js";
+import { $, api, apiJson, clampBpm, jsonBody, setSegActive, sweepPlayhead } from "functions/util.js";
 
 const TPB = 384; // ticks per 4/4 bar (96/quarter)
 const LO = 36,
@@ -18,7 +18,6 @@ const ROWS = HI - LO + 1;
 const ROWH = 18; // px per note row
 const PAD_LO = 48,
     PAD_HI = 83; // sample-mode notes map to pads 0..35 (note−48)
-const BLACK = new Set([1, 3, 6, 8, 10]);
 
 let cur = null; // { pattern, notes:[{start,dur,note,vel,track}], bars, sample, name, track, sel:Set, primary, origSmf, deviceDirty }
 let drag = null; // { mode:'move'|'resize', idx, grabTick, origNote, orig:Map }
@@ -54,7 +53,7 @@ function buildGutter() {
     g.innerHTML = "";
     for (let n = HI; n >= LO; n--) {
         const d = document.createElement("div");
-        d.className = "pe-key" + (BLACK.has(n % 12) ? " black" : "") + (n >= PAD_LO && n <= PAD_HI ? " pe-pad" : ""); // not ".pad" — collides with the pad-grid rule
+        d.className = "pe-key" + (isBlackKey(n) ? " black" : "") + (n >= PAD_LO && n <= PAD_HI ? " pe-pad" : ""); // not ".pad" — collides with the pad-grid rule
         d.style.top = rowTop(n) + "px"; // absolute, same formula as the roll
         d.style.height = ROWH + "px";
         d.textContent = midiLabel(n);
@@ -76,7 +75,7 @@ function buildBackground(roll) {
     // numeric-only markup, safe as an HTML string
     let html = "";
     for (let b = 0; b <= cur.bars; b++) html += `<div class="pe-bar" style="left:${(b / cur.bars) * 100}%"></div>`;
-    for (let n = LO; n <= HI; n++) if (BLACK.has(n % 12)) html += `<div class="pe-rowbg" style="top:${rowTop(n)}px;height:${ROWH}px"></div>`;
+    for (let n = LO; n <= HI; n++) if (isBlackKey(n)) html += `<div class="pe-rowbg" style="top:${rowTop(n)}px;height:${ROWH}px"></div>`;
     roll.insertAdjacentHTML("afterbegin", html);
     bgBars = cur.bars;
 }
@@ -534,11 +533,7 @@ function onKey(e) {
 
 function setTool(t) {
     cur.tool = t;
-    for (const x of ["pencil", "eraser", "select"]) {
-        const b = $("#pe-tool-" + x);
-        b.classList.toggle("on", x === t);
-        b.setAttribute("aria-pressed", String(x === t));
-    }
+    setSegActive(["pencil", "eraser", "select"].map((x) => [$("#pe-tool-" + x), x === t]));
     const roll = $("#pe-roll");
     roll.classList.toggle("erasing", t === "eraser");
     roll.classList.toggle("selecting", t === "select");
@@ -593,13 +588,10 @@ export function openPatternEditor(p) {
 
 function setTrack(t) {
     cur.track = t;
-    for (const [id, on] of [
-        ["#pe-track-smp", t === 0],
-        ["#pe-track-kbd", t === 1]
-    ]) {
-        $(id).classList.toggle("on", on);
-        $(id).setAttribute("aria-pressed", String(on));
-    }
+    setSegActive([
+        [$("#pe-track-smp"), t === 0],
+        [$("#pe-track-kbd"), t === 1]
+    ]);
 }
 
 const pNum = () => `P${String(cur.pattern + 1).padStart(2, "0")}`;
@@ -623,10 +615,10 @@ function setPlayBtn() {
 // APPROXIMATE preview playhead (the app can't read the device's true position):
 // a rAF line sweeps the roll over the pattern's duration (bars × 4 beats at the
 // bank BPM) and loops, the way the device loops the pattern.
-let peRAF = null;
+let peStop = null;
 function stopPlayhead() {
-    if (peRAF) cancelAnimationFrame(peRAF);
-    peRAF = null;
+    if (peStop) peStop();
+    peStop = null;
     const ph = $("#pe-roll").querySelector("#pe-playhead");
     if (ph) ph.hidden = true;
 }
@@ -641,18 +633,8 @@ function startPlayhead(bpm) {
         roll.append(ph);
     }
     ph.hidden = false;
-    const bars = cur.bars; // matches the pattern just written
-    const durMs = bars * 4 * (60000 / Math.max(20, Math.min(300, bpm || 120))); // 4/4
-    const width = roll.clientWidth; // once — a per-frame read
-    let t0 = null; // after moving = reflow/frame
-    const frame = (ts) => {
-        if (!pePlaying) return;
-        if (t0 == null) t0 = ts;
-        const frac = ((ts - t0) % durMs) / durMs; // loop
-        ph.style.transform = `translateX(${frac * width}px)`;
-        peRAF = requestAnimationFrame(frame);
-    };
-    peRAF = requestAnimationFrame(frame);
+    const durMs = cur.bars * 4 * (60000 / clampBpm(bpm)); // 4/4 at the bank BPM
+    peStop = sweepPlayhead(ph, durMs, roll.clientWidth, () => pePlaying);
 }
 
 async function stopPreview() {
