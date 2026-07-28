@@ -17,7 +17,8 @@
         "format:check": "prettier --check .",
         "test": "node --import ./test/unit/alias-register.mjs --test test/unit/*.test.mjs",
         "stamp-version": "node tools/stamp-docs-version.mjs",
-        "version": "node tools/stamp-docs-version.mjs && git add docs/index.html src/native-tools/bridge.py CITATION.cff"
+        "stamp-dates": "node tools/stamp-docs-dates.mjs",
+        "version": "node tools/stamp-docs-version.mjs && node tools/stamp-docs-dates.mjs && git add docs/*.html docs/sitemap.xml src/native-tools/bridge.py CITATION.cff"
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
