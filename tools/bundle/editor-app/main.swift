@@ -193,7 +193,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     // ── menu actions ─────────────────────────────────────────────────────────
     @objc func openEditor() {
         if service.status == .enabled {
-            openUI()
+            openWhenBridgeUp()   // reachability-gated: never open a dead browser window
         } else {
             ensureService(interactive: true)
         }
@@ -233,8 +233,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     func pollBridge(attempt: Int) {
         if attempt > 60 {   // ~18 s — daemon should be up long before this
-            alert("Bridge not responding",
-                  "The background service is installed but not answering on port 8765. Check /Library/Logs/DehliMusikk/msmpl-bridge.log")
+            // The daemon never answered. On a fresh install or version update
+            // the usual cause is a PENDING Login-Items approval — a (re)registered
+            // daemon won't launch until approved — so steer there rather than
+            // leaving the user at a dead browser page. Only fall back to the log
+            // hint when the service is already approved (.enabled) yet silent.
+            if service.status == .requiresApproval {
+                promptApproval()
+            } else {
+                alert("Background service isn’t responding",
+                      "The microSAMPLER bridge is installed but isn’t answering on port 8765.\n\nIf you just installed or updated the app, approve it in System Settings → General → Login Items & Extensions, then reopen this app.\n\nIf it’s already approved, check /Library/Logs/DehliMusikk/msmpl-bridge.log.")
+            }
             return
         }
         DispatchQueue.global(qos: .userInitiated).async {
