@@ -6,6 +6,9 @@
     "description": "Build tooling for the microSAMPLER Editor / Librarian web app (the app itself has no runtime npm dependencies).",
     "license": "GPL-3.0-or-later",
     "author": "Benjamin Dehli <superelg@gmail.com>",
+    "engines": {
+        "node": "^20.19.0 || ^22.13.0 || >=24"
+    },
     "scripts": {
         "build": "node tools/build.mjs",
         "pack": "node tools/build.mjs && node tools/pack.mjs",

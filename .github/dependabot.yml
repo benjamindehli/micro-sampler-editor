@@ -1,0 +1,21 @@
+# Keep the build/release supply chain current. The app ships NO runtime npm
+# deps (only vendored pyusb/libusb), so this covers the dev tooling (esbuild,
+# eslint, prettier) and the GitHub Actions used by CI/release. Monthly +
+# grouped into one PR per ecosystem to stay low-noise for a solo maintainer.
+version: 2
+updates:
+    - package-ecosystem: github-actions
+      directory: /
+      schedule:
+          interval: monthly
+      groups:
+          actions:
+              patterns: ["*"]
+
+    - package-ecosystem: npm
+      directory: /
+      schedule:
+          interval: monthly
+      groups:
+          dev-dependencies:
+              patterns: ["*"]

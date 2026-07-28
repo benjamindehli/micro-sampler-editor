@@ -197,14 +197,14 @@ Run the offline test suite (no hardware needed):
 
 ```bash
 cd src/native-tools
-python3 protocol.py && python3 test_download.py && python3 test_upload.py \
-  && python3 test_bank.py && python3 test_bridge.py
+python3 protocol.py                       # protocol self-test
+for t in test_*.py; do python3 "$t"; done # every offline test (same as CI)
 ```
 
 JavaScript unit tests for the pure modules (audio DSP + value encoders), via Node's built-in test runner (no deps):
 
 ```bash
-npm test        # node --test test/unit/*.test.mjs
+npm test        # Node's built-in runner over test/unit/*.test.mjs
 ```
 
 There isn't a frontend build step during development. The browser loads the ES modules directly from `src/web-editor/`.

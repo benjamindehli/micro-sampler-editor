@@ -46,14 +46,17 @@ async function loadPatterns() {
     }
 }
 
+// the theme accent as an "r,g,b" string. getComputedStyle forces a sync style
+// recalc, so read it ONCE per render (was 16 forced reflows — one per card) and
+// pass it into drawRoll, never read it per card.
+const accentRgb = () => getComputedStyle(document.documentElement).getPropertyValue("--amber-rgb").trim() || "255,138,30";
+
 function renderPatterns(patterns) {
     lastPatterns = patterns;
     stopTransport(); // cards are about to be rebuilt
     const grid = $("#pattern-grid");
     grid.innerHTML = "";
-    // read the accent ONCE per render — getComputedStyle forces a sync style
-    // recalc, so reading it per card was 16 forced reflows a render
-    const rgb = getComputedStyle(document.documentElement).getPropertyValue("--amber-rgb").trim() || "255,138,30";
+    const rgb = accentRgb();
     for (const p of patterns) {
         const card = buildCard(p);
         grid.append(card);
@@ -148,7 +151,7 @@ function applyPattern(p) {
     const old = grid.children[p.pattern];
     if (old) grid.replaceChild(card, old);
     else grid.append(card);
-    if (p.valid) drawRoll(card.querySelector(".pattern-roll"), p, getComputedStyle(document.documentElement).getPropertyValue("--amber-rgb").trim() || "255,138,30");
+    if (p.valid) drawRoll(card.querySelector(".pattern-roll"), p, accentRgb());
 }
 
 function sampleLabel(idx) {
