@@ -65,6 +65,24 @@ function buildGutter() {
 // screen-reader label for a note
 const noteLabel = (nt) => `${nt.track ? "Keyboard" : "Sample"} ${midiLabel(nt.note)}, bar ${Math.floor(nt.start / TPB) + 1}, velocity ${nt.vel}`;
 
+const noteFill = (nt) => `rgba(${nt.track ? "255,233,201" : "var(--amber-rgb)"},${(0.4 + (nt.vel / 127) * 0.6).toFixed(3)})`;
+
+// bar lines + black-key row shading depend ONLY on cur.bars — rebuild this
+// static layer just when bars changes (or if it's missing), not on every
+// renderRoll. Sits at the front so notes + playhead paint over it.
+let bgBars = -1;
+function buildBackground(roll) {
+    for (const el of roll.querySelectorAll(".pe-bar, .pe-rowbg")) el.remove();
+    // numeric-only markup, safe as an HTML string
+    let html = "";
+    for (let b = 0; b <= cur.bars; b++) html += `<div class="pe-bar" style="left:${(b / cur.bars) * 100}%"></div>`;
+    for (let n = LO; n <= HI; n++) if (BLACK.has(n % 12)) html += `<div class="pe-rowbg" style="top:${rowTop(n)}px;height:${ROWH}px"></div>`;
+    roll.insertAdjacentHTML("afterbegin", html);
+    bgBars = cur.bars;
+}
+
+// full note-layer rebuild (note SET changed: add/remove/reorder/geometry). For
+// selection- or velocity-only changes use paintNotes() — a cheap in-place patch.
 function renderRoll() {
     const roll = $("#pe-roll");
     // the rebuild below replaces every note element, which would drop keyboard
@@ -73,19 +91,14 @@ function renderRoll() {
     const refocus = af && af.classList && af.classList.contains("pe-note") ? af.dataset.i : null;
     const ph = roll.querySelector("#pe-playhead"); // preserve the moving playhead across the rebuild
     roll.style.height = ROWS * ROWH + "px";
+    if (bgBars !== cur.bars || !roll.querySelector(".pe-bar")) buildBackground(roll);
+    for (const el of roll.querySelectorAll(".pe-note")) el.remove(); // keep bars/rowbg/playhead
     const tot = total();
-    // bar lines + black-key row shading: numeric-only markup, safe as an HTML string
-    let html = "";
-    for (let b = 0; b <= cur.bars; b++) html += `<div class="pe-bar" style="left:${(b / cur.bars) * 100}%"></div>`;
-    for (let n = LO; n <= HI; n++) if (BLACK.has(n % 12)) html += `<div class="pe-rowbg" style="top:${rowTop(n)}px;height:${ROWH}px"></div>`;
-    roll.innerHTML = html;
     // notes carry text (aria-label/title) — build them with DOM APIs so the text
     // is set as data, never parsed as HTML (avoids any text-to-HTML injection path)
     cur.notes.forEach((nt, i) => {
         if (nt.start >= tot) return;
         const w = (nt.dur / tot) * 100; // actual length — independent of the grid setting
-        const a = (0.4 + (nt.vel / 127) * 0.6).toFixed(3); // velocity → fill opacity
-        const bg = nt.track ? `rgba(255,233,201,${a})` : `rgba(var(--amber-rgb),${a})`;
         const d = document.createElement("div");
         d.className = `pe-note ${nt.track ? "kbd" : "smp"}${cur.sel.has(i) ? " sel" : ""}`;
         d.dataset.i = i;
@@ -93,14 +106,31 @@ function renderRoll() {
         d.setAttribute("role", "button");
         d.setAttribute("aria-label", noteLabel(nt));
         d.title = `${midiLabel(nt.note)} · vel ${nt.vel}`;
-        d.style.cssText = `left:${(nt.start / tot) * 100}%;width:${w}%;top:${rowTop(nt.note) + 1}px;height:${ROWH - 2}px;background:${bg}`;
+        d.style.cssText = `left:${(nt.start / tot) * 100}%;width:${w}%;top:${rowTop(nt.note) + 1}px;height:${ROWH - 2}px;background:${noteFill(nt)}`;
         const grip = document.createElement("span");
         grip.className = "pe-resize";
         d.append(grip);
         roll.append(d);
     });
-    if (ph) roll.append(ph); // re-attach the preview playhead
+    if (ph) roll.append(ph); // re-attach the preview playhead (keep it on top)
     if (refocus != null) roll.querySelector(`.pe-note[data-i="${refocus}"]`)?.focus();
+}
+
+// Patch existing note elements' selection outline + velocity fill in place —
+// used when the note SET (count + indices) is unchanged, so rebuilding every
+// div (bars, ~25 row shades, up to 199 notes) is unnecessary. The velocity
+// slider dragged over a big selection hit renderRoll per input event; a click
+// rebuilt the whole roll just to move one .sel outline.
+function paintNotes() {
+    for (const el of $("#pe-roll").querySelectorAll(".pe-note")) {
+        const i = +el.dataset.i;
+        const nt = cur.notes[i];
+        if (!nt) continue;
+        el.classList.toggle("sel", cur.sel.has(i));
+        el.style.background = noteFill(nt);
+        el.setAttribute("aria-label", noteLabel(nt)); // velocity is in the label
+        el.title = `${midiLabel(nt.note)} · vel ${nt.vel}`;
+    }
 }
 
 function setVelUI() {
@@ -154,7 +184,7 @@ function selectAll() {
     cur.sel = new Set(cur.notes.map((_, i) => i));
     cur.primary = cur.notes.length ? cur.notes.length - 1 : null;
     setVelUI();
-    renderRoll();
+    paintNotes(); // selection-only — note set unchanged
 }
 function copySel() {
     const idxs = selArr();
@@ -230,7 +260,7 @@ function onPointerDown(e) {
         }
         roll.setPointerCapture(e.pointerId);
         setVelUI();
-        renderRoll();
+        paintNotes(); // selection change only — the note set is unchanged
         roll.querySelector(`.pe-note[data-i="${cur.primary}"]`)?.focus(); // so arrow keys work after a click
         return;
     }
@@ -365,7 +395,7 @@ function finishMarquee() {
             cur.sel = new Set();
             cur.primary = null;
             setVelUI();
-            renderRoll();
+            paintNotes(); // selection-only
         }
         return;
     }
@@ -380,7 +410,7 @@ function finishMarquee() {
     cur.sel = sel;
     cur.primary = sel.size ? Math.max(...sel) : null;
     setVelUI();
-    renderRoll();
+    paintNotes(); // selection-only — marquee doesn't change the note set
 }
 
 function onPointerUp() {
@@ -405,7 +435,7 @@ function onWheel(e) {
     if (!cur.sel.has(i)) cur.sel = new Set([i]);
     cur.primary = i;
     setVelUI();
-    renderRoll();
+    paintNotes(); // velocity + selection change — note set unchanged
     pushHistory();
 }
 
@@ -417,7 +447,7 @@ function onFocusIn(e) {
     cur.primary = idx;
     if (!cur.sel.has(idx)) {
         cur.sel = new Set([idx]);
-        renderRoll();
+        paintNotes(); // selection-only
     }
     setVelUI();
 }
@@ -733,7 +763,7 @@ async function cancel() {
         const idxs = selArr();
         if (idxs.length) {
             for (const i of idxs) cur.notes[i].vel = v;
-            renderRoll();
+            paintNotes(); // velocity-only — note set unchanged, no full rebuild per tick
         }
     };
     $("#pe-vel").onchange = () => {
