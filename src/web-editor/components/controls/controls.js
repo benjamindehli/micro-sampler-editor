@@ -48,79 +48,45 @@ export function tuneCents(w) {
 export const tuneDisplay = (wire) => fmtSigned(tuneCents(wire));
 export const OBJ_BASE = 16;
 
+// One descriptor per live-edit param — the single source of truth that drives
+// caching, model readback, the control-strip wiring, setControl, and showSlot's
+// init (this replaced five parallel switch/call blocks that each had to be kept
+// in sync). kind: switch | fader | seg; key = the state.bank.slots[n] property;
+// bool = stored as a boolean; fmt = display formatter for faders; def = the
+// value shown for an empty slot.
+const SPEC = {
+    [PARAM.LOOP]: { kind: "switch", ctl: "#ctl-loop", val: "#val-loop", key: "loop", bool: true, def: 0 },
+    [PARAM.REVERSE]: { kind: "switch", ctl: "#ctl-reverse", val: "#val-reverse", key: "reverse", bool: true, def: 0 },
+    [PARAM.FX_SW]: { kind: "switch", ctl: "#ctl-fx", val: "#val-fx", key: "fx_sw", bool: true, def: 0 },
+    [PARAM.BPM_SYNC]: { kind: "seg", ctl: "#ctl-sync", key: "bpm_sync", def: 0 },
+    [PARAM.DECAY]: { kind: "fader", ctl: "#ctl-decay", val: "#val-decay", key: "decay", def: 127 },
+    [PARAM.RELEASE]: { kind: "fader", ctl: "#ctl-release", val: "#val-release", key: "release", def: 0 },
+    [PARAM.TUNE]: { kind: "fader", ctl: "#ctl-tune", val: "#val-tune", key: "tune", fmt: tuneDisplay, def: 64 },
+    [PARAM.LEVEL]: { kind: "fader", ctl: "#ctl-level", val: "#val-level", key: "level", fmt: fmtLevel, def: 101 },
+    [PARAM.PAN]: { kind: "fader", ctl: "#ctl-pan", val: "#val-pan", key: "pan", fmt: fmtPan, def: 64 },
+    [PARAM.SEMITONE]: { kind: "fader", ctl: "#ctl-semitone", val: "#val-semitone", key: "semitone", fmt: fmtSigned, def: 0 },
+    [PARAM.VELO_INT]: { kind: "fader", ctl: "#ctl-velo", val: "#val-velo", key: "velo_int", fmt: fmtSigned, def: 0 }
+};
+
 // keep the bank cache in sync with every edit — controls initialise from it
 // on pad selection, so without this, re-selecting a pad showed the state as
 // of the last RECEIVE. `v` is display/model space (signed for bipolar).
 export function cacheParam(slot, param, v) {
-    const s = state.bank && state.bank.slots[slot];
+    const s = state.bank?.slots?.[slot];
     if (!s || s.empty) return;
-    switch (param) {
-        case PARAM.LOOP:
-            s.loop = !!v;
-            break;
-        case PARAM.BPM_SYNC:
-            s.bpm_sync = v;
-            break;
-        case PARAM.REVERSE:
-            s.reverse = !!v;
-            break;
-        case PARAM.DECAY:
-            s.decay = v;
-            break;
-        case PARAM.RELEASE:
-            s.release = v;
-            break;
-        case PARAM.LEVEL:
-            s.level = v;
-            break;
-        case PARAM.PAN:
-            s.pan = v;
-            break;
-        case PARAM.FX_SW:
-            s.fx_sw = !!v;
-            break;
-        case PARAM.SEMITONE:
-            s.semitone = v;
-            break;
-        case PARAM.TUNE:
-            s.tune = v;
-            break;
-        case PARAM.VELO_INT:
-            s.velo_int = v;
-            break;
-    }
+    const spec = SPEC[param];
+    if (spec) s[spec.key] = spec.bool ? !!v : v;
 }
 
 // read a param's current MODEL value from the cache (inverse of cacheParam;
 // same space the control setters + the wire `value` use)
 function readModel(slot, param) {
-    const s = state.bank && state.bank.slots[slot];
+    const s = state.bank?.slots?.[slot];
     if (!s || s.empty) return null;
-    switch (param) {
-        case PARAM.LOOP:
-            return s.loop ? 1 : 0;
-        case PARAM.REVERSE:
-            return s.reverse ? 1 : 0;
-        case PARAM.FX_SW:
-            return s.fx_sw ? 1 : 0;
-        case PARAM.BPM_SYNC:
-            return s.bpm_sync;
-        case PARAM.DECAY:
-            return s.decay;
-        case PARAM.RELEASE:
-            return s.release;
-        case PARAM.LEVEL:
-            return s.level;
-        case PARAM.PAN:
-            return s.pan;
-        case PARAM.TUNE:
-            return s.tune;
-        case PARAM.SEMITONE:
-            return s.semitone;
-        case PARAM.VELO_INT:
-            return s.velo_int;
-    }
-    return null;
+    const spec = SPEC[param];
+    if (!spec) return null;
+    const v = s[spec.key];
+    return spec.bool ? (v ? 1 : 0) : v;
 }
 
 // send a param to a SPECIFIC slot (model-space value): cache it, mirror the
@@ -187,18 +153,17 @@ export function setSwitch(btnSel, valSel, on) {
     $(btnSel).setAttribute("aria-checked", String(on));
     $(valSel).textContent = on ? "ON" : "OFF";
 }
-wireSwitch("#ctl-loop", "#val-loop", PARAM.LOOP);
-wireSwitch("#ctl-reverse", "#val-reverse", PARAM.REVERSE);
-
 // BPM Sync segmented switch (device rule: Pitch Change locks Tune)
-$("#ctl-sync")
-    .querySelectorAll("button")
-    .forEach((b) => {
-        b.onclick = () => {
-            setSeg(+b.dataset.v);
-            sendParam(PARAM.BPM_SYNC, +b.dataset.v);
-        };
-    });
+function wireSeg(sel, param) {
+    $(sel)
+        .querySelectorAll("button")
+        .forEach((b) => {
+            b.onclick = () => {
+                setSeg(+b.dataset.v);
+                sendParam(param, +b.dataset.v);
+            };
+        });
+}
 export function setSeg(v) {
     $("#ctl-sync")
         .querySelectorAll("button")
@@ -221,51 +186,35 @@ export function setFader(inSel, valSel, v, fmt) {
     $(inSel).value = v;
     $(valSel).textContent = fmt ? fmt(v) : String(v);
 }
-wireFader("#ctl-decay", "#val-decay", PARAM.DECAY);
-wireFader("#ctl-release", "#val-release", PARAM.RELEASE);
-wireFader("#ctl-tune", "#val-tune", PARAM.TUNE, tuneDisplay);
-wireFader("#ctl-level", "#val-level", PARAM.LEVEL, fmtLevel);
-wireFader("#ctl-pan", "#val-pan", PARAM.PAN, fmtPan);
-wireFader("#ctl-semitone", "#val-semitone", PARAM.SEMITONE, fmtSigned);
-wireFader("#ctl-velo", "#val-velo", PARAM.VELO_INT, fmtSigned);
-wireSwitch("#ctl-fx", "#val-fx", PARAM.FX_SW);
+
+// wire every control from the descriptor table (each param exactly once)
+for (const [k, spec] of Object.entries(SPEC)) {
+    const param = +k;
+    if (spec.kind === "switch") wireSwitch(spec.ctl, spec.val, param);
+    else if (spec.kind === "fader") wireFader(spec.ctl, spec.val, param, spec.fmt);
+    else if (spec.kind === "seg") wireSeg(spec.ctl, param);
+}
 
 // set a control from a MODEL-space value (no dec14 — that's the wire form)
 function setControl(param, value) {
-    switch (param) {
-        case PARAM.LOOP:
-            setSwitch("#ctl-loop", "#val-loop", !!value);
-            break;
-        case PARAM.REVERSE:
-            setSwitch("#ctl-reverse", "#val-reverse", !!value);
-            break;
-        case PARAM.BPM_SYNC:
-            setSeg(value);
-            break;
-        case PARAM.DECAY:
-            setFader("#ctl-decay", "#val-decay", value);
-            break;
-        case PARAM.RELEASE:
-            setFader("#ctl-release", "#val-release", value);
-            break;
-        case PARAM.TUNE:
-            setFader("#ctl-tune", "#val-tune", value, tuneDisplay);
-            break;
-        case PARAM.SEMITONE:
-            setFader("#ctl-semitone", "#val-semitone", value, fmtSigned);
-            break;
-        case PARAM.LEVEL:
-            setFader("#ctl-level", "#val-level", value, fmtLevel);
-            break;
-        case PARAM.PAN:
-            setFader("#ctl-pan", "#val-pan", value, fmtPan);
-            break;
-        case PARAM.VELO_INT:
-            setFader("#ctl-velo", "#val-velo", value, fmtSigned);
-            break;
-        case PARAM.FX_SW:
-            setSwitch("#ctl-fx", "#val-fx", !!value);
-            break;
+    const spec = SPEC[param];
+    if (!spec) return;
+    if (spec.kind === "switch") setSwitch(spec.ctl, spec.val, !!value);
+    else if (spec.kind === "seg") setSeg(value);
+    else setFader(spec.ctl, spec.val, value, spec.fmt);
+}
+
+// initialise the whole control strip from a slot's cached model values (or the
+// device defaults when the slot is empty). Drives showSlot in slot.js.
+export function applySlotControls(s) {
+    for (const spec of Object.values(SPEC)) {
+        if (spec.kind === "switch") {
+            setSwitch(spec.ctl, spec.val, !s.empty && !!s[spec.key]);
+        } else {
+            const value = s.empty ? spec.def : (s[spec.key] ?? spec.def);
+            if (spec.kind === "seg") setSeg(value);
+            else setFader(spec.ctl, spec.val, value, spec.fmt);
+        }
     }
 }
 

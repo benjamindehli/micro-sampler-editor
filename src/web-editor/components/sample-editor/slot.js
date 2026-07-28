@@ -1,10 +1,10 @@
 // Slot editor header: name LCD, info chips, start/end readout, control init.
-import { fmtLevel, fmtPan, setFader, setSeg, setSwitch, tuneDisplay } from "components/controls/controls.js";
+import { applySlotControls } from "components/controls/controls.js";
 import { loadWave } from "components/sample-editor/waveform.js";
 import { noteName } from "functions/notes.js";
 import { slotData, state } from "functions/state.js";
 import { tick } from "functions/ticker.js";
-import { $, apiJson, fmtSigned, jsonBody } from "functions/util.js";
+import { $, apiJson, jsonBody } from "functions/util.js";
 
 export async function showSlot(i, { keepWave = false } = {}) {
     const s = slotData(i);
@@ -23,17 +23,7 @@ export async function showSlot(i, { keepWave = false } = {}) {
 
     // controls — fully initialised from the bank blob (flags8 decoded
     // 2026-06-08: bit7=loop, bits5-6=bpm sync, bit4=reverse, bit3=fx sw)
-    setSwitch("#ctl-loop", "#val-loop", !s.empty && !!s.loop);
-    setSwitch("#ctl-reverse", "#val-reverse", !s.empty && !!s.reverse);
-    setSeg(s.empty ? 0 : (s.bpm_sync ?? 0));
-    setFader("#ctl-decay", "#val-decay", s.empty ? 127 : s.decay);
-    setFader("#ctl-release", "#val-release", s.empty ? 0 : s.release);
-    setFader("#ctl-tune", "#val-tune", s.empty ? 64 : (s.tune ?? 64), tuneDisplay);
-    setFader("#ctl-level", "#val-level", s.empty ? 101 : s.level, fmtLevel);
-    setFader("#ctl-pan", "#val-pan", s.empty ? 64 : s.pan, fmtPan);
-    setFader("#ctl-semitone", "#val-semitone", s.empty ? 0 : (s.semitone ?? 0), fmtSigned);
-    setFader("#ctl-velo", "#val-velo", s.empty ? 0 : (s.velo_int ?? 0), fmtSigned);
-    setSwitch("#ctl-fx", "#val-fx", !s.empty && s.fx_sw);
+    applySlotControls(s);
 
     // start/end points — editable by dragging the S/E flags on the waveform
     renderPoints(s);
