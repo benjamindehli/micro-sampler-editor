@@ -4,14 +4,14 @@
 // nearest device rate itself). Pure functions, no DOM — unit-tested in plain
 // node (test/audioTools.test.mjs; `npm test`).
 
-// Decode a PCM RIFF/WAVE → { channels: [Float32Array…], rate }. Handles the
-// same shapes the bridge does (native-tools/upload.py): 8/16/24/32-bit integer
-// PCM, mono or stereo. Returns null for anything else (float WAV, >2ch,
-// malformed) so the caller falls back to sending the original bytes untouched.
-export function decodeWavPcm(arrayBuffer) {
-    const dv = new DataView(arrayBuffer);
-    if (dv.byteLength < 44) return null;
-    if (dv.getUint32(0) !== 0x52494646 || dv.getUint32(8) !== 0x57415645) return null;
+// Walk a RIFF/WAVE header's chunks → { format, channels, rate, bits, dataOff,
+// dataLen } (dataOff/dataLen are 0 when there's no data chunk), or null when the
+// input isn't a RIFF/WAVE carrying a fmt chunk. Proper chunk traversal — fixed
+// 44-byte offset assumptions break on files with LIST/INFO chunks before data.
+// The format code is NOT validated here: decodeWavPcm rejects non-PCM itself,
+// while the header-only readers (util.wavFormat, dialogs.riffFormat) accept any.
+export function readWavHeader(dv) {
+    if (dv.byteLength < 12 || dv.getUint32(0) !== 0x52494646 || dv.getUint32(8) !== 0x57415645) return null;
     let off = 12,
         fmt = null,
         dataOff = 0,
@@ -35,8 +35,19 @@ export function decodeWavPcm(arrayBuffer) {
         }
         off += 8 + size + (size & 1);
     }
-    if (!fmt || fmt.format !== 1) return null; // PCM only
-    const { channels, rate, bits } = fmt;
+    return fmt ? { ...fmt, dataOff, dataLen } : null;
+}
+
+// Decode a PCM RIFF/WAVE → { channels: [Float32Array…], rate }. Handles the
+// same shapes the bridge does (native-tools/upload.py): 8/16/24/32-bit integer
+// PCM, mono or stereo. Returns null for anything else (float WAV, >2ch,
+// malformed) so the caller falls back to sending the original bytes untouched.
+export function decodeWavPcm(arrayBuffer) {
+    const dv = new DataView(arrayBuffer);
+    if (dv.byteLength < 44) return null;
+    const h = readWavHeader(dv);
+    if (!h || h.format !== 1) return null; // PCM only
+    const { channels, rate, bits, dataOff, dataLen } = h;
     if (![1, 2].includes(channels) || ![8, 16, 24, 32].includes(bits)) return null;
     const bytes = bits >> 3,
         frameBytes = channels * bytes;

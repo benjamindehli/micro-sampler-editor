@@ -1,4 +1,6 @@
 // Shared helpers: DOM lookup, escaping, formatting, bridge API access.
+import { readWavHeader } from "functions/audioTools.js";
+
 export const $ = (s) => document.querySelector(s);
 
 export const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -62,8 +64,8 @@ export function confirmDialog(title, body, okLabel = "OK") {
 }
 
 export function wavFormat(arrayBuf) {
-    // minimal RIFF/WAVE fmt reader (LE): channels @22, rate @24
-    const dv = new DataView(arrayBuf);
-    if (dv.getUint32(0, false) !== 0x52494646) return null; // 'RIFF'
-    return { channels: dv.getUint16(22, true), rate: dv.getUint32(24, true) };
+    // channels + rate off the shared RIFF/WAVE chunk walk (device WAVs have a
+    // canonical 44-byte header, so a 44-byte slice is enough — see sampleLoad)
+    const h = readWavHeader(new DataView(arrayBuf));
+    return h ? { channels: h.channels, rate: h.rate } : null;
 }

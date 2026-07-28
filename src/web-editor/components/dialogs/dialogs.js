@@ -6,7 +6,7 @@ import { syncPads } from "components/pads/pads.js";
 import { forgetSample } from "components/sample-editor/sampleLoad.js";
 import { openSlice } from "components/sample-editor/slice.js";
 import { showSlot } from "components/sample-editor/slot.js";
-import { decodeWavPcm, encodeWav, processBuffer, toolsActive } from "functions/audioTools.js";
+import { decodeWavPcm, encodeWav, processBuffer, readWavHeader, toolsActive } from "functions/audioTools.js";
 import { noteName } from "functions/notes.js";
 import { slotData, state } from "functions/state.js";
 import { tick } from "functions/ticker.js";
@@ -130,36 +130,11 @@ const preflightSoon = () => {
 };
 for (const id of UD_TOOL_IDS) $("#" + id).addEventListener("input", preflightSoon);
 
-// minimal RIFF/WAVE chunk walk over the file head (proper fmt/data chunks —
-// 44-byte assumptions break on files with LIST/INFO chunks)
+// header fields the pre-flight needs, off the shared RIFF/WAVE chunk walk
 function riffFormat(dv) {
-    try {
-        if (dv.getUint32(0) !== 0x52494646 || dv.getUint32(8) !== 0x57415645) return null; // "RIFF" … "WAVE"
-        let off = 12,
-            ch = 0,
-            rate = 0,
-            bits = 0,
-            dataBytes = 0;
-        while (off + 8 <= dv.byteLength) {
-            const id = dv.getUint32(off),
-                size = dv.getUint32(off + 4, true);
-            if (id === 0x666d7420) {
-                // "fmt "
-                ch = dv.getUint16(off + 10, true);
-                rate = dv.getUint32(off + 12, true);
-                bits = dv.getUint16(off + 22, true);
-            }
-            if (id === 0x64617461) {
-                dataBytes = size;
-                break;
-            } // "data"
-            off += 8 + size + (size & 1);
-        }
-        if (!ch || !rate || !bits) return null;
-        return { channels: ch, rate, bytesPerFrame: ch * (bits >> 3), dataBytes };
-    } catch {
-        return null;
-    }
+    const h = readWavHeader(dv);
+    if (!h || !h.channels || !h.rate || !h.bits) return null;
+    return { channels: h.channels, rate: h.rate, bytesPerFrame: h.channels * (h.bits >> 3), dataBytes: h.dataLen };
 }
 
 // pre-flight: will this WAV fit the device's sample pool? Mirrors the
