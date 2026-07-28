@@ -483,8 +483,8 @@ class Device:
         self.channel = reply[2] & 0x0f
 
     def send_param(self, obj, param, value):
-        self._require_device()
         with self.lock:
+            self._require_device()
             self.ms.send_sysex(P.parameter_change(self.channel, obj, param, value))
 
     def set_bank_settings(self, name, bpm):
@@ -492,9 +492,9 @@ class Device:
         params 0..7, BPM*10 as param 16 — from EditBankParameterAction).
         Batched because 9 separate /api/param round-trips each contend with
         the background reader's lock cycle — user-visibly sluggish."""
-        self._require_device()
         padded = name[:8].ljust(8)
         with self.lock:
+            self._require_device()
             for i, c in enumerate(padded):
                 self.ms.send_sysex(P.parameter_change(self.channel, 0, i,
                                                       ord(c) & 0x7f))
@@ -579,9 +579,9 @@ class Device:
         send the 2 knob assigns (params 2-3) + every effect param (16+i) to
         override. Batched for the same reason bank settings are (per-message
         round-trips contend the reader lock = sluggish)."""
-        self._require_device()
-        ch = self.channel
         with self.lock:
+            self._require_device()
+            ch = self.channel
             self.ms.send_sysex(P.parameter_change(ch, 80, 1, int(fx_type)))
             for k in (0, 1):
                 self.ms.send_sysex(P.parameter_change(ch, 80, 2 + k,
@@ -600,11 +600,11 @@ class Device:
           microSAMPLER's keyboard-mode track sits on global channel + 1).
         `note` (0..127), when given, is the raw MIDI note to send (a real MIDI
         keyboard's full range in keyboard mode); otherwise it is 48 + slot."""
-        self._require_device()
         n = max(0, min(127, int(note))) if note is not None else 48 + max(0, min(35, int(slot)))
-        ch = (self.channel + (1 if keyboard else 0)) & 0x0f
-        status = (0x90 if on else 0x80) | ch
         with self.lock:
+            self._require_device()
+            ch = (self.channel + (1 if keyboard else 0)) & 0x0f
+            status = (0x90 if on else 0x80) | ch
             self.ms.send_short(status, n, max(1, min(127, int(velocity))),
                                cable=self.cable)
 
@@ -612,10 +612,10 @@ class Device:
         """Pitch bend (En bb mm, ±1 octave on the device) — keyboard-mode only,
         so it is sent on the keyboard channel (global + 1) by default. 14-bit
         value 0..16383, centre 8192 (no bend)."""
-        self._require_device()
         value = max(0, min(16383, int(value)))
-        ch = (self.channel + (1 if keyboard else 0)) & 0x0f
         with self.lock:
+            self._require_device()
+            ch = (self.channel + (1 if keyboard else 0)) & 0x0f
             self.ms.send_short(0xE0 | ch, value & 0x7f, (value >> 7) & 0x7f,
                                cable=self.cable)
 
@@ -657,7 +657,6 @@ class Device:
         mm = q*8. Then stream MIDI clock (the sequencer is a slave — clock
         advances it) and send system-realtime Start (0xFA). send_short derives
         the USB-MIDI CIN automatically (0xB CC, 0xF single-byte real-time)."""
-        self._require_device()
         mm = max(0, min(127, int(q) * 8))
         # Always STOP first: a pattern-select (NRPN) doesn't register while the
         # sequencer is running, and a Start during playback just restarts the
@@ -665,20 +664,22 @@ class Device:
         # one. Stop, let the device settle, then select + start the new one.
         self._stop_clock()
         with self.lock:
+            self._require_device()
             self.ms.send_short(0xFC, 0, 0, cable=self.cable)        # MIDI Stop
         time.sleep(0.06)                                        # let the stop land
         self._nrpn(0x01, mm)                                    # select [PATTERN] dial
         self._start_clock(bpm)                                  # advance the slave seq
         time.sleep(0.03)                                        # let AUTO switch to EXT
         with self.lock:
+            self._require_device()
             self.ms.send_short(0xFA, 0, 0, cable=self.cable)        # MIDI Start
         return {'pattern': int(q), 'playing': True}
 
     def stop_pattern(self):
         """Stop sequencer playback on the DEVICE (MIDI Stop, 0xFC) + stop clock."""
-        self._require_device()
         self._stop_clock()
         with self.lock:
+            self._require_device()
             self.ms.send_short(0xFC, 0, 0, cable=self.cable)        # MIDI Stop
         return {'playing': False}
 
@@ -686,10 +687,10 @@ class Device:
         """Set the device's overall output via the Universal Real-Time Master
         Volume SysEx [F0 7F 7F 04 01 vv mm F7] (owner's manual p.46) — 14-bit,
         mm = MSB, max when both 7F. `value` is a 0..127 slider position."""
-        self._require_device()
         v = max(0, min(127, int(value)))
         v14 = round(v / 127 * 0x3FFF)
         with self.lock:
+            self._require_device()
             self.ms.send_sysex(bytes([0xF0, 0x7F, 0x7F, 0x04, 0x01,
                                       v14 & 0x7F, (v14 >> 7) & 0x7F, 0xF7]))
         return {'value': v}
@@ -698,10 +699,10 @@ class Device:
         """All-sound-off safety net for stuck notes / runaway playback: All
         Sound Off (CC#120) + All Note Off (CC#123) on the global channel, MIDI
         Stop, and our clock off. (Manual lists CC#120/123 for exactly this.)"""
-        self._require_device()
         self._stop_clock()
-        cc = 0xB0 | (self.channel & 0x0f)
         with self.lock:
+            self._require_device()
+            cc = 0xB0 | (self.channel & 0x0f)
             self.ms.send_short(cc, 0x78, 0, cable=self.cable)   # All Sound Off
             self.ms.send_short(cc, 0x7B, 0, cable=self.cable)   # All Note Off
             self.ms.send_short(cc, 0x79, 0, cable=self.cable)   # Reset All Controllers
@@ -711,9 +712,9 @@ class Device:
     def _nrpn(self, lsb, data):
         """Send one NRPN on the global channel: MSB 0x20, given LSB, data (CC#06).
         The device's panel buttons/dials are addressed this way (manual p.46)."""
-        self._require_device()
-        cc = 0xB0 | (self.channel & 0x0f)
         with self.lock:
+            self._require_device()
+            cc = 0xB0 | (self.channel & 0x0f)
             self.ms.send_short(cc, 0x63, 0x20, cable=self.cable)    # NRPN MSB
             self.ms.send_short(cc, 0x62, lsb & 0x7f, cable=self.cable)
             self.ms.send_short(cc, 0x06, data & 0x7f, cable=self.cable)  # data MSB
