@@ -38,6 +38,20 @@ only as a fallback): a newer system build — `brew install libusb` /
 the bundled 1.0.26 before the microSAMPLER's USB stack wedges (a device-side
 limit, not a libusb bug). `MSAMPLER_BUNDLED_LIBUSB=1` forces the bundled one.
 
+**Verifying the binaries** — `libusb/CHECKSUMS.txt` records the SHA-256 of each
+shipped library (these are the only opaque blobs in the repo, and they load into
+a root-privileged bridge). Check them with:
+
+```bash
+cd libusb && sha256sum -c CHECKSUMS.txt
+```
+
+Regenerate the list whenever the binaries are refreshed (see below):
+
+```bash
+cd libusb && sha256sum */libusb-1.0.* > CHECKSUMS.txt   # then re-add the header
+```
+
 ## Refreshing these
 
 ```bash

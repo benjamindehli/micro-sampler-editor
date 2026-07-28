@@ -1,0 +1,10 @@
+# SHA-256 of the vendored libusb 1.0.26 binaries — the only opaque blobs the app
+# ships (they load into a root-privileged bridge to claim the USB device, so their
+# integrity is worth being able to verify). Origin: the pyocd `libusb-package`
+# 1.0.26.3 wheels, one platform tag per folder (see ../README.md "Refreshing").
+# Verify from this directory with:  sha256sum -c CHECKSUMS.txt
+76ba6c460edf72db63b6326facbda86606af5d858176932017e90e87f2bc3c28  darwin-x86_64/libusb-1.0.dylib
+7475d65a770d63166bb195c0064b3d9076aefff7283a521a1c6ccd68b88f69e2  darwin-arm64/libusb-1.0.dylib
+ebb607db86f6daf07a6b0c13996e86e9cba701ab745ddcbaa9afb8c2308e36f4  linux-x86_64/libusb-1.0.so
+35c1ffff65a5d058d65181c53b1c4c23348d1fa85b25a3f88d00ffef3e31cc91  linux-aarch64/libusb-1.0.so
+5110843071a8ae319ae3cf7509eccb5898648302614e5b930c8d0e568fcb3d37  win-amd64/libusb-1.0.dll
