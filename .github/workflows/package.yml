@@ -30,7 +30,7 @@ jobs:
         name: Library app (Linux x86_64)
         runs-on: ubuntu-22.04 # oldest LTS runner = widest glibc compatibility
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v7
             - name: Check tag matches package.json
               if: github.event_name == 'release'
               env:
@@ -39,7 +39,7 @@ jobs:
                   PKG="v$(node -p "require('./package.json').version")"
                   test "$TAG" = "$PKG" || { echo "::error::tag $TAG does not match package.json $PKG (run npm version first)"; exit 1; }
                   node tools/stamp-docs-version.mjs --check
-            - uses: actions/setup-python@v6
+            - uses: actions/setup-python@v7
               with:
                   python-version: "3.12"
             - run: pip install 'pyinstaller==6.*' # majors change onedir layout
@@ -96,7 +96,7 @@ jobs:
             APP_LIB: dist/bundle/microSAMPLER Library.app
             APP_ED: dist/bundle/microSAMPLER Editor Librarian.app
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v7
             - name: Check tag matches package.json
               if: github.event_name == 'release'
               env:
@@ -105,7 +105,7 @@ jobs:
                   PKG="v$(node -p "require('./package.json').version")"
                   test "$TAG" = "$PKG" || { echo "::error::tag $TAG does not match package.json $PKG (run npm version first)"; exit 1; }
                   node tools/stamp-docs-version.mjs --check
-            - uses: actions/setup-python@v6
+            - uses: actions/setup-python@v7
               with:
                   python-version: "3.12"
             - run: pip install 'pyinstaller==6.*' # majors change onedir layout
