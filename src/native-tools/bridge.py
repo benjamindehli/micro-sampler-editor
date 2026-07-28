@@ -268,6 +268,7 @@ class Device:
             got = self.lock.acquire(timeout=0.2)
             if not got:
                 continue
+            err = None
             try:
                 if not self.ms:
                     return
@@ -277,9 +278,23 @@ class Device:
                     self._on_sysex(msg)
                 self._scan_cc(midi)
                 self._scan_notes(midi)
+            except Exception as e:
+                err = e
             finally:
                 self.lock.release()
-            time.sleep(0.005)
+            if err is not None:
+                # A real USB error (device glitch/unplug — plain read timeouts
+                # are swallowed inside _read_raw) would otherwise propagate out
+                # of this thread and kill it, silently stopping EVERY live
+                # panel-edit SSE event for the rest of the session. Log it and
+                # back off, but keep looping so the reader recovers if the
+                # device returns; a clean close()/release() still exits us by
+                # setting _stop (and nulling self.ms → the `return` above).
+                sys.stderr.write('  reader: USB read error (%s) — retrying\n'
+                                 % err)
+                time.sleep(0.5)
+            else:
+                time.sleep(0.005)
 
     def _scan_cc(self, midi):
         """Forward Control Change messages as SSE events. The panel's FX EDIT
