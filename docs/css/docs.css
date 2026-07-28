@@ -104,6 +104,7 @@ img {
 }
 .topnav .brand img {
     height: 26px;
+    aspect-ratio: 392 / 232; /* logo.svg viewBox — reserve width so it can't shift the brand on load */
 }
 .topnav .brand b {
     font:
@@ -470,6 +471,7 @@ footer {
 }
 footer .logo {
     height: 26px;
+    aspect-ratio: 392 / 232; /* logo.svg viewBox — reserve width to avoid a load-time shift */
     margin-bottom: 0.6rem;
     opacity: 0.85;
 }
