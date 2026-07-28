@@ -850,15 +850,8 @@ class Device:
                 return None, None
             pcm = DL.fetch_pcm(self.ms, self.channel, hdr['data_size'],
                                progress=False)
-        buf = io.BytesIO()
-        samples = bytearray(pcm[:len(pcm) & ~1])
-        samples[0::2], samples[1::2] = pcm[1::2], pcm[0::2]   # BE -> LE
-        with wave.open(buf, 'wb') as w:
-            w.setnchannels(2 if hdr['stereo'] else 1)
-            w.setsampwidth(2)
-            w.setframerate(hdr['rate_hz'])
-            w.writeframes(bytes(samples))
-        return buf.getvalue(), hdr['tempo_bpm']
+        wav = DL.pcm_to_wav_bytes(pcm, hdr['rate_hz'], hdr['stereo'])
+        return wav, hdr['tempo_bpm']
 
     def upload_wav(self, slot, wav_bytes, name, tempo):
         chans, rate = UL.load_wav(io.BytesIO(wav_bytes))
@@ -1576,6 +1569,22 @@ class Handler(BaseHTTPRequestHandler):
         """The raw request body (Content-Length bytes)."""
         return self.rfile.read(int(self.headers.get('Content-Length', 0)))
 
+    @staticmethod
+    def _slot(s):
+        """Parse+range-check a 0..35 sample slot; the RuntimeError maps to 400."""
+        n = int(s)
+        if not 0 <= n <= 35:
+            raise RuntimeError('slot 0..35')
+        return n
+
+    @staticmethod
+    def _pat(s):
+        """Parse+range-check a 0..15 pattern index; the RuntimeError maps to 400."""
+        n = int(s)
+        if not 0 <= n <= 15:
+            raise RuntimeError('pattern 0..15')
+        return n
+
     def _json_body(self):
         """The request body parsed as JSON ({} when empty)."""
         return json.loads(self._body() or b'{}')
@@ -1640,25 +1649,16 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(DEVICE.patterns_summary())
             m = re.match(r'^/api/pattern/(\d+)\.mid$', path)
             if m:
-                q = int(m.group(1))
-                if not 0 <= q <= 15:
-                    return self._err('pattern 0..15', 400)
-                data = DEVICE.pattern_mid(q)
+                data = DEVICE.pattern_mid(self._pat(m.group(1)))
                 if data is None:
                     return self._err('pattern is empty', 404)
                 return self._bytes(data, 'audio/midi')
             m = re.match(r'^/api/sample/(\d+)/params$', path)
             if m:
-                slot = int(m.group(1))
-                if not 0 <= slot <= 35:
-                    return self._err('slot 0..35', 400)
-                return self._json(DEVICE.sample_params(slot))
+                return self._json(DEVICE.sample_params(self._slot(m.group(1))))
             m = re.match(r'^/api/sample/(\d+)\.wav$', path)
             if m:
-                slot = int(m.group(1))
-                if not 0 <= slot <= 35:
-                    return self._err('slot 0..35', 400)
-                data, tempo = DEVICE.download_wav(slot)
+                data, tempo = DEVICE.download_wav(self._slot(m.group(1)))
                 if data is None:
                     return self._err('slot is empty', 404)
                 extra = {'X-Sample-Tempo': tempo} if tempo else None
@@ -1731,10 +1731,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(DEVICE.swap_samples(a, bb))
             m = re.match(r'^/api/sample/(\d+)/clear$', path)
             if m:
-                slot = int(m.group(1))
-                if not 0 <= slot <= 35:
-                    return self._err('slot 0..35', 400)
-                return self._json(DEVICE.clear_sample(slot))
+                return self._json(DEVICE.clear_sample(self._slot(m.group(1))))
             if path == '/api/effect':
                 body = self._json_body()
                 knobs = body.get('knobs', [0, 0])
@@ -1788,9 +1785,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(DEVICE.panic())
             m = re.match(r'^/api/pattern/(\d+)/play$', path)
             if m:
-                q = int(m.group(1))
-                if not 0 <= q <= 15:
-                    return self._err('pattern 0..15', 400)
+                q = self._pat(m.group(1))
                 body = self._json_body()
                 return self._json(DEVICE.play_pattern(q, float(body.get('bpm', 120))))
             if path == '/api/backup':
@@ -1812,16 +1807,12 @@ class Handler(BaseHTTPRequestHandler):
             m = re.match(r'^/api/backup/(.+)/restore-sample$', path)
             if m:
                 body = self._json_body()
-                to = int(body['to'])
-                if not 0 <= to <= 35:
-                    return self._err('slot 0..35', 400)
+                to = self._slot(body['to'])
                 wav, name, tempo = backup_sample_wav(m.group(1), int(body['from']))
                 return self._json(DEVICE.upload_wav(to, wav, name, tempo))
             m = re.match(r'^/api/pattern/(\d+)(/init)?$', path)
             if m:
-                q = int(m.group(1))
-                if not 0 <= q <= 15:
-                    return self._err('pattern 0..15', 400)
+                q = self._pat(m.group(1))
                 if m.group(2):                       # /init: factory pattern,
                     old = DEVICE.pattern_cache.get(q)  # keep sample assignment
                     par = P.parse_pattern(old) if old else None   # None if the
@@ -1833,9 +1824,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(DEVICE.pattern_write(q, blob))
             m = re.match(r'^/api/sample/(\d+)/name$', path)
             if m:
-                slot = int(m.group(1))
-                if not 0 <= slot <= 35:
-                    return self._err('slot 0..35', 400)
+                slot = self._slot(m.group(1))
                 body = self._json_body()
                 name = str(body.get('name', '')).strip()
                 if not name:
@@ -1844,9 +1833,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(DEVICE.rename(slot, name, long_name))
             m = re.match(r'^/api/sample/(\d+)/points$', path)
             if m:
-                slot = int(m.group(1))
-                if not 0 <= slot <= 35:
-                    return self._err('slot 0..35', 400)
+                slot = self._slot(m.group(1))
                 body = self._json_body()
                 start, end = int(body['start']), int(body['end'])
                 if not 0 <= start < end:
@@ -1854,9 +1841,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(DEVICE.set_points(slot, start, end))
             m = re.match(r'^/api/sample/(\d+)/tempo$', path)
             if m:
-                slot = int(m.group(1))
-                if not 0 <= slot <= 35:
-                    return self._err('slot 0..35', 400)
+                slot = self._slot(m.group(1))
                 body = self._json_body()
                 try:
                     bpm = float(body['bpm'])
@@ -1867,9 +1852,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(DEVICE.set_tempo(slot, bpm))
             m = re.match(r'^/api/sample/(\d+)$', path)
             if m:
-                slot = int(m.group(1))
-                if not 0 <= slot <= 35:
-                    return self._err('slot 0..35', 400)
+                slot = self._slot(m.group(1))
                 wav = self._body()
                 name = params.get('name', 'SAMPLE')[:8].upper()
                 tempo = float(params.get('tempo', '120'))

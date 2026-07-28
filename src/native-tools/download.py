@@ -25,7 +25,7 @@ Usage (CoreMIDI owns the interface, so sudo):
   sudo python3 download.py 0 --header-only    # phase 1 only (safest probe)
   sudo python3 download.py 0 --no-data        # header + params, skip PCM
 """
-import argparse, array, sys, time, wave
+import argparse, array, io, sys, time, wave
 
 from msusb import MicroSampler, from_usb_midi, _hex, PACKET, EP_IN
 import protocol as P
@@ -140,18 +140,31 @@ def fetch_params(ms, channel, sample_no):
     return par
 
 
-def write_wav(path, pcm, rate_hz, stereo):
+def be_pcm_to_le(pcm):
     # Wire PCM is 16-bit signed BIG-endian (setByPackedData: first byte << 8);
-    # WAV wants little-endian, so swap.
+    # WAV wants little-endian, so swap. array.byteswap is fast and portable —
+    # audioop.byteswap was removed in Python 3.13, so don't reach for it.
     samples = array.array('h')
     samples.frombytes(pcm[:len(pcm) & ~1])
     if sys.byteorder == 'little':
         samples.byteswap()
-    with wave.open(path, 'wb') as w:
+    return samples.tobytes()
+
+
+def pcm_to_wav_bytes(pcm, rate_hz, stereo):
+    """Wrap big-endian device PCM as a little-endian 16-bit WAV (bytes)."""
+    buf = io.BytesIO()
+    with wave.open(buf, 'wb') as w:
         w.setnchannels(2 if stereo else 1)
         w.setsampwidth(2)
         w.setframerate(rate_hz)
-        w.writeframes(samples.tobytes())
+        w.writeframes(be_pcm_to_le(pcm))
+    return buf.getvalue()
+
+
+def write_wav(path, pcm, rate_hz, stereo):
+    with open(path, 'wb') as f:
+        f.write(pcm_to_wav_bytes(pcm, rate_hz, stereo))
 
 
 def main():
