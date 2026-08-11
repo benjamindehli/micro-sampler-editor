@@ -248,6 +248,7 @@ img {
     gap: 0.7rem;
     margin-top: 1.3rem;
     align-items: center;
+    justify-content: center;
 }
 .cta {
     display: inline-block;
@@ -274,6 +275,7 @@ img {
 .hero .social {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 0.5rem;
     margin-top: 0.7rem;
 }
