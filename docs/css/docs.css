@@ -270,6 +270,29 @@ img {
     background: var(--steel-3);
     border-color: var(--line-hi);
 }
+/* secondary hero row: the small GitHub star/follow buttons */
+.hero .social {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.7rem;
+}
+.hero .social a:hover {
+    text-decoration: none;
+}
+.cta.small {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.72rem;
+    padding: 0.5rem 0.8rem;
+}
+.cta.small svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+    flex: none;
+}
 
 /* ── home: cards linking to the sub-pages / highlighting features ─────── */
 .cards {
