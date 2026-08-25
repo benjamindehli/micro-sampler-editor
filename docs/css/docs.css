@@ -79,6 +79,17 @@ a {
 a:hover {
     text-decoration: underline;
 }
+/* WCAG 1.4.1 / Lighthouse "links rely on colour to be distinguishable":
+   amber-on-ink is under the 3:1 required against surrounding body text, so a
+   link embedded in a RUN OF TEXT needs a second cue — underline it. Links that
+   stand alone (nav, TOC, .cta buttons, .card blocks, heading anchors) aren't
+   inside text and keep their own affordance. :where() keeps specificity at
+   (0,2,1) so the opt-outs below can still win. */
+.content :where(p, li, dd, dt, td, th, blockquote, figcaption) a:not(.cta):not(.anchor) {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.15em;
+}
 img {
     max-width: 100%;
     height: auto;
@@ -202,9 +213,15 @@ img {
 .toc li {
     margin: 0.18rem 0;
 }
-.toc a {
+/* .content-scoped so it outranks the prose-underline rule: the TOC is a list of
+   links, not prose, so it keeps the hover-only underline */
+.content .toc a {
     color: var(--amber-hi);
     font-size: 0.9rem;
+    text-decoration: none;
+}
+.content .toc a:hover {
+    text-decoration: underline;
 }
 @media (max-width: 560px) {
     .toc ul {
