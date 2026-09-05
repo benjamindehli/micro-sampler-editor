@@ -12,6 +12,8 @@ It should be able to do everything I used the original editor for, and it also a
 
 **[Full documentation & guide →](https://benjamindehli.github.io/microsampler-editor-librarian/)**
 
+Also listed on [KVR Audio](https://www.kvraudio.com/product/microsampler-editor-librarian-by-dehli-musikk).
+
 ## Download
 
 ### macOS (13+)
